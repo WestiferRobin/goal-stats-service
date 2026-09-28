@@ -11,6 +11,15 @@ def test_built_system_swagger_and_openapi(smoke_client):
     assert "SwaggerUIBundle" in js
     spec, _ = smoke_client.request("/swagger/v1/swagger.json")
     assert set(spec["paths"]) == {
+        "/api/v1/teams",
+        "/api/v1/predictions",
+        "/api/v1/snapshots",
+        "/api/v1/snapshots/{snapshot_id}",
+        "/api/v1/history",
+        "/api/v1/insights",
+        "/api/v1/backtests",
+        "/api/v1/tournaments/simulate",
+        "/api/v1/live/refresh",
         "/health",
         "/ready",
         "/items",

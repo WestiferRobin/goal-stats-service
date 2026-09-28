@@ -1,0 +1,14 @@
+team1,team2,actual_winner,final_team1_goals,final_team2_goals,snapshot_minute,snapshot_extra_minute,match_status_short,match_status_long,snapshot_team1_goals,snapshot_team2_goals,team1_possession,team2_possession,team1_total_shots,team2_total_shots,team1_shots_on_target,team2_shots_on_target,team1_big_chances,team2_big_chances,team1_defender_blocks,team2_defender_blocks,team1_goalkeeper_saves,team2_goalkeeper_saves,team1_corners,team2_corners,team1_yellow_cards,team2_yellow_cards,team1_red_cards,team2_red_cards,team1_bad_star,team2_bad_star
+Spain,England,Spain,1,0
+Sweden,Australia,Sweden,2,0
+Spain,Sweden,Spain,2,1
+Australia,England,England,1,3
+Spain,Netherlands,Spain,2,1
+Japan,Sweden,Sweden,1,2
+England,Colombia,England,2,1
+Australia,Denmark,Australia,2,0
+France,Morocco,France,4,0
+Colombia,Jamaica,Colombia,1,0
+Netherlands,South Africa,Netherlands,2,0
+Japan,Norway,Japan,3,1
+Switzerland,Spain,Spain,1,5

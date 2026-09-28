@@ -11,6 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from models.action import Action
+from models.football import FootballHistory, FootballSnapshot, FootballTeam
 from models.item import Item
 from settings.database import DatabaseSettings
 
@@ -53,6 +54,8 @@ def is_ready(database: Database) -> bool:
                 return False
             connection.execute(select(Item).limit(1)).all()
             connection.execute(select(Action).limit(1)).all()
+            for model in (FootballTeam, FootballHistory, FootballSnapshot):
+                connection.execute(select(model).limit(1)).all()
             return True
     except (SQLAlchemyError, OSError, CommandError):
         return False

@@ -7,7 +7,20 @@ def test_exact_route_and_openapi_resource_contract(app):
         "/items/{item_id}/actions": {"get", "post"},
     }
     spec = app.test_client().get("/swagger/v1/swagger.json").json
-    assert set(spec["paths"]) == set(expected) | {"/health", "/ready"}
+    football = {
+        "/api/v1/teams": {"get"},
+        "/api/v1/predictions": {"post"},
+        "/api/v1/snapshots": {"get", "post"},
+        "/api/v1/snapshots/{snapshot_id}": {"get"},
+        "/api/v1/history": {"get"},
+        "/api/v1/insights": {"get"},
+        "/api/v1/backtests": {"get"},
+        "/api/v1/tournaments/simulate": {"post"},
+        "/api/v1/live/refresh": {"post"},
+    }
+    assert set(spec["paths"]) == set(expected) | set(football) | {"/health", "/ready"}
+    for path, methods in football.items():
+        assert set(spec["paths"][path]) - {"parameters"} == methods
     for path, methods in expected.items():
         operations = spec["paths"][path]
         assert set(operations) - {"parameters"} == methods

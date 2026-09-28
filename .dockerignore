@@ -14,3 +14,7 @@
 !mypy.ini
 **/__pycache__
 **/*.pyc
+!sql/
+!sql/**
+!data/
+!data/**

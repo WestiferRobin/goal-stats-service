@@ -26,9 +26,18 @@ def test_fresh_alembic_history_upgrade_downgrade_and_model_agreement(
     command.upgrade(config, "head")
     command.current(config)
     command.check(config)
-    assert set(Base.metadata.tables) == {"items", "actions"}
+    assert set(Base.metadata.tables) == {
+        "items",
+        "actions",
+        "football_teams",
+        "football_history",
+        "football_snapshots",
+    }
     assert set(inspect(postgres_app.extensions["goalstats_database"].engine).get_table_names()) == {
         "alembic_version",
+        "football_teams",
+        "football_history",
+        "football_snapshots",
         "items",
         "actions",
     }

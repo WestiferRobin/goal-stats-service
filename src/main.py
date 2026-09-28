@@ -35,16 +35,19 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from exceptions.handlers import register_error_handlers, request_validation
+from football.cli import register_commands
 from infra.caches.action import ActionCache
 from infra.caches.item import ItemCache
 from infra.resources.db import Database, is_ready
 from infra.resources.redis import RedisCache
 from routers.action import create_actions_blueprint
+from routers.football import create_football_blueprint
 from routers.infra import create_health_blueprint
 from routers.item import create_items_blueprint
 from routers.openapi import create_docs_blueprint
 from schemas.problem import ProblemDetailSchema
 from services.action import ActionService
+from services.football import FootballService
 from services.item import ItemService
 from settings.base import ConfigurationError
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
@@ -83,11 +86,11 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     action_service = ActionService(database, action_cache)
     if settings.redis.url is None:
         app.logger.warning("Redis is unconfigured; database fallback is available")
-    app.register_api(
-        create_health_blueprint(database, cache, settings.redis.cache_key_prefix)
-    )
+    app.register_api(create_health_blueprint(database, cache, settings.redis.cache_key_prefix))
     app.register_api(create_items_blueprint(item_service))
     app.register_api(create_actions_blueprint(action_service))
+    app.register_api(create_football_blueprint(FootballService(database)))
+    register_commands(app, database)
     register_error_handlers(app)
     if settings.core.openapi_enabled:
         app.register_blueprint(create_docs_blueprint(app))

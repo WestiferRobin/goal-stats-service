@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from settings.base import ConfigurationError, Environment, port
 
 SERVICE = "goalstats-template-py"
-API_TITLE = "GoalStats Template API"
+API_TITLE = "GoalStats Monolith API"
 API_VERSION = "v1"
 LOGGER_NAME = "goalstats_template"
 POLICY_DEFAULTS = {"LOG_LEVEL": "INFO", "OPENAPI_ENABLED": "true"}

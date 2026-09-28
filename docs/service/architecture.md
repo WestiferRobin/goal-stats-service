@@ -1,4 +1,11 @@
-# Reference architecture
+# Monolithic backend architecture
+
+The [football domain](football.md) is hosted in the same process and PostgreSQL
+database as the compatibility Item/Action resources below. Football uses the shared
+Database transaction boundary directly; its pure prediction model has no Flask or
+provider dependencies. PostgreSQL replaces browser-session timelines, CSV appends
+and per-worker live caches. All modules deploy together.
+
 
 ```text
 Route → Service → Repository → SQLAlchemy Session → PostgreSQL

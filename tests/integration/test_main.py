@@ -115,7 +115,9 @@ def audit(event, args):
 sys.addaudithook(audit)
 from main import create_app
 from models.base import Base
-assert set(Base.metadata.tables) == {'items', 'actions'}
+assert set(Base.metadata.tables) == {
+    'items', 'actions', 'football_teams', 'football_history', 'football_snapshots'
+}
 app = create_app({'APP_ENV': 'test', 'DATABASE_URL': 'postgresql://u:p@127.0.0.1:1/goalstats_test_import'})
 assert app.test_client().get('/health').text == 'Healthy'
 app.extensions['goalstats_database'].dispose()

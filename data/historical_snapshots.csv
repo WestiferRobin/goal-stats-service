@@ -1,0 +1,4 @@
+team1,team2,snapshot_minute,snapshot_extra_minute,match_status_short,match_status_long,snapshot_team1_goals,snapshot_team2_goals,team1_possession,team2_possession,team1_total_shots,team2_total_shots,team1_shots_on_target,team2_shots_on_target,team1_big_chances,team2_big_chances,team1_defender_blocks,team2_defender_blocks,team1_goalkeeper_saves,team2_goalkeeper_saves,team1_corners,team2_corners,team1_yellow_cards,team2_yellow_cards,team1_red_cards,team2_red_cards,team1_bad_star,team2_bad_star,actual_winner,final_team1_goals,final_team2_goals
+France,England,53,0,2H,Second Half,1,4,44,56,7,12,3,7,0,0,2,4,2,2,2,3,0,0,0,0,False,False,,,
+France,England,61,0,2H,Second Half,2,4,44,56,8,13,4,7,0,0,2,4,2,2,2,3,0,0,0,0,False,False,,,
+France,England,68,0,2H,Second Half,3,4,45,55,12,15,7,8,0,0,2,5,3,4,2,4,0,0,0,0,False,False,,,

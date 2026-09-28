@@ -1,8 +1,13 @@
-# GoalStats Flask service template
+# GoalStats monolithic backend
 
 Python 3.12, Flask/Gunicorn, PostgreSQL/SQLAlchemy/Alembic, Redis,
-Pydantic/flask-openapi3 and pytest. Item + Action are the reference domain.
+Pydantic/flask-openapi3 and pytest. RoadToTheFinal football predictions, history,
+live updates and tournaments run in this application with one database.
+Item + Action remain compatibility routes. Source CSV datasets live in `data/`.
 Flat `src/`; factory: `main:create_app()`; one pinned `requirements.txt`.
+
+See the [football API and import guide](docs/service/football.md) and
+[standalone SQL scripts](sql/README.md). The same API supports React or Wix server code.
 
 ## First time: host / IDE development
 
@@ -15,6 +20,7 @@ make setup
 make doctor
 make providers
 make migrate
+PYTHONPATH=src .venv/bin/python -m football.import_data
 .venv/bin/python src/main.py
 ```
 
