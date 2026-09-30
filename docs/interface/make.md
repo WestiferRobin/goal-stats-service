@@ -7,32 +7,29 @@ The root Makefile defines shared variables and includes these modules:
 | --- | --- |
 | `install.mk` | `setup` |
 | `doctor.mk` | `doctor` |
-| `dev.mk` | `build`, `run`, `stop`, `logs` |
+| `dev.mk` | `dev`, `init`, `seed`, `quick-test`, `providers`, `providers-stop`, `build`, `run`, `stop`, `logs` |
 | `db.mk` | `migrate`, `migration`, `migration-check` |
-| `test.mk` | `unit`, `integration`, `test`, `smoke` |
+| `test.mk` | `unit`, `integration`, `test`, `smoke`, `test-providers` |
 | `coverage.mk` | `coverage` |
-| `ci.mk` | `check`, `tooling`, `certify` |
+| `ci.mk` | `check`, `tooling`, `certify`, `certify-host` |
 
 `make help` groups the interface. `ENV=local` is the default; runtime/database
 commands accept `ENV=local|dev` and reject unknown values. TEST is internally managed.
 `PYTHON=python3.12` can select the host interpreter. Application dependencies are
-installed in Docker from the one pinned `requirements.txt` using pip.
+installed in `.venv` for host work and in Docker for containers from the one pinned `requirements.txt` using pip.
+
+For new contributors, start with the [README](../../README.md#run-locally).
 
 ```sh
-make setup
-make doctor
-make build ENV=local
-make migrate ENV=local
-make run ENV=local
-make logs ENV=local
-make stop ENV=local
-make build ENV=dev
-make migrate ENV=dev
-make run ENV=dev
-make stop ENV=dev
-make migration MESSAGE="describe the change"
-make migration-check ENV=local
+make dev          # prepare LOCAL and run the host app
+# Ctrl-C stops Flask
+make providers-stop
 ```
+
+For IDE use: `make init`, then Run/Debug `src/main.py`. `make seed` imports CSVs
+into an already migrated LOCAL database. `make quick-test` runs host unit tests.
+The detailed Docker/database commands below remain available for maintenance.
+
 
 `setup` creates/reuses Python 3.12 `.venv`, installs/verifies the pinned requirements,
 and creates `.env.local` and `.env.test`, preserves valid canonical files, and safely migrates legacy configuration. `doctor` only diagnoses: venv/version/pins/pip consistency, Docker, both configuration
@@ -68,8 +65,20 @@ successful suites. Commands propagate failures and do not stage, commit, or depl
 owns `certify-host`; Python orchestration implements them. Provider targets reject
 `ENV=dev`. Normal `integration`, `test`, `migrate`, `smoke`, and `certify` retain their
 existing workflows. Host certification is additive and allocates its own ports.
-See the [README workflow](../../README.md#first-time-host--ide-development) for initial IDE setup.
+See the [README workflow](../../README.md#run-locally) for initial IDE setup.
 
-After `providers ENV=local` and `migrate ENV=local`, run/debug `src/main.py` directly:
+After `make init`, run/debug `src/main.py` directly:
 it derives host URLs from canonical `.env.local` without IDE environment configuration. No `make ide`
-command is needed. Rebuild an existing image when dependencies or migrations change.
+command is needed. Host preparation uses current source; Docker workflows require image rebuilds.
+
+## Everyday LOCAL shortcuts
+
+- `make dev`: setup, start LOCAL providers, apply host-code migrations, import `data/`,
+  then run Flask in the foreground. Ctrl-C stops the app; `make providers-stop` stops providers.
+- `make init`: the same preparation without launching Flask, for IDE Run/Debug.
+- `make seed`: import CSVs into the existing LOCAL database, preserving existing rows.
+- `make quick-test`: host unit suite using `.venv`, without Docker or providers.
+
+These commands reject `ENV=dev`. The migration/import/app subprocesses use the same
+canonical LOCAL configuration; ambient database overrides cannot redirect the shortcuts.
+Failures stop the sequence before app startup. Existing advanced commands are unchanged.

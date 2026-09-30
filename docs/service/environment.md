@@ -5,8 +5,8 @@ There are two human-facing files per service, both ignored and private:
 - `.env.local`: machine credentials, ports and LOCAL/DEV preferences.
 - `.env.test`: TEST policy only. It cannot specify provider endpoints or ownership.
 
-`make setup` creates missing files. Never copy an example or enter credentials in
-an IDE. The authoritative keys, defaults and validation live in
+`make setup` (also run by `make dev` and `make init`) creates missing files.
+Database and Redis credentials are derived automatically; do not add their URLs to an IDE. The authoritative keys, defaults and validation live in
 the concern modules `settings/core.py`, `settings/database.py`, and `settings/redis.py`.
 `settings/environment.py` owns private parsing, source selection and typed composition;
 `settings/base.py` contains only common errors, environment/context types and primitives.
@@ -62,7 +62,7 @@ Generic dotenv discovery and production/cloud configuration are not part of this
 `Settings` contains frozen `CoreSettings`, `DatabaseSettings`, and `RedisSettings`.
 The factory accepts this object, an explicit string mapping, or no argument.
 A supplied mapping never merges with ambient environment; no argument reads process
-configuration only. Neither path discovers machine files. Direct main alone calls
+configuration only. Neither path discovers machine files. Direct main and explicit host database/import commands call
 `load_local()` and passes its validated object to the factory without reparsing.
 
 Generic factory configuration defaults OpenAPI to disabled; machine and TEST policy
@@ -70,3 +70,22 @@ default it to enabled. Redis may be omitted/disabled, preserving database fallba
 No settings singleton, dotenv loader, or pydantic-settings dependency is used.
 Pydantic defines API schemas; settings remain dependency-light validated dataclasses.
 Port probes and provider diagnostics belong to direct startup in `main.py`.
+
+## Optional live API credential
+
+`API_FOOTBALL_KEY` is read from the server process environment on live refresh.
+It is separate from `.env.local` and `.env.test`, whose parsers accept only their
+supported keys. Generic `.env` files, including RoadToTheFinal's ignored `.env`,
+are not loaded by this backend. Get the credential through your team's private
+channel and set it in the terminal environment before `make dev`, or in your
+local IDE Run configuration. Do not commit the value or put it in frontend code.
+
+The current Compose files do not forward this variable automatically; container
+live access requires explicit secret/environment injection. The key is optional
+for setup, CSV imports, predictions and backtests. A valid key does not guarantee
+a live fixture exists for the chosen teams.
+
+The `dev`, `init` and `seed` shortcuts pin database settings to LOCAL machine
+configuration. Direct Python startup still supports the validated process overrides
+described above. `make dev` is a host workflow; `ENV=dev` selects the separate
+Docker DEV environment only on commands that support it.

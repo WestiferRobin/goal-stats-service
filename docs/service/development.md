@@ -1,5 +1,13 @@
 # Developer workflow
 
+For initial setup and a first API request, follow the [README](../../README.md#run-locally).
+Use `make dev` for terminal development or `make init` followed by IDE Run/Debug.
+Both prepare dependencies, LOCAL providers, migrations and CSV data. This page
+covers the details and advanced Docker workflows.
+
+The host app uses port **5300** by default. The table below describes the separate
+Docker app modes: LOCAL Docker uses **5100**, and DEV Docker uses **5200**.
+
 `Makefile` includes responsibility-focused `make/*.mk` fragments, which delegate to `scripts/workflow.py`, a standard-library Python orchestrator.
 It owns configuration parsing, Compose selection, child process handling, readiness,
 and cleanup. There is no duplicated shell workflow or dotenv shell evaluation.
@@ -23,14 +31,15 @@ provider pair and network. Provider fixtures additionally use unique Redis prefi
 Both persistent stacks have completely new Python identities. PostgreSQL 17 and
 Redis 7.4 versions/digests are shared across all three Compose files.
 
-## Setup and normal development
+## Advanced Docker development
 
 Run `make setup` twice safely: existing files and values are preserved. It verifies
 Docker/Compose, Make and host Python, creates/reuses `.venv`, installs/verifies pinned requirements, creates missing private environment files,
 and prints next steps. Fresh setup starts no containers. Legacy migration may briefly
 start an existing PostgreSQL provider to verify its credentials, then restore its stopped state.
 Setup modifies no application source.
-Build, migrate, then run the selected stack. DEV uses two synchronous Gunicorn workers,
+For Docker application mode, build, migrate, then run the selected stack.
+Import football data explicitly using the [container import command](football.md#start-and-import). DEV uses two synchronous Gunicorn workers,
 30-second request timeout and 10-second graceful shutdown, with a 15-second Compose
 stop grace period and an init process for signal forwarding/reaping.
 
@@ -108,22 +117,18 @@ run after checking ownership. Pre-existing developer resources must be preserved
 
 Run `make doctor` after setup for read-only Python 3.12/venv/dependencies, TEST policy, ports, Docker/Compose, repository
 file, and private configuration checks. Missing configuration is a diagnostic;
-only `make setup` creates it. See [Make interface](../interface/make.md).
+`make setup`, `make init`, and `make dev` can create it. See [Make interface](../interface/make.md).
 
 `make certify` runs quality, tooling tests, application coverage, built DEV pytest
 smoke, and lifecycle/failure checks. It does not commit or publish. See
-[certification](../testing/certification.md). Templates evolve here first;
-parent workspace adoption is a separate reviewed change.
+[certification](../testing/certification.md). Parent workspace changes are separate from this backend workflow.
 
 ## IDE DEVELOPMENT
 
 Use Python **3.12**, repository `.venv/bin/python`, and only `requirements.txt`.
-Run `make setup` for the interpreter, dependencies and configuration.
-`make providers` starts PostgreSQL and Redis only,
-waits for health, verifies loopback bindings and PostgreSQL authentication, and
-validates canonical configuration. It reuses the existing LOCAL project and DB volume.
-It neither migrates nor starts Flask. Next run `make migrate ENV=local`, then
-Run/Debug `src/main.py`. Rebuild an existing image after dependency/migration changes.
+Run `make init` to prepare the interpreter, dependencies, configuration, providers,
+migrations and CSV data. Then Run/Debug `src/main.py`. `make init` reuses the LOCAL
+project and PostgreSQL volume and does not start Flask.
 
 | Setting | PyCharm | VS Code |
 | --- | --- | --- |
@@ -150,19 +155,18 @@ full LOCAL app: use `make stop ENV=local` before switching from full Docker LOCA
 Stop the host IDE process before stopping its providers. DEV/ordinary TEST do not
 publish provider ports.
 
-Migration builds a missing runtime image automatically. Rebuild an existing image
-after requirements or migration changes; migrate initially and
-for new revisions. Host source edits need a restart, not a Docker rebuild. Repeat
-`make setup` when requirements change. Docker DEV still requires source rebuilds.
-`make migrate ENV=local` remains canonical; explicit host Alembic environment is
-optional. Host and Docker derive URLs from the same `.env.local` machine configuration.
+`make init` and `make dev` apply migrations from current host source and recheck
+requirements. Restart the host app after source edits. These commands need no
+application Docker image. For the advanced `make migrate` Docker command, rebuild
+an existing image after requirements or migration changes. Docker DEV also needs
+a source rebuild. Both paths derive credentials from the same `.env.local`.
 
 Run `make setup` to migrate legacy configuration safely. Conflicting values are refused.
 Changing `.env.local` does **not** rotate passwords in an existing PostgreSQL volume.
 Never delete a data volume to resolve an environment mismatch.
 
-For Docker-free tests, run `.venv/bin/python -m pytest tests/unit`, a unit folder,
-a file, or a `path::test_name` node. Do not attach the LOCAL app env file to pytest.
+For Docker-free tests, run `make quick-test`. To narrow the run, use
+`.venv/bin/python -m pytest` with a unit folder, file, or `path::test_name` node. Do not attach the LOCAL app env file to pytest.
 Use `make integration` normally; `make test-providers` is optional for individual
 IDE integration tests and must remain running. See [test ownership](../testing/overview.md).
 
@@ -175,9 +179,10 @@ defaults. Invalid overrides and non-loopback provider URLs fail; FLASK_DEBUG can
 enable Flask debugging. Missing configuration directs you to setup, then providers.
 PostgreSQL unavailability refuses startup with a credential-free message. Reachable
 but unmigrated databases allow startup with migration guidance and Unhealthy readiness.
-Redis unavailability retains database fallback and Degraded readiness. Startup never
-migrates or starts Docker. An occupied app port produces an actionable error.
+Redis unavailability retains database fallback and Degraded readiness. Direct Python startup never
+migrates or starts Docker; `make dev` performs preparation first. An occupied app port produces an actionable error.
 
 The file path is relative to the repository, not cwd: plain Python script Run works
 from the repository root or `src/`. Imported factory, unit/integration tests, Alembic,
-and Docker never invoke this loader. Do not attach LOCAL host config to pytest.
+and Docker do not implicitly invoke this loader. Explicit host database/import
+commands use it to select LOCAL configuration. Do not attach LOCAL host config to pytest.

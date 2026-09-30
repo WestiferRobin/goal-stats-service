@@ -22,6 +22,13 @@ from environment_setup import setup_files
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE = "goalstats-template-py:tooling"
 HELP = """GoalStats Flask — host/IDE first; Python 3.12 + Make + running Docker/Compose required.
+EVERYDAY  make dev                   Setup, providers, migrate, import CSVs, run host app
+          make init                  Same preparation without starting Flask (for IDE users)
+          make seed                  Import root data/ CSVs; preserve existing rows
+          make quick-test            Fast host unit tests; no Docker required
+          make providers-stop        After Ctrl-C: stop providers, keep database data
+
+ADVANCED COMMANDS
 SETUP     make setup                 Create/reuse .venv, install pins, prepare private env files
           make doctor                Read-only Python/dependencies/config/Docker/port diagnosis
 HOST      make providers             Healthy LOCAL PostgreSQL + Redis; no app/migration
@@ -46,7 +53,8 @@ RELEASE   make smoke                 Built disposable DEV HTTP smoke
 SHUTDOWN  make providers-stop        Stop LOCAL providers only; preserve database data
           make stop                  Remove selected Docker containers/network; preserve DB
 Default ENV=local. Docker/database commands also accept ENV=dev; providers are LOCAL only.
-Run setup once; daily: providers -> IDE Run. Rebuild/migrate after relevant changes.
+Start Docker Desktop, then make dev. IDE users: make init, then IDE Run.
+Dev/init apply LOCAL migrations and import CSVs explicitly before starting the app.
 TEST is automatic. Release checks are heavier. No command stages, commits or publishes.
 """
 
@@ -155,7 +163,7 @@ def setup(directory=ROOT):
                     stack.compose("rm", "-f", "postgres")
 
     setup_files(directory, has_volume=has_volume, verify=verify)
-    print("Next: make doctor; make providers; make migrate; run .venv/bin/python src/main.py")
+    print("Setup ready. Use make dev to prepare the database and start the app.")
 
 
 def read_settings(path, mode="local"):
@@ -446,6 +454,39 @@ def doctor():
     print("Doctor: PASS (read-only)")
 
 
+def local_workflow(command):
+    """One LOCAL workflow using the checked-in host code, not a stale Docker image."""
+    from python_environment import verify
+
+    if command in {"dev", "init"}:
+        setup()
+    else:
+        verify(ROOT)
+    interpreter = ROOT / ".venv/bin/python"
+    if command == "quick-test":
+        run([interpreter, "-m", "pytest", "tests/unit", "-q"])
+        return
+
+    from host_development import local_providers
+
+    stack = Stack("local")
+    # Use the same configured LOCAL database for providers, migrations, import and app.
+    environment = {k: v for k, v in os.environ.items() if k not in schema.DIRECT_KEYS}
+    environment.update(schema.application(stack.settings, "local", host=True))
+    environment["PYTHONPATH"] = str(ROOT / "src")
+    if command == "seed":
+        run([interpreter, "-m", "football.import_data"], env=environment)
+        return
+    local_providers(stack)
+    run([interpreter, ROOT / "scripts/prepare_local_database.py"], env=environment)
+    url = f"http://127.0.0.1:{environment['HOST_APP_PORT']}/swagger"
+    if command == "init":
+        print(f"LOCAL prepared. Run src/main.py in your IDE; Swagger: {url}")
+    else:
+        print(f"Starting LOCAL: {url}\nStop with Ctrl-C; then make providers-stop.", flush=True)
+        run([interpreter, ROOT / "src/main.py"], env=environment)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command")
@@ -457,6 +498,10 @@ def main():
     command = args.command
     if command == "help":
         print(HELP)
+    elif command in {"dev", "init", "seed", "quick-test"}:
+        if args.env != "local":
+            raise RuntimeError(f"make {command} requires ENV=local")
+        local_workflow(command)
     elif command == "setup":
         setup()
     elif command == "doctor":

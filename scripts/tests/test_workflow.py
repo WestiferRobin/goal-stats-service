@@ -163,3 +163,70 @@ def test_default_collection_excludes_smoke():
     assert result.returncode == 0, result.stderr
     assert "tests/smoke/" not in result.stdout
     assert "tests/unit/" in result.stdout and "tests/integration/" in result.stdout
+
+
+@pytest.mark.parametrize("mode", ["dev", "init", "seed", "quick-test"])
+def test_simple_local_workflow(monkeypatch, mode):
+    import host_development
+    import python_environment
+    import workflow
+
+    events = []
+    monkeypatch.setattr(workflow, "setup", lambda: events.append("setup"))
+    monkeypatch.setattr(python_environment, "verify", lambda root: events.append("verify"))
+    monkeypatch.setattr(workflow, "Stack", lambda mode: type("Stack", (), {"settings": {}})())
+    monkeypatch.setattr(
+        host_development, "local_providers", lambda stack: events.append("providers")
+    )
+    monkeypatch.setattr(
+        workflow.schema,
+        "application",
+        lambda *a, **k: {
+            "HOST_APP_PORT": "5300",
+            "DATABASE_URL": "canonical-local",
+            "APP_ENV": "local",
+        },
+    )
+    monkeypatch.setenv("DATABASE_URL", "wrong-database")
+
+    def run(args, **kwargs):
+        events.append([str(arg) for arg in args])
+        if "env" in kwargs:
+            assert kwargs["env"]["DATABASE_URL"] == "canonical-local"
+            assert kwargs["env"]["PYTHONPATH"] == str(workflow.ROOT / "src")
+
+    monkeypatch.setattr(workflow, "run", run)
+    workflow.local_workflow(mode)
+    commands = [event for event in events if isinstance(event, list)]
+    if mode in {"dev", "init"}:
+        assert events[:2] == ["setup", "providers"]
+        assert commands[0][-1].endswith("scripts/prepare_local_database.py")
+        assert len(commands) == (2 if mode == "dev" else 1)
+        if mode == "dev":
+            assert commands[1][-1].endswith("src/main.py")
+    else:
+        assert events[0] == "verify"
+        assert "providers" not in events
+        assert len(commands) == 1
+        assert ("football.import_data" if mode == "seed" else "pytest") in commands[0]
+
+
+def test_dev_does_not_start_app_when_preparation_fails(monkeypatch):
+    import host_development
+    import workflow
+
+    commands = []
+    monkeypatch.setattr(workflow, "setup", lambda: None)
+    monkeypatch.setattr(workflow, "Stack", lambda mode: type("Stack", (), {"settings": {}})())
+    monkeypatch.setattr(host_development, "local_providers", lambda stack: None)
+    monkeypatch.setattr(workflow.schema, "application", lambda *a, **k: {"HOST_APP_PORT": "5300"})
+
+    def fail(args, **kwargs):
+        commands.append(args)
+        raise RuntimeError("migration failed")
+
+    monkeypatch.setattr(workflow, "run", fail)
+    with pytest.raises(RuntimeError, match="migration failed"):
+        workflow.local_workflow("dev")
+    assert len(commands) == 1
+    assert str(commands[0][-1]).endswith("prepare_local_database.py")

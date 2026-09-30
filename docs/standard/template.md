@@ -1,20 +1,14 @@
-# Template ownership and identity
+# Repository identity and template history
 
-This is the canonical Flask Item + Action reference service. Its relevant package,
-fixture, Make, script, and documentation conventions follow Prizm's Python template.
-Flask Blueprints, explicit resource construction, Pydantic, synchronous resources, and
-Gunicorn intentionally replace FastAPI-specific mechanics.
+This repository now hosts the GoalStats monolithic backend, including the
+RoadToTheFinal football domain. Item/Action routes remain for compatibility.
+New contributors should follow the [README](../../README.md), not scaffold another
+service. The repository, database and Docker names below are retained to preserve
+existing tooling, credentials and volumes.
 
-Template-owned conventions include package responsibilities, configuration,
-resource/transaction ownership, HTTP errors, test ownership, Make interface,
-Docker safety, and certification. Generated services customize their actual domain
-models/contracts/repositories/services/routers and corresponding tests/migrations.
-Item + Action demonstrate that placement; do not silently turn Item into User.
-
-Architecture changes should be promoted into this template first, certified here,
-then deliberately adopted into generated services. This repository does not edit
-parent scaffolding or other repositories. Legacy .NET stays archived on
-`legacy/dotnet`; active runtime/dependency instructions are Python only.
+The implementation inherited flat Python modules, Flask Blueprints, explicit
+resource construction, Pydantic contracts, synchronous PostgreSQL access and
+Gunicorn from the original template. The identity table is a maintenance reference.
 
 ## Stable scaffold anchors
 
@@ -31,7 +25,7 @@ parent scaffolding or other repositories. Legacy .NET stays archived on
 | Developer databases | `goalstats_template_py_local`, `goalstats_template_py_dev` |
 | TEST database | `goalstats_test_runtime` |
 | Cache namespace | `goalstats-template-py:<env>:v1` |
-| API display title | `GoalStats Template API` |
+| API display title | `GoalStats Monolith API` |
 | Logger identity | `goalstats_template` (service label, not an import/package) |
 | Internal Compose services | `app`, `runner`, `postgres`, `redis` |
 | Disposable tool container | `goalstats-template-py-tool-<hex>` |
@@ -46,7 +40,7 @@ placeholder: preserve `b7f42e9c1a60` unless a separately reviewed migration is n
 
 Dependencies remain Python 3.12 and one pinned `requirements.txt`. No generic
 provider framework, async architecture, authentication platform, queues, or gRPC
-is included. PostgreSQL and Redis are the only runtime providers.
+is included. PostgreSQL and Redis are runtime providers; API-Football is optional for live refresh.
 
 ## Flat Python execution contract
 
@@ -89,7 +83,7 @@ internal state from payloads; generated services create their own `.env.local` a
 `.env.test` through setup. Identity literals are transformed only in reviewed paths.
 
 Direct `src/main.py` means LOCAL host development. The `load_local()` helper in
-`src/settings/environment.py` belongs only to that entrypoint; factory and Alembic
+`src/settings/environment.py` also serves explicit host preparation/import commands; factory and Alembic
 configuration use `load_application()` without reading machine files. Portable VS Code app launch must not inject
 an env file; PyCharm Python script Run needs no environment profile. Scaffold guards
 must validate this shared loader and preserve its source bytes without identity rewrites.
@@ -97,7 +91,7 @@ must validate this shared loader and preserve its source bytes without identity 
 API body DTOs use `*Request`, resource/list DTOs use `*Response`, and path/shared
 contracts use `*Schema` (including `ProblemDetailSchema`). Domain exceptions live
 in `exceptions/base.py`, `item.py`, and `action.py`; Flask handling lives in
-`exceptions/handlers.py`. Package markers remain empty.
+`exceptions/handlers.py`. Football uses its own domain module and flat `schemas/football.py` contracts.
 
 Domain API contracts live in `schemas/<domain>/request.py` (`*Request`),
 `response.py` (`*Response`), and `base.py` (`*Schema`). The latter owns path/query

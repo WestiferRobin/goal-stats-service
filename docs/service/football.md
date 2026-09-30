@@ -16,12 +16,11 @@ requirement to scaffold more microservices.
 ## Start and import
 
 ```sh
-make providers
-make build
-make migrate
-PYTHONPATH=src .venv/bin/python -m football.import_data
-.venv/bin/python src/main.py
+make dev
 ```
+
+For IDE use, run `make init` and then Run/Debug `src/main.py`. To import the
+CSVs again into a running, migrated LOCAL database, use `make seed`.
 
 The three source CSVs live in the project-root `data/` folder. Both host and
 container importers use that folder by default, independently of the working
@@ -29,8 +28,8 @@ directory. The SQL exporter reads the same files.
 
 The host importer uses the same private `.env.local` settings as direct startup.
 It validates all three files before writing and commits the batch atomically.
-Repeated imports preserve existing rows. To use another directory, pass it as the
-positional argument; it must contain `teams.csv`, `match_history.csv` and
+Repeated imports preserve existing rows. To use another directory, run
+`PYTHONPATH=src .venv/bin/python -m football.import_data /path/to/csvs`; it must contain `teams.csv`, `match_history.csv` and
 `historical_snapshots.csv`. File order is part of imported record identity.
 
 In a configured container, `flask --app main:create_app import-football` imports

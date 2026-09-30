@@ -1,5 +1,11 @@
 # Test ownership
 
+After setup, use `make quick-test` for fast host unit feedback. Use `make test`
+for unit + integration tests with automatically managed disposable providers.
+Use `make check` for lint, formatting and types, and `make tooling` after changing
+Make/Python workflow code. Plain `pytest` includes integration tests and therefore
+requires a provisioned owned TEST session; it is not the quick-start command.
+
 UNIT TESTS FOLLOW LOGIC
 
 INTEGRATION TESTS FOLLOW BOUNDARIES
