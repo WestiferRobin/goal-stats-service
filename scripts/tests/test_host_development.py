@@ -67,7 +67,7 @@ def owned_session(tmp_path, monkeypatch):
     # tmp_path may contain a /var -> /private/var symlink on macOS.
     root = tmp_path.resolve()
     monkeypatch.setattr(ownership, "ROOT", root)
-    project = "goalstats-template-py-test-" + "a" * 24
+    project = "goal-stats-service-test-" + "a" * 24
     token = "b" * 48
     directory = root / ".host-sessions" / project
     directory.mkdir(parents=True, mode=0o700)

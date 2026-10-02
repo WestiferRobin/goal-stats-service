@@ -29,7 +29,7 @@ def test_cache_settings_defaults_and_explicit_isolation(explicit_config, monkeyp
     monkeypatch.setenv("REDIS_URL", "invalid")
     settings = load_application(explicit_config)
     assert settings.redis.url is None
-    assert settings.redis.cache_key_prefix == "goalstats-template-py:test:v1"
+    assert settings.redis.cache_key_prefix == "goal-stats-service:test:v1"
     assert settings.redis.cache_ttl_seconds == 300
     settings = load_application({**explicit_config, "REDIS_URL": "redis://:private@localhost/0"})
     assert "private" not in repr(settings)

@@ -4,10 +4,10 @@ from dataclasses import dataclass
 
 from settings.base import ConfigurationError, Environment, port
 
-SERVICE = "goalstats-template-py"
+SERVICE = "goal-stats-service"
 API_TITLE = "GoalStats Monolith API"
 API_VERSION = "v1"
-LOGGER_NAME = "goalstats_template"
+LOGGER_NAME = "goal_stats_service"
 POLICY_DEFAULTS = {"LOG_LEVEL": "INFO", "OPENAPI_ENABLED": "true"}
 PORT_DEFAULTS = {"HOST_APP_PORT": "5300", "LOCAL_APP_PORT": "5100", "DEV_APP_PORT": "5200"}
 

@@ -5,8 +5,8 @@ backtests, tournament simulator and optional live-provider adapter. PostgreSQL
 owns teams, imported history and saved match snapshots. Redis remains optional.
 No other GoalStats service or sibling repository is needed at runtime.
 
-The source was `frontend/RoadToTheFinal/{app,live_feed}.py` and its three CSVs
-at revision `8f17bc42e30f436f5cd860f2791695421160ccd2`.
+The model came from the historical RoadToTheFinal `app.py`, `live_feed.py`, and
+three CSV datasets at revision `8f17bc42e30f436f5cd860f2791695421160ccd2`.
 The model was extracted without Flask, sessions, template rendering or import-time
 network/file writes. Existing Item/Action routes remain available for compatibility.
 The directory and Compose project keep their existing names so local volumes and
@@ -16,26 +16,21 @@ requirement to scaffold more microservices.
 ## Start and import
 
 ```sh
-make dev
+make setup
+make run
 ```
 
-For IDE use, run `make init` and then Run/Debug `src/main.py`. To import the
-CSVs again into a running, migrated LOCAL database, use `make seed`.
+Startup applies migrations and imports the bundled CSVs automatically. Repeating
+`make run` is safe and preserves existing imported rows.
 
 The three source CSVs live in the project-root `data/` folder. Both host and
 container importers use that folder by default, independently of the working
 directory. The SQL exporter reads the same files.
 
-The host importer uses the same private `.env.local` settings as direct startup.
-It validates all three files before writing and commits the batch atomically.
-Repeated imports preserve existing rows. To use another directory, run
-`PYTHONPATH=src .venv/bin/python -m football.import_data /path/to/csvs`; it must contain `teams.csv`, `match_history.csv` and
-`historical_snapshots.csv`. File order is part of imported record identity.
-
-In a configured container, `flask --app main:create_app import-football` imports
-the bundled files; `--directory /path/to/csvs` selects another set. Startup never
-runs migrations or imports automatically. [SQL alternatives](../../sql/README.md)
-cover fresh databases, existing template upgrades and repeatable seed data.
+The importer validates all three files before writing and commits the batch
+atomically. File order is part of imported record identity. Maintainers can run the
+Flask `import-football` command inside the application container for a nonstandard
+data directory. [SQL alternatives](../../sql/README.md) are advanced reference only.
 
 ## Frontend contract
 
@@ -90,8 +85,7 @@ Use 4, 8, 16 or 32 distinct teams, and 1,000–2,000 simulations. Results use pe
 The original semifinal counter was corrected to count each team once per stage.
 
 For live refresh, send `{"team1":"Spain","team2":"England"}`. Supply
-`API_FOOTBALL_KEY` in the server process environment (or container secret injection),
-not `.env.local` or frontend code. Provider calls occur only on explicit refresh.
+`API_FOOTBALL_KEY` in `.env.local`, never frontend code. Provider calls occur only on explicit refresh.
 Fresh results are stored in PostgreSQL; failures return the latest previously real
 update with `source: "cached"` and its original `observed_at`, or 503 if none exists.
 Cached reads do not create new timeline entries. No demo stats are substituted.
@@ -117,7 +111,6 @@ types; the new request, persistence and service boundaries are typed and validat
 
 ## Verification
 
-`make check`, `.venv/bin/python -m pytest tests/unit`, and `make integration` cover
-format/types, probability invariants, validation, data leakage, stage counting,
+`make test` covers format/types, probability invariants, validation, data leakage, stage counting,
 repeatable imports, shared live fallback, persistence and migration/model agreement.
 Integration tests run only against automatically owned disposable TEST providers.

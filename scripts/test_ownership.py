@@ -50,7 +50,7 @@ def verify_host_session(environ=None):
             manifest["version"] != 1
             or manifest["state"] != "active"
             or manifest["root"] != str(ROOT)
-            or not re.fullmatch(r"goalstats-template-py-test-[a-f0-9]{24}", project)
+            or not re.fullmatch(r"goal-stats-service-test-[a-f0-9]{24}", project)
             or path.parent.name != project
             or not re.fullmatch(r"[a-f0-9]{48}", manifest["token"])
         ):

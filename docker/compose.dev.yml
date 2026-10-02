@@ -5,9 +5,9 @@ services:
     environment:
       POSTGRES_USER: goalstats
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run make setup}
-      POSTGRES_DB: goalstats_template_py_dev
+      POSTGRES_DB: goal_stats_service_dev
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U goalstats -d goalstats_template_py_dev"]
+      test: ["CMD-SHELL", "pg_isready -U goalstats -d goal_stats_service_dev"]
       interval: 1s
       timeout: 3s
       retries: 40
@@ -22,7 +22,7 @@ services:
       timeout: 3s
       retries: 40
   app:
-    image: goalstats-template-py:runtime
+    image: goal-stats-service:runtime
     build:
       context: ..
       target: runtime
@@ -30,9 +30,9 @@ services:
     stop_grace_period: 15s
     environment:
       APP_ENV: dev
-      DATABASE_URL: postgresql+psycopg://goalstats:${POSTGRES_PASSWORD}@postgres:5432/goalstats_template_py_dev
+      DATABASE_URL: postgresql+psycopg://goalstats:${POSTGRES_PASSWORD}@postgres:5432/goal_stats_service_dev
       REDIS_URL: redis://redis:6379/0
-      CACHE_KEY_PREFIX: goalstats-template-py:dev:v1
+      CACHE_KEY_PREFIX: goal-stats-service:dev:v1
       OPENAPI_ENABLED: ${OPENAPI_ENABLED:-true}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-300}

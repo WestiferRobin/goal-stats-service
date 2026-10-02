@@ -32,7 +32,7 @@ def redis(stack, *args):
 
 
 def sql(stack, query):
-    database = "goalstats_template_py_" + stack.env
+    database = "goal_stats_service_" + stack.env
     return stack.compose(
         "exec",
         "-T",
@@ -89,7 +89,7 @@ def runtime_failures(stack):
 
 
 def signal_cleanup(signum):
-    project = "goalstats-template-py-test-" + secrets.token_hex(6)
+    project = "goal-stats-service-test-" + secrets.token_hex(6)
     with tempfile.TemporaryDirectory() as directory:
         log = Path(directory) / "signal.log"
         code = (
@@ -241,7 +241,7 @@ def certify():
             print(f"{stack.env.upper()} persistence and runtime ownership: PASS", flush=True)
         tests("coverage")
         for fault in ("unit", "integration", "migration", "provider"):
-            project = "goalstats-template-py-test-" + secrets.token_hex(6)
+            project = "goal-stats-service-test-" + secrets.token_hex(6)
             try:
                 tests("test", fault=fault, project=project)
             except subprocess.CalledProcessError:

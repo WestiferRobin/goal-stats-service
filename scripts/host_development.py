@@ -62,7 +62,7 @@ def check_local_bindings(stack, *, before=False):
                 config = dict(v.split("=", 1) for v in container["Config"]["Env"] if "=" in v)
                 if (
                     config.get("POSTGRES_PASSWORD") != stack.settings["POSTGRES_PASSWORD"]
-                    or config.get("POSTGRES_DB") != "goalstats_template_py_local"
+                    or config.get("POSTGRES_DB") != "goal_stats_service_local"
                     or config.get("POSTGRES_USER") != "goalstats"
                 ):
                     raise RuntimeError(
@@ -123,7 +123,7 @@ def local_providers(stack, *, stop=False):
         "-U",
         "goalstats",
         "-d",
-        "goalstats_template_py_local",
+        "goal_stats_service_local",
         "-At",
         "-c",
         "SELECT 1",
@@ -143,7 +143,7 @@ def local_providers(stack, *, stop=False):
 
 def test_providers():
     """Foreground ownership lease; crashes leave durable evidence but cannot authorize tests."""
-    project = "goalstats-template-py-test-" + secrets.token_hex(12)
+    project = "goal-stats-service-test-" + secrets.token_hex(12)
     token = secrets.token_hex(24)
     stack = Stack("test", project=project, settings={"POSTGRES_PASSWORD": secrets.token_hex(24)})
     root = ROOT / ".host-sessions"

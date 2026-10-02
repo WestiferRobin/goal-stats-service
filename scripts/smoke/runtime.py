@@ -15,9 +15,9 @@ def run_smoke(stack, *, fault=False):
         "SMOKE_BASE_URL": "http://app:8000",
         "SMOKE_DATABASE_URL": "postgresql://goalstats:"
         + stack.settings["POSTGRES_PASSWORD"]
-        + "@postgres:5432/goalstats_template_py_dev",
+        + "@postgres:5432/goal_stats_service_dev",
         "SMOKE_REDIS_URL": "redis://redis:6379/0",
-        "SMOKE_CACHE_PREFIX": "goalstats-template-py:dev:v1",
+        "SMOKE_CACHE_PREFIX": "goal-stats-service:dev:v1",
         "SMOKE_FAULT": "1" if fault else "0",
     }
     args = [

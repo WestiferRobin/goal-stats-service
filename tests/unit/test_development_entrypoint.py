@@ -40,7 +40,7 @@ def test_direct_local_constructs_once_without_reloader_or_dotenv(host_file, monk
     assert values.core.app_env == "local"
     assert (
         values.database.url.port == 55432
-        and values.database.url.database == "goalstats_template_py_local"
+        and values.database.url.database == "goal_stats_service_local"
     )
     diagnostics.assert_called_once_with(factory.return_value)
     factory.return_value.run.assert_called_once_with(
@@ -135,7 +135,7 @@ def test_precedence_defaults_and_optional_redis(host_file):
     assert config.core.openapi_enabled is True
     assert config.core.log_level == "DEBUG"
     assert config.redis.url is None
-    assert config.redis.cache_key_prefix == "goalstats-template-py:local:v1"
+    assert config.redis.cache_key_prefix == "goal-stats-service:local:v1"
 
 
 @pytest.mark.parametrize(

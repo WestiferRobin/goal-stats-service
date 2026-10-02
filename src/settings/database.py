@@ -12,7 +12,7 @@ from settings.base import ConfigurationError, ExecutionContext
 if TYPE_CHECKING:
     from sqlalchemy.engine import URL
 
-DATABASE = "goalstats_template_py"
+DATABASE = "goal_stats_service"
 PORT_DEFAULTS = {"LOCAL_POSTGRES_PORT": "55432"}
 PASSWORD_KEYS = frozenset({"POSTGRES_PASSWORD", "DEV_POSTGRES_PASSWORD"})
 

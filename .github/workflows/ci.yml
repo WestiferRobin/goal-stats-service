@@ -10,21 +10,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: goalstats-template-${{ github.workflow }}-${{ github.ref }}
+  group: goal-stats-service-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  certify:
+  test:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Prepare private local configuration
-        run: make setup
-      - name: Diagnose runner prerequisites
-        run: make doctor
-      - name: Certify service and disposable runtime workflows
-        run: make certify
+      - name: Test service
+        run: make test

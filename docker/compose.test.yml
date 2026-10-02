@@ -22,7 +22,8 @@ services:
       timeout: 3s
       retries: 40
   runner:
-    image: goalstats-template-py:tooling
+    image: goal-stats-service:tooling
+    hostname: ${TEST_RUNNER_HOSTNAME:-goal-stats-test-runner}
     build:
       context: ..
       target: tooling
@@ -32,7 +33,7 @@ services:
       APP_ENV: test
       DATABASE_URL: postgresql+psycopg://goalstats:${POSTGRES_PASSWORD}@postgres:5432/goalstats_test_runtime
       REDIS_URL: redis://redis:6379/0
-      CACHE_KEY_PREFIX: goalstats-template-py:test:v1
+      CACHE_KEY_PREFIX: goal-stats-service:test:v1
       OPENAPI_ENABLED: ${OPENAPI_ENABLED:-true}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-300}

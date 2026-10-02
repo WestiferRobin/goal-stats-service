@@ -34,12 +34,12 @@ def smoke_client():
     redis_url = os.environ.get("SMOKE_REDIS_URL", "")
     prefix = os.environ.get("SMOKE_CACHE_PREFIX", "")
     if not (
-        re.fullmatch(r"goalstats-template-py-cert-[a-f0-9]+", project)
+        re.fullmatch(r"goal-stats-service-cert-[a-f0-9]+", project)
         and url == "http://app:8000"
         and urlsplit(database_url).hostname == "postgres"
-        and urlsplit(database_url).path == "/goalstats_template_py_dev"
+        and urlsplit(database_url).path == "/goal_stats_service_dev"
         and redis_url == "redis://redis:6379/0"
-        and prefix == "goalstats-template-py:dev:v1"
+        and prefix == "goal-stats-service:dev:v1"
     ):
         pytest.fail(
             "Smoke requires the disposable stack configuration from make smoke", pytrace=False

@@ -13,6 +13,7 @@ htmlcov/
 venv/
 .env
 .env.local
+# Legacy configuration names remain ignored during workflow migration.
 .env.test
 .env.dev
 .env.host.local

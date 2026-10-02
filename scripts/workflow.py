@@ -20,7 +20,7 @@ from environment_config import schema
 from environment_setup import setup_files
 
 ROOT = Path(__file__).resolve().parents[1]
-IMAGE = "goalstats-template-py:tooling"
+IMAGE = "goal-stats-service:tooling"
 HELP = """GoalStats Flask — host/IDE first; Python 3.12 + Make + running Docker/Compose required.
 EVERYDAY  make dev                   Setup, providers, migrate, import CSVs, run host app
           make init                  Same preparation without starting Flask (for IDE users)
@@ -185,10 +185,10 @@ class Stack:
         if env not in {"local", "dev", "test"}:
             raise RuntimeError("ENV must be local or dev (TEST is managed automatically)")
         self.env = env
-        self.project = project or f"goalstats-template-py-{env}"
+        self.project = project or f"goal-stats-service-{env}"
         self.disposable = project is not None
         if self.disposable and not re.fullmatch(
-            r"goalstats-template-py-(test|cert)-[a-f0-9]+", project
+            r"goal-stats-service-(test|cert)-[a-f0-9]+", project
         ):
             raise RuntimeError("Disposable project must use a unique owned test/cert identity")
         self.settings = (
@@ -330,7 +330,7 @@ def fresh(env):
         port = sock.getsockname()[1]
     return Stack(
         env,
-        project="goalstats-template-py-cert-" + secrets.token_hex(6),
+        project="goal-stats-service-cert-" + secrets.token_hex(6),
         settings={
             "POSTGRES_PASSWORD": secrets.token_hex(24),
             "APP_PORT": str(port),
@@ -358,7 +358,7 @@ def build_tooling():
 
 
 def tool_command(*command):
-    name = "goalstats-template-py-tool-" + secrets.token_hex(6)
+    name = "goal-stats-service-tool-" + secrets.token_hex(6)
     try:
         run(["docker", "run", "--rm", "--name", name, "--network", "none", IMAGE, *command])
     finally:
@@ -373,7 +373,7 @@ def tests(mode, *, fault=None, project=None):
         return
     stack = Stack(
         "test",
-        project=project or "goalstats-template-py-test-" + secrets.token_hex(6),
+        project=project or "goal-stats-service-test-" + secrets.token_hex(6),
         settings={"POSTGRES_PASSWORD": secrets.token_hex(24)},
     )
     try:

@@ -1,17 +1,32 @@
+# GoalStats public developer interface. Advanced maintenance targets are private.
+ifeq ($(OS),Windows_NT)
+BASH := C:/Progra~1/Git/bin/bash.exe
+else
+BASH := /bin/bash
+endif
 .DEFAULT_GOAL := help
-ENV ?= local
-PYTHON ?= $(if $(filter setup init dev doctor help,$(or $(MAKECMDGOALS),help)),python3.12,$(if $(wildcard .venv/bin/python),.venv/bin/python,python3.12))
-export ENV MESSAGE
-export PYTHONDONTWRITEBYTECODE = 1
 
-include make/install.mk
-include make/doctor.mk
-include make/dev.mk
-include make/db.mk
-include make/test.mk
-include make/coverage.mk
-include make/ci.mk
+.PHONY: setup run test stop help
+setup run stop:
+	@$(BASH) scripts/local.sh $@
 
-.PHONY: help
+test:
+	@$(BASH) scripts/test.sh
+
 help:
-	@$(PYTHON) scripts/workflow.py help
+	@$(BASH) scripts/local.sh help
+
+# Internal maintenance interface. These targets intentionally do not appear in help.
+PYTHON ?= python3.12
+MESSAGE ?=
+.PHONY: _migration _migration-check _smoke _coverage _certify
+_migration:
+	@ENV=local MESSAGE="$(MESSAGE)" $(PYTHON) scripts/workflow.py migration
+_migration-check:
+	@ENV=local $(PYTHON) scripts/workflow.py migration-check
+_smoke:
+	@$(PYTHON) scripts/workflow.py smoke
+_coverage:
+	@$(PYTHON) scripts/workflow.py coverage
+_certify:
+	@$(PYTHON) scripts/workflow.py certify

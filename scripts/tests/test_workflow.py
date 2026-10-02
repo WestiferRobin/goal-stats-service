@@ -16,7 +16,7 @@ def test_persistent_stack_refuses_volume_deletion():
         stack.stop(volumes=True)
 
 
-@pytest.mark.parametrize("project", ["other-project", "goalstats-template-py-local", ""])
+@pytest.mark.parametrize("project", ["other-project", "goal-stats-service-local", ""])
 def test_disposable_stack_requires_owned_identity(project):
     with pytest.raises(RuntimeError, match="Disposable project"):
         Stack("test", project=project, settings={})
@@ -44,7 +44,7 @@ def test_ambient_database_and_compose_settings_do_not_choose_test_resources(monk
     monkeypatch.setenv("COMPOSE_PROJECT_NAME", "unrelated")
     stack = Stack(
         "test",
-        project="goalstats-template-py-test-a123",
+        project="goal-stats-service-test-a123",
         settings={"POSTGRES_PASSWORD": "test-only"},
     )
     assert "unrelated" not in stack.args
@@ -118,7 +118,7 @@ def test_smoke_failure_preserves_exit_and_cleans_stack(monkeypatch):
 
     events = []
     stack = SimpleNamespace(
-        project="goalstats-template-py-cert-a123",
+        project="goal-stats-service-cert-a123",
         compose=lambda *args: events.append("build"),
         migrate=lambda: events.append("migrate"),
         start=lambda: events.append("start"),

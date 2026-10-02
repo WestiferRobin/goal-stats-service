@@ -14,22 +14,22 @@ Gunicorn from the original template. The identity table is a maintenance referen
 
 | Identity | Current value |
 | --- | --- |
-| Repository | `template-goalstats-service` |
+| Repository | `goal-stats-service` |
 | Source/import root | `src/` (flat modules; no service package directory) |
 | Coverage source | `src` |
 | Factory | `main:create_app()` |
-| Image/runtime slug | `goalstats-template-py` |
-| Image tags | `goalstats-template-py:runtime`, `goalstats-template-py:tooling` |
-| Developer Compose projects | `goalstats-template-py-local`, `goalstats-template-py-dev` |
-| Disposable projects | `goalstats-template-py-test-<hex>`, `goalstats-template-py-cert-<hex>` |
-| Developer databases | `goalstats_template_py_local`, `goalstats_template_py_dev` |
+| Image/runtime slug | `goal-stats-service` |
+| Image tags | `goal-stats-service:runtime`, `goal-stats-service:tooling` |
+| Developer Compose projects | `goal-stats-service-local`, `goal-stats-service-dev` |
+| Disposable projects | `goal-stats-service-test-<hex>`, `goal-stats-service-cert-<hex>` |
+| Developer databases | `goal_stats_service_local`, `goal_stats_service_dev` |
 | TEST database | `goalstats_test_runtime` |
-| Cache namespace | `goalstats-template-py:<env>:v1` |
+| Cache namespace | `goal-stats-service:<env>:v1` |
 | API display title | `GoalStats Monolith API` |
-| Logger identity | `goalstats_template` (service label, not an import/package) |
+| Logger identity | `goal_stats_service` (service label, not an import/package) |
 | Internal Compose services | `app`, `runner`, `postgres`, `redis` |
-| Disposable tool container | `goalstats-template-py-tool-<hex>` |
-| CI concurrency | `goalstats-template-${{ github.workflow }}-${{ github.ref }}` |
+| Disposable tool container | `goal-stats-service-tool-<hex>` |
+| CI concurrency | `goal-stats-service-${{ github.workflow }}-${{ github.ref }}` |
 
 Later scaffolding must update identity producers, consumers, safety guards, fixtures,
 Docker/Compose references, and observations together. There is no Python package-directory identity to transform. Flat module names,
@@ -59,7 +59,7 @@ factory commands must explicitly expose the source directory, for example
 `PYTHONPATH=src flask --app 'main:create_app()' run`. No developer shell path
 configuration is assumed by the public Make workflows.
 
-The remaining `goalstats_template` occurrences are intentional service identities:
+The remaining `goal_stats_service` occurrences are intentional service identities:
 LOCAL/DEV database names (and their producers/ownership checks) and the isolated
 application logger label. They are not Python package references. Generic TEST
 identities and unrelated-resource sentinels remain intentionally generic.
@@ -79,8 +79,8 @@ Track only portable `.vscode/settings.json`, `.vscode/launch.json`, and optional
 
 Scaffolding must preserve the shared code-owned configuration schema, private setup,
 manifest-based TEST ownership and portable IDE launch. Reject all real env files and
-internal state from payloads; generated services create their own `.env.local` and
-`.env.test` through setup. Identity literals are transformed only in reviewed paths.
+internal state from payloads; generated services use `.env.local`, while tests create
+ephemeral configuration internally. Identity literals are transformed only in reviewed paths.
 
 Direct `src/main.py` means LOCAL host development. The `load_local()` helper in
 `src/settings/environment.py` also serves explicit host preparation/import commands; factory and Alembic
