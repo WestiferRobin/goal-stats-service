@@ -1,13 +1,14 @@
 """Explicit private sources and typed composition; never a global settings singleton."""
 
 import os
+import re
+import socket
 import stat
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlsplit
 
-from settings.base import ConfigurationError, ExecutionContext, boolean, loopback, port
+from settings.base import ConfigurationError, ExecutionContext, boolean, port
 from settings.core import POLICY_DEFAULTS as CORE_POLICY
 from settings.core import PORT_DEFAULTS as CORE_PORTS
 from settings.core import SERVICE as SERVICE
@@ -58,7 +59,7 @@ def read_private(path: Path, keys: frozenset[str]) -> dict[str, str]:
     except FileNotFoundError:
         kind = "LOCAL" if path.name == ".env.local" else "TEST"
         raise ConfigurationError(
-            f"{path.name}: {kind} configuration is missing. Run make setup, then make providers."
+            f"{path.name}: {kind} configuration is missing. Run make setup."
         ) from None
     except (OSError, UnicodeError):
         raise ConfigurationError(
@@ -166,7 +167,7 @@ def load_application(values: Mapping[str, str] | None = None) -> Settings:
             mode,
             log_level(source.get("LOG_LEVEL", CORE_POLICY["LOG_LEVEL"])),
             boolean(source.get("OPENAPI_ENABLED", "false")),
-            port(source.get("HOST_APP_PORT", CORE_PORTS["HOST_APP_PORT"]), "HOST_APP_PORT"),
+            port(source.get("HOST_APP_PORT", "5100"), "HOST_APP_PORT"),
         ),
         DatabaseSettings(database_url(source.get("DATABASE_URL", ""))),
         RedisSettings(
@@ -177,18 +178,73 @@ def load_application(values: Mapping[str, str] | None = None) -> Settings:
     )
 
 
-def load_local(environ: Mapping[str, str] | None = None) -> Settings:
+# The public local contract is intentionally separate from retained private DEV tooling.
+DEVELOPMENT_DEFAULTS = {
+    "APP_PORT": "5100",
+    "POSTGRES_PORT": "55432",
+    "REDIS_PORT": "56379",
+    **POLICY_DEFAULTS,
+    "API_FOOTBALL_KEY": "",
+}
+DEVELOPMENT_KEYS = frozenset(DEVELOPMENT_DEFAULTS) | {"POSTGRES_PASSWORD"}
+
+
+def local_values(path: Path | None = None) -> dict[str, str]:
+    values = {**DEVELOPMENT_DEFAULTS, **read_private(path or LOCAL_FILE, DEVELOPMENT_KEYS)}
+    # Literal, unquoted values only: identical interpretation in Python and Compose.
+    for key, value in values.items():
+        if not re.fullmatch(r"[a-zA-Z0-9_./:@+\-]*", value):
+            raise ConfigurationError(f"{key} must be an unquoted literal without whitespace.")
+    if not re.fullmatch(r"[a-zA-Z0-9_-]+", values.get("POSTGRES_PASSWORD", "")):
+        raise ConfigurationError("POSTGRES_PASSWORD must be nonempty and URL-safe; preserve it.")
+    for key in ("APP_PORT", "POSTGRES_PORT", "REDIS_PORT"):
+        port(values[key], key)
+    if len({int(values[k]) for k in ("APP_PORT", "POSTGRES_PORT", "REDIS_PORT")}) != 3:
+        raise ConfigurationError("Application and provider ports must be distinct.")
+    policy({key: values[key] for key in POLICY_DEFAULTS})
+    return values
+
+
+def local_runtime(environ: Mapping[str, str] | None = None) -> dict[str, str]:
     source = os.environ if environ is None else environ
-    if "APP_ENV" in source and source["APP_ENV"].strip().lower() != "local":
-        raise ConfigurationError(
-            "Direct execution supports LOCAL only. Remove the conflicting APP_ENV setting."
-        )
-    values = application(load_machine(LOCAL_FILE), "local", host=True)
-    values.update({key: source[key] for key in DIRECT_KEYS if key in source})
-    values.update(APP_ENV="local", FLASK_DEBUG="0")
-    result = load_application(values)
-    if not loopback(result.database.url.host):
-        raise ConfigurationError("DATABASE_URL for LOCAL host development must use loopback.")
-    if result.redis.url and not loopback(urlsplit(result.redis.url).hostname):
-        raise ConfigurationError("REDIS_URL for LOCAL host development must use loopback.")
-    return result
+    if "APP_ENV" in source and source["APP_ENV"] != "local":
+        raise ConfigurationError("Conflicting inherited APP_ENV; use local development settings.")
+    values = local_values()
+    runtime = {
+        **values,
+        "APP_ENV": "local",
+        "DATABASE_URL": (
+            "postgresql+psycopg://goalstats:"
+            + values["POSTGRES_PASSWORD"]
+            + "@127.0.0.1:"
+            + values["POSTGRES_PORT"]
+            + "/goal_stats_service_local"
+        ),
+        "REDIS_URL": "redis://127.0.0.1:" + values["REDIS_PORT"] + "/0",
+        "CACHE_KEY_PREFIX": default_prefix("local"),
+        "HOST_APP_PORT": values["APP_PORT"],
+        "FLASK_DEBUG": "0",
+    }
+    for key, value in runtime.items():
+        if key in source and source[key] != value:
+            raise ConfigurationError(f"Conflicting inherited {key}; use .env.local instead.")
+    return runtime
+
+
+def check_local_port() -> None:
+    value = int(local_runtime()["HOST_APP_PORT"])
+    with socket.socket() as probe:
+        # Permit an immediate restart after closed connections, but never a live listener.
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            probe.bind(("127.0.0.1", value))
+        except OSError:
+            raise ConfigurationError(
+                f"Application port {value} is occupied. "
+                "Stop host Flask with Ctrl-C or IDE Stop, then retry. "
+                "If another application owns the port, stop it yourself or change APP_PORT."
+            ) from None
+
+
+def load_local(environ: Mapping[str, str] | None = None) -> Settings:
+    return load_application(local_runtime(environ))

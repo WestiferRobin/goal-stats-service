@@ -111,3 +111,31 @@ def bootstrap(root):
         )
     verify(root)
     print("Python 3.12 .venv and pinned dependencies ready (existing valid installs reused).")
+
+
+def main():
+    import argparse
+
+    from environment_config import schema
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=("bootstrap", "verify", "config", "port"))
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parents[1]
+    if sys.version_info[:2] != (3, 12):
+        raise RuntimeError("Python 3.12 is required. Select it with make setup PYTHON=python3.12.")
+    if args.action == "bootstrap":
+        bootstrap(root)
+    elif args.action == "verify":
+        verify(root)
+    elif args.action == "config":
+        print(schema.local_runtime()["HOST_APP_PORT"])
+    else:
+        schema.check_local_port()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (RuntimeError, ValueError, OSError, subprocess.SubprocessError) as exc:
+        sys.exit(str(exc))

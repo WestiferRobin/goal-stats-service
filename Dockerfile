@@ -20,5 +20,5 @@ CMD ["gunicorn", "--bind=0.0.0.0:8000", "--workers=2", "--timeout=30", "--gracef
 FROM runtime AS tooling
 COPY tests/ ./tests/
 COPY scripts/ ./scripts/
-COPY pytest.ini ruff.toml mypy.ini ./
+COPY pytest.ini ruff.toml mypy.ini Makefile .env.example ./
 CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider"]

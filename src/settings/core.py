@@ -9,6 +9,7 @@ API_TITLE = "GoalStats Monolith API"
 API_VERSION = "v1"
 LOGGER_NAME = "goal_stats_service"
 POLICY_DEFAULTS = {"LOG_LEVEL": "INFO", "OPENAPI_ENABLED": "true"}
+# Retained private workflow defaults; public host settings use APP_PORT.
 PORT_DEFAULTS = {"HOST_APP_PORT": "5300", "LOCAL_APP_PORT": "5100", "DEV_APP_PORT": "5200"}
 
 
@@ -31,7 +32,7 @@ class CoreSettings:
     app_env: Environment = Environment.LOCAL
     log_level: str = POLICY_DEFAULTS["LOG_LEVEL"]
     openapi_enabled: bool = False
-    host_app_port: int = int(PORT_DEFAULTS["HOST_APP_PORT"])
+    host_app_port: int = 5100
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "app_env", environment(self.app_env))

@@ -6,9 +6,9 @@ BASH := /bin/bash
 endif
 .DEFAULT_GOAL := help
 
-.PHONY: setup run test stop help
-setup run stop:
-	@$(BASH) scripts/local.sh $@
+.PHONY: setup infra run deploy test stop help
+setup infra run deploy stop:
+	@PYTHON="$(PYTHON)" $(BASH) scripts/local.sh $@
 
 test:
 	@$(BASH) scripts/test.sh

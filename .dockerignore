@@ -18,3 +18,6 @@
 !sql/**
 !data/
 !data/**
+
+!Makefile
+!.env.example

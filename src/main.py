@@ -1,6 +1,7 @@
 """Application factory; direct execution alone loads LOCAL machine configuration."""
 
 import logging
+import os
 import socket
 import sys
 from collections.abc import Mapping
@@ -51,7 +52,7 @@ from services.football import FootballService
 from services.item import ItemService
 from settings.base import ConfigurationError
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
-from settings.environment import Settings, load_application, load_local
+from settings.environment import Settings, load_application, load_local, local_runtime
 
 
 def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
@@ -99,12 +100,14 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
 
 def _check_app_port(port: int) -> None:
     with socket.socket() as probe:
+        # Permit an immediate restart after closed connections, but never a live listener.
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             probe.bind(("127.0.0.1", port))
         except OSError:
             raise ConfigurationError(
                 f"LOCAL application port {port} is unavailable. Stop the other application "
-                "or choose HOST_APP_PORT."
+                "or change APP_PORT."
             ) from None
 
 
@@ -119,22 +122,21 @@ def _diagnose_providers(app: Flask) -> None:
     except SQLAlchemyError:
         database.dispose()
         raise ConfigurationError(
-            "LOCAL PostgreSQL is unavailable. Run make providers ENV=local "
-            "and verify the existing configuration."
+            "LOCAL PostgreSQL is unavailable. Run make infra and verify the existing configuration."
         ) from None
     if not is_ready(database):
         app.logger.warning(
-            "LOCAL database is not ready. If migrations are pending, run make migrate ENV=local."
+            "LOCAL database is not ready. If migrations are pending, run make run or make deploy."
         )
     if not cache.ready(settings.redis.cache_key_prefix):
         app.logger.warning(
-            "LOCAL Redis is unavailable; database fallback remains active. "
-            "Run make providers ENV=local."
+            "LOCAL Redis is unavailable; database fallback remains active. Run make infra."
         )
 
 
 def development_main() -> None:
     settings = load_local()
+    os.environ["API_FOOTBALL_KEY"] = local_runtime()["API_FOOTBALL_KEY"]
     _check_app_port(settings.core.host_app_port)
     app = create_app(settings)
     _diagnose_providers(app)

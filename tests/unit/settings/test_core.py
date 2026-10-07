@@ -9,7 +9,7 @@ def test_typed_core_is_immutable_and_validated(mode):
     from dataclasses import FrozenInstanceError
 
     core = CoreSettings(app_env=mode)
-    assert core.host_app_port == 5300
+    assert core.host_app_port == 5100
     with pytest.raises(FrozenInstanceError):
         core.host_app_port = 1
 

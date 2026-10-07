@@ -154,3 +154,38 @@ def test_doctor_checks_test_policy_before_port_diagnosis(monkeypatch, tmp_path):
     with pytest.raises(workflow.schema.ConfigurationError, match=r"\.env.test:1") as error:
         workflow.doctor()
     assert "private-value" not in str(error.value)
+
+
+def test_bootstrap_wrong_python_starts_nothing(monkeypatch, tmp_path):
+    monkeypatch.setattr(host.sys, "version_info", (3, 13))
+    monkeypatch.setattr(host.subprocess, "run", lambda *a, **k: pytest.fail("unexpected process"))
+    with pytest.raises(RuntimeError, match="Python 3.12"):
+        host.bootstrap(tmp_path)
+    assert not (tmp_path / ".venv").exists()
+
+
+def test_pip_check_failure_is_actionable(monkeypatch, tmp_path):
+    executable = tmp_path / ".venv/bin/python"
+    executable.parent.mkdir(parents=True)
+    executable.touch()
+    monkeypatch.setattr(
+        host,
+        "probe",
+        lambda *a: {
+            "version": [3, 12],
+            "prefix": str(tmp_path / ".venv"),
+            "base": "/base",
+            "missing": [],
+        },
+    )
+    monkeypatch.setattr(host.subprocess, "run", lambda *a, **k: SimpleNamespace(returncode=1))
+    with pytest.raises(RuntimeError, match="dependency consistency"):
+        host.verify(tmp_path)
+
+
+def test_bootstrap_cli_dispatch(monkeypatch, tmp_path):
+    calls = []
+    monkeypatch.setattr(host.sys, "argv", ["python_environment.py", "bootstrap"])
+    monkeypatch.setattr(host, "bootstrap", lambda root: calls.append(root))
+    host.main()
+    assert calls == [__import__("pathlib").Path(host.__file__).resolve().parents[1]]

@@ -113,9 +113,11 @@ errors. flask-openapi3 generates OpenAPI 3.1.0 documenting resource schemas, enu
 canonical Location headers, and the Problem Details response. `/health` and `/ready`
 are documented under `infra`, including their plain-text responses and readiness statuses.
 Swagger is served at `/swagger` with local pinned assets and the generated spec at
-`/swagger/v1/swagger.json`. LOCAL reloads source; DEV uses a non-root built Gunicorn
-image; TEST owns disposable providers. See [Development](development.md) for runtime
-identities and cleanup. No User or prediction domain is present.
+`/swagger/v1/swagger.json`. `make run` uses foreground host Flask with manual/IDE
+restart; `make deploy` retains Docker Flask source reload with its browser debugger
+disabled. Both use the same LOCAL providers and data. Private DEV tooling uses a built
+Gunicorn image; TEST owns disposable providers. See [Development](development.md)
+for runtime identities and cleanup.
 
 ## Package placement
 

@@ -1,14 +1,23 @@
 # Make interface
 
-The public interface intentionally has five targets:
+Run commands from the repository root, sequentially.
 
 | Command | Contract |
 | --- | --- |
-| `make setup` | Check tools, create missing `.env.local`, and build images; start nothing |
-| `make run` | Start providers, migrate, import bundled data, and start the API |
-| `make test` | Run quality checks and isolated unit/integration tests |
-| `make stop` | Stop local containers; preserve database data |
-| `make help` | Display only this public interface |
+| `make setup` | Check Docker/Compose/Make/Python 3.12, preserve/create `.env.local`, prepare `.venv` and images; start nothing |
+| `make infra` | Stop owned Docker Flask; start/wait for PostgreSQL and Redis only |
+| `make run` | Validate host setup; stop owned Docker Flask; prepare database; run foreground host Flask |
+| `make deploy` | Deploy the complete backend locally in Docker. No cloud deployment. |
+| `make test` | Run quality checks and owned disposable unit/integration tests |
+| `make stop` | Remove local Docker containers/network; preserve PostgreSQL data |
+| `make help` | Display these seven commands |
 
-Run all commands from the repository root. There is one local mode and one developer
-configuration file. Compose and maintenance scripts remain internal mechanisms.
+`run` and `deploy` differ in where Flask executes. Both use project
+`goalstats-service-local`, database `goal_stats_service_local`, and `.env.local`.
+Both build the preparation image and run the same migrations/import before Flask starts.
+`infra` does not migrate/import and refuses an occupied application port.
+
+Ctrl-C or IDE Stop ends host Flask; providers remain running. Stop host Flask before
+`deploy` or `infra`. `stop` never kills a host process and never deletes the database volume.
+If Flask remains running after `stop`, it loses access to its providers.
+Private underscore-prefixed maintenance targets remain outside this public interface.

@@ -54,3 +54,47 @@ def test_typed_factory_bypasses_loading(monkeypatch):
     assert app.extensions["goalstats_settings"] is settings
     assert dict(os.environ) == before
     app.extensions["goalstats_database"].dispose()
+
+
+def test_current_example_and_container_identity(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from settings import environment as host
+
+    path = tmp_path / ".env.local"
+    path.write_bytes((Path(__file__).resolve().parents[3] / ".env.example").read_bytes())
+    path.chmod(0o600)
+    monkeypatch.setattr(host, "LOCAL_FILE", path)
+    values = host.local_values()
+    config = host.load_local({})
+    assert config.core.host_app_port == 5100
+    assert config.database.url.host == "127.0.0.1"
+    assert config.database.url.port == 55432
+    assert config.database.url.database == "goal_stats_service_local"
+    assert config.database.url.username == "goalstats"
+    assert config.database.url.password == values["POSTGRES_PASSWORD"]
+    assert config.redis.url == "redis://127.0.0.1:56379/0"
+    assert config.redis.cache_key_prefix == "goal-stats-service:local:v1"
+
+
+@pytest.mark.parametrize("value", ["$(touch secret)", "${HOME}", '"secret"', "a b", "a#b", "a@b"])
+def test_public_password_rejects_ambiguous_values_without_disclosure(tmp_path, value):
+    from settings.environment import local_values
+
+    path = tmp_path / ".env.local"
+    path.write_text("POSTGRES_PASSWORD=" + value + "\n")
+    path.chmod(0o600)
+    with pytest.raises(ConfigurationError) as error:
+        local_values(path)
+    assert value not in str(error.value)
+
+
+@pytest.mark.parametrize("key", ["APP_PORT", "POSTGRES_PORT", "REDIS_PORT"])
+def test_public_ports_validate(tmp_path, key):
+    from settings.environment import local_values
+
+    path = tmp_path / ".env.local"
+    path.write_text("POSTGRES_PASSWORD=safe-password\n" + key + "=65536\n")
+    path.chmod(0o600)
+    with pytest.raises(ConfigurationError, match=key):
+        local_values(path)

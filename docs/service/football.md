@@ -20,8 +20,10 @@ make setup
 make run
 ```
 
-Startup applies migrations and imports the bundled CSVs automatically. Repeating
-`make run` is safe and preserves existing imported rows.
+`make run` starts host Flask; `make deploy` starts Docker Flask. Both apply the same
+migrations and import bundled CSVs through one-off Docker app commands before startup.
+Imports preserve existing rows. Stop host Flask before repeating `make run` or switching
+to `make deploy`. `make infra` starts providers only and does not import.
 
 The three source CSVs live in the project-root `data/` folder. Both host and
 container importers use that folder by default, independently of the working

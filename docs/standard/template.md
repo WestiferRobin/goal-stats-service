@@ -20,9 +20,11 @@ Gunicorn from the original template. The identity table is a maintenance referen
 | Factory | `main:create_app()` |
 | Image/runtime slug | `goal-stats-service` |
 | Image tags | `goal-stats-service:runtime`, `goal-stats-service:tooling` |
-| Developer Compose projects | `goal-stats-service-local`, `goal-stats-service-dev` |
+| Public local Compose project | `goalstats-service-local` |
+| Private legacy Compose projects | `goal-stats-service-local`, `goal-stats-service-dev` |
 | Disposable projects | `goal-stats-service-test-<hex>`, `goal-stats-service-cert-<hex>` |
-| Developer databases | `goal_stats_service_local`, `goal_stats_service_dev` |
+| Public development database | `goal_stats_service_local` |
+| Private DEV database | `goal_stats_service_dev` |
 | TEST database | `goalstats_test_runtime` |
 | Cache namespace | `goal-stats-service:<env>:v1` |
 | API display title | `GoalStats Monolith API` |
@@ -66,7 +68,7 @@ identities and unrelated-resource sentinels remain intentionally generic.
 
 ## Host development and propagation
 
-Host IDE support is additive to Docker. Flat `src/`, `main:create_app()`, Python 3.12,
+Host Flask is the public `make run` workflow; `make deploy` runs Docker Flask locally. Flat `src/`, `main:create_app()`, Python 3.12,
 one `requirements.txt`, Item/Action behavior, HTTP/OpenAPI, database schema/migration
 history, Redis semantics and health/readiness contracts stay unchanged. Direct
 `src/main.py` adds only a LOCAL development entrypoint. `src/` is not a package;
@@ -77,8 +79,8 @@ Track only portable `.vscode/settings.json`, `.vscode/launch.json`, and optional
 `.vscode/extensions.json`. Ignore `.idea/`, `.venv/`, `.env.local`, and
 `.host-sessions/`. No extra dotenv example or dependency manifest is introduced.
 
-Scaffolding must preserve the shared code-owned configuration schema, private setup,
-manifest-based TEST ownership and portable IDE launch. Reject all real env files and
+Scaffolding must preserve the public configuration schema, setup-created Python 3.12
+venv, Docker test receipt ownership and POSIX IDE launch. Reject all real env files and
 internal state from payloads; generated services use `.env.local`, while tests create
 ephemeral configuration internally. Identity literals are transformed only in reviewed paths.
 
@@ -100,3 +102,15 @@ class. Other domain schema files contain `*Schema` contracts only when genuinely
 needed. Shared primitives stay in `schemas/common.py`, and singleton cross-cutting
 contracts such as `schemas/problem.py` need no package hierarchy. Imports name the
 defining module explicitly; empty package markers do not re-export schemas.
+
+
+## Public lifecycle contract
+
+The seven public commands are setup, infra, run, deploy, test, stop, and help.
+`scripts/local.sh` owns the public lifecycle. Both application locations share
+`goalstats-service-local_postgres-data`, `.env.local`, migrations, imports and cache
+namespace. Never substitute the differently spelled private legacy project identity.
+Setup starts nothing; infra starts only providers; run/deploy share Docker preparation.
+Ctrl-C/IDE Stop ends host Flask; stop removes Docker resources without deleting data.
+Host development supports macOS/Linux/WSL and manual restart. Retained private DEV and
+host-test tooling does not define the public configuration or command contract.
