@@ -1,9 +1,11 @@
 """Frontend-independent football request contracts."""
 
-from typing import Annotated, Self
+import re
+from datetime import date
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
 
 Count = Annotated[int, Field(ge=0, le=1000)]
 
@@ -42,6 +44,11 @@ class Matchup(Contract):
         return self
 
 
+def validate_possession(first: float, second: float) -> None:
+    if abs(first + second - 100) > 0.01:
+        raise ValueError("Possession must total 100")
+
+
 class PredictionRequest(Matchup):
     minute: int = Field(default=0, ge=0, le=120)
     extra_minute: int = Field(default=0, ge=0, le=30)
@@ -51,8 +58,7 @@ class PredictionRequest(Matchup):
 
     @model_validator(mode="after")
     def possession_total(self) -> Self:
-        if abs(self.team1_stats.possession + self.team2_stats.possession - 100) > 0.01:
-            raise ValueError("Possession must total 100")
+        validate_possession(self.team1_stats.possession, self.team2_stats.possession)
         return self
 
 
@@ -116,3 +122,90 @@ class PredictionResponse(Contract):
     confidence: Confidence
     reasoning: list[str]
     model: str
+
+
+# Normalized historical catalog; separate from prototype prediction inputs.
+CatalogID = Annotated[int, Field(ge=1, le=2147483647)]
+
+
+class CatalogTeamPath(Contract):
+    team_id: CatalogID
+
+
+class CatalogMatchPath(Contract):
+    match_id: CatalogID
+
+
+class CatalogMatchQuery(HistoryQuery):
+    offset: int = Field(default=0, ge=0, le=9223372036854775807)
+    team_id: CatalogID | None = Field(default=None, description="Home or away participant")
+    competition_id: CatalogID | None = None
+    date_from: date | None = Field(default=None, description="Inclusive date, YYYY-MM-DD")
+    date_to: date | None = Field(default=None, description="Inclusive date, YYYY-MM-DD")
+
+    @field_validator("date_from", "date_to", mode="before")
+    @classmethod
+    def calendar_date(cls, value: object) -> object:
+        if isinstance(value, str) and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            raise ValueError("Use YYYY-MM-DD")
+        return value
+
+    @model_validator(mode="after")
+    def ordered_dates(self) -> Self:
+        if self.date_from and self.date_to and self.date_from > self.date_to:
+            raise ValueError("date_from must not follow date_to")
+        return self
+
+
+class CatalogTeamResponse(Contract):
+    team_id: int = Field(examples=[1])
+    name: str = Field(examples=["New Zealand"])
+    category: str = Field(examples=["women_senior_national"])
+    offense: float | None = Field(examples=[None])
+    defense: float | None = Field(examples=[None])
+    form: float | None = Field(examples=[None])
+    star_power: float | None = Field(examples=[None])
+    clutch: float | None = Field(examples=[None])
+    fifa_rank: int | None = Field(examples=[None])
+    ranking_date: date | None = Field(examples=[None])
+    prediction_ready: Literal[False] = Field(
+        default=False,
+        description="No supported prediction input path exists for normalized catalog IDs.",
+    )
+
+
+class CatalogCompetitionResponse(Contract):
+    competition_id: int = Field(examples=[1])
+    name: str = Field(examples=["FIFA Women's World Cup"])
+    edition_label: str = Field(examples=["2023"])
+    category: str = Field(examples=["women_senior_national"])
+
+
+class CatalogMatchResponse(Contract):
+    match_id: int = Field(examples=[1])
+    match_date: date = Field(examples=["2023-07-20"])
+    competition_id: int = Field(examples=[1])
+    competition_name: str = Field(examples=["FIFA Women's World Cup"])
+    edition_label: str = Field(examples=["2023"])
+    home_team_id: int = Field(examples=[1])
+    home_team_name: str = Field(examples=["New Zealand"])
+    away_team_id: int = Field(examples=[2])
+    away_team_name: str = Field(examples=["Norway"])
+    home_score: int = Field(examples=[1])
+    away_score: int = Field(examples=[0])
+    score_basis: str = Field(examples=["including_extra_time_no_shootout"])
+    neutral: bool | None = Field(examples=[False])
+    city: str | None = Field(examples=["Auckland"])
+    country: str | None = Field(examples=["New Zealand"])
+
+
+class CatalogTeamsResponse(RootModel[list[CatalogTeamResponse]]):
+    pass
+
+
+class CatalogCompetitionsResponse(RootModel[list[CatalogCompetitionResponse]]):
+    pass
+
+
+class CatalogMatchesResponse(RootModel[list[CatalogMatchResponse]]):
+    pass

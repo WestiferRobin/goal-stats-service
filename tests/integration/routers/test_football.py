@@ -132,7 +132,7 @@ def test_standalone_schema_paths(postgres_app, upgrade_existing):
             assert connection.scalar(text("SELECT count(*) FROM football_teams")) == 32
             assert connection.scalar(text("SELECT count(*) FROM football_history")) == 16
             context = MigrationContext.configure(connection)
-            assert context.get_current_revision() == "d94f81ab2301"
+            assert context.get_current_revision() == "a7c93e25d104"
             assert compare_metadata(context, Base.metadata) == []
         finally:
             connection.rollback()

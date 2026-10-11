@@ -2,6 +2,7 @@
 
 pytest_plugins = [
     "tests.fixtures.settings",
+    "tests.fixtures.historical",
     "tests.fixtures.application",
     "tests.fixtures.database",
     "tests.fixtures.redis",

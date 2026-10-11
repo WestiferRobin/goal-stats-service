@@ -37,3 +37,32 @@ Conflicting inherited ports, credentials, API key, policy, `DATABASE_URL`, `REDI
 `APP_ENV`, or `HOST_APP_PORT` are rejected. Remove such exports and use `.env.local`.
 No public ENV selector or second persistent environment file exists. Direct Python
 startup loads configuration explicitly; imports/factory/test settings remain independent.
+
+
+## Explicit PostgreSQL TLS and import targets
+
+Factory/CLI/Alembic execution reads an explicit `DATABASE_URL`; it never falls back
+to `.env.local`. Direct `python src/main.py` remains the separate local-development
+entry point. Cloud jobs must inject credentials via deployment secrets and set
+`FLASK_SKIP_DOTENV=1` when using the Flask executable.
+
+The shared URL validator allows only `sslmode`, `sslrootcert`, `sslcert`, and `sslkey`
+query parameters. Supported explicit modes are `disable`, `require`, `verify-ca`,
+and `verify-full`. Verification modes require an explicit CA; certificate paths must
+be absolute POSIX paths for the application container, except `sslrootcert=system`
+with `verify-full`. Client certificate and key must be supplied together. Actual file
+availability and certificate validity are enforced by libpq at connection time.
+Unknown/duplicate parameters, relative paths, host/service overrides and implicit
+TLS fallback modes (`allow`/`prefer`) are rejected. Local URLs without TLS query parameters
+retain their existing behavior; explicitly requested TLS disables GSS preference so TLS is actually used.
+
+Cloud imports require `verify-full`, which verifies both the certificate chain and
+hostname, plus `--confirm-production` and exact expected host/database flags.
+This follows [PostgreSQL's TLS guidance](https://www.postgresql.org/docs/current/libpq-ssl.html).
+These safeguards are independent of `APP_ENV`, and apply to dry-runs too. SQLAlchemy
+hides parameters and CLI errors suppress raw connection/driver messages. Migrations
+and imports share `DatabaseSettings` and the same engine construction. The importer
+checks schema readiness but never migrates automatically.
+
+See [historical import operations](football.md#historical-import-operations) for local
+and cloud one-off commands. No production credentials belong in the repository.

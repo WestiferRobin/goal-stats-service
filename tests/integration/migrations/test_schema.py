@@ -27,6 +27,11 @@ def test_fresh_alembic_history_upgrade_downgrade_and_model_agreement(
     command.current(config)
     command.check(config)
     assert set(Base.metadata.tables) == {
+        "teams",
+        "competitions",
+        "matches",
+        "scenarios",
+        "predictions",
         "items",
         "actions",
         "football_teams",
@@ -38,6 +43,11 @@ def test_fresh_alembic_history_upgrade_downgrade_and_model_agreement(
         "football_teams",
         "football_history",
         "football_snapshots",
+        "teams",
+        "competitions",
+        "matches",
+        "scenarios",
+        "predictions",
         "items",
         "actions",
     }

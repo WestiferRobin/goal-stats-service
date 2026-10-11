@@ -8,6 +8,15 @@ def test_exact_route_and_openapi_resource_contract(app):
     }
     spec = app.test_client().get("/swagger/v1/swagger.json").json
     football = {
+        "/api/v1/scenarios/{scenario_id}/predictions": {"get", "post"},
+        "/api/v1/predictions/{prediction_id}": {"get"},
+        "/api/v1/scenarios": {"get", "post"},
+        "/api/v1/scenarios/{scenario_id}": {"get", "patch"},
+        "/api/v1/catalog/teams": {"get"},
+        "/api/v1/catalog/teams/{team_id}": {"get"},
+        "/api/v1/catalog/competitions": {"get"},
+        "/api/v1/catalog/matches": {"get"},
+        "/api/v1/catalog/matches/{match_id}": {"get"},
         "/api/v1/teams": {"get"},
         "/api/v1/predictions": {"post"},
         "/api/v1/snapshots": {"get", "post"},

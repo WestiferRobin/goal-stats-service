@@ -24,7 +24,7 @@ cleanup() {
   docker rm -f "$runner" >/dev/null 2>&1 || true
   if [[ "$started" == true ]]; then
     if (( status != 0 )); then "${compose[@]}" logs --no-color --tail 100 >&2 || true; fi
-    "${compose[@]}" down --volumes --remove-orphans >/dev/null || status=1
+    "${compose[@]}" down --remove-orphans >/dev/null || status=1
   fi
   rm -rf "$temporary"
   exit "$status"

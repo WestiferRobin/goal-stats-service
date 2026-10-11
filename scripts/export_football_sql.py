@@ -24,16 +24,20 @@ def export() -> None:
     for filename, revision in [
         ("001_fresh_database.sql", "head"),
         ("002_upgrade_template.sql", "b7f42e9c1a60:head"),
+        ("002_upgrade_existing.sql", "d94f81ab2301:head"),
+        ("004_upgrade_scenarios.sql", "e3a71c92b406:head"),
+        ("005_upgrade_predictions.sql", "f6b82d14c903:head"),
     ]:
         stream = io.StringIO()
         config = Config(str(ROOT / "alembic.ini"), output_buffer=stream)
         command.upgrade(config, revision, sql=True)
-        sql = stream.getvalue()
-        if filename == "002_upgrade_template.sql":
-            guard = """DO $$ BEGIN
+        sql = "\n".join(line.rstrip() for line in stream.getvalue().splitlines()) + "\n"
+        if ":" in revision:
+            parent = revision.split(":", 1)[0]
+            guard = f"""DO $$ BEGIN
 IF (SELECT count(*) FROM alembic_version) <> 1 OR NOT EXISTS (
-    SELECT 1 FROM alembic_version WHERE version_num = 'b7f42e9c1a60'
-) THEN RAISE EXCEPTION 'Expected template revision b7f42e9c1a60'; END IF;
+    SELECT 1 FROM alembic_version WHERE version_num = '{parent}'
+) THEN RAISE EXCEPTION 'Expected starting revision {parent}'; END IF;
 END $$;
 """
             sql = sql.replace("BEGIN;", "BEGIN;\n\n" + guard, 1)

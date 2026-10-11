@@ -46,10 +46,14 @@ from routers.football import create_football_blueprint
 from routers.infra import create_health_blueprint
 from routers.item import create_items_blueprint
 from routers.openapi import create_docs_blueprint
+from routers.predictions import create_predictions_blueprint
+from routers.scenarios import create_scenarios_blueprint
 from schemas.problem import ProblemDetailSchema
 from services.action import ActionService
 from services.football import FootballService
 from services.item import ItemService
+from services.predictions import PredictionService
+from services.scenarios import ScenarioService
 from settings.base import ConfigurationError
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
 from settings.environment import Settings, load_application, load_local, local_runtime
@@ -91,6 +95,8 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.register_api(create_items_blueprint(item_service))
     app.register_api(create_actions_blueprint(action_service))
     app.register_api(create_football_blueprint(FootballService(database)))
+    app.register_api(create_scenarios_blueprint(ScenarioService(database)))
+    app.register_api(create_predictions_blueprint(PredictionService(database)))
     register_commands(app, database)
     register_error_handlers(app)
     if settings.core.openapi_enabled:

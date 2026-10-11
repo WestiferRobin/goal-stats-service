@@ -71,6 +71,12 @@ inserting, serializing it with parent deletion; the database FK remains the fina
 relationship invariant. Overlapping operations may observe either legitimate
 ordering. There is no generic repository, DI framework, or custom UnitOfWork class.
 
+The separate [historical catalog](historical-catalog.md) adds `teams`, `competitions`,
+and `matches` at revision `e3a71c92b406`, without changing the prototype tables.
+Its pinned dataset contract is consumed by the explicit historical CLI importer;
+local acceptance verified 64 historical matches and restart persistence. See the
+[Task #2 evidence](task2-acceptance.md).
+
 ## Cache behavior
 
 RedisCache owns bounded GET/SET/DEL, JSON, and safe failure logging. Resource caches
