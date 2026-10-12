@@ -14,9 +14,10 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import Session
 
 from models.base import Base
-from models.catalog import Match, Team
+from models.match import Match
 from models.scenario import Scenario
-from schemas.scenarios import ScenarioState
+from models.team import Team
+from schemas.scenario import ScenarioState
 
 pytestmark = pytest.mark.postgres
 URL = "/api/v1/scenarios"
@@ -201,8 +202,19 @@ def test_invalid_paths_and_queries(scenario_client, suffix):
 
 
 def test_missing_scenario(scenario_client):
-    assert scenario_client.get(URL + "/999").status_code == 404
-    assert scenario_client.patch(URL + "/999", json={"match_minute": 1}).status_code == 404
+    for response in (
+        scenario_client.get(URL + "/999"),
+        scenario_client.patch(URL + "/999", json={"match_minute": 1}),
+    ):
+        assert response.status_code == 404
+        assert response.mimetype == "application/problem+json"
+        assert set(response.json) == {"type", "title", "status", "detail"}
+        assert response.json["status"] == 404
+    response = scenario_client.delete(URL + "/999")
+    assert response.status_code == 405
+    assert {"GET", "HEAD", "PATCH", "OPTIONS"} <= set(
+        response.headers["Allow"].replace(" ", "").split(",")
+    )
 
 
 @pytest.mark.parametrize("method", ["post", "patch"])

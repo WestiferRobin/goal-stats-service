@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import func, select, text
 
 from football.datasets import import_datasets
-from models.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
 
 pytestmark = pytest.mark.postgres
 
@@ -128,7 +128,7 @@ def test_standalone_schema_path(postgres_app):
             assert connection.scalar(text("SELECT count(*) FROM football_teams")) == 32
             assert connection.scalar(text("SELECT count(*) FROM football_history")) == 16
             context = MigrationContext.configure(connection)
-            assert context.get_current_revision() == "a7c93e25d104"
+            assert context.get_current_revision() == "c8d42f19e630"
             assert compare_metadata(context, Base.metadata) == []
         finally:
             connection.rollback()

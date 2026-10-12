@@ -15,11 +15,11 @@ from sqlalchemy.orm import Session
 from football.engine import Match as EngineMatch
 from football.engine import Team as EngineTeam
 from models.base import Base
-from models.catalog import Team
 from models.prediction import Prediction
 from models.scenario import Scenario
+from models.team import Team
 from services.football import report
-from services.predictions import PredictionService
+from services.prediction import PredictionService
 
 pytestmark = pytest.mark.postgres
 
@@ -146,7 +146,7 @@ def test_recalculation_preserves_A_and_B_and_reopens_after_restart(
     def forbidden(*args):
         raise AssertionError("Retrieval must not compute")
 
-    monkeypatch.setattr("services.predictions.predict_inputs", forbidden)
+    monkeypatch.setattr("services.prediction.predict_inputs", forbidden)
     import_database.dispose()
     reopened = app_factory(postgres_config).test_client()
     for row in [first, second, third]:
@@ -166,7 +166,7 @@ def test_concurrent_scenario_edit_after_capture_keeps_original_inputs(
         assert patch.status_code == 200
         return predict_inputs(inputs)
 
-    monkeypatch.setattr("services.predictions.predict_inputs", edit_then_compute)
+    monkeypatch.setattr("services.prediction.predict_inputs", edit_then_compute)
     saved = generate(scenario_client, saved_scenario).json
     assert saved["input_snapshot"]["match_minute"] == saved["output"]["minute"] == 65
     assert (
@@ -248,7 +248,7 @@ def test_invalid_output_never_persists(
     from football.scenario_prediction import predict_inputs
 
     monkeypatch.setattr(
-        "services.predictions.predict_inputs", lambda inputs: {**predict_inputs(inputs), **change}
+        "services.prediction.predict_inputs", lambda inputs: {**predict_inputs(inputs), **change}
     )
     response = scenario_client.post(history_url(saved_scenario))
     assert response.status_code == 500
@@ -262,7 +262,7 @@ def test_engine_failure_never_persists(
     def fail(inputs):
         raise RuntimeError("secret provider credentials")
 
-    monkeypatch.setattr("services.predictions.predict_inputs", fail)
+    monkeypatch.setattr("services.prediction.predict_inputs", fail)
     response = scenario_client.post(history_url(saved_scenario))
     assert response.status_code == 500 and "secret" not in response.text
     assert count(import_database) == 0

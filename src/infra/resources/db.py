@@ -12,12 +12,12 @@ from sqlalchemy import create_engine, select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from models.action import Action
-from models.catalog import Competition, Match, Team
-from models.football import FootballHistory, FootballSnapshot, FootballTeam
-from models.item import Item
+from models.competition import Competition
+from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.match import Match
 from models.prediction import Prediction
 from models.scenario import Scenario
+from models.team import Team
 from settings.base import ConfigurationError
 from settings.database import DatabaseSettings, ImportTarget
 
@@ -65,8 +65,6 @@ def is_ready(database: Database) -> bool:
                 or set(MigrationContext.configure(connection).get_current_heads()) != expected
             ):
                 return False
-            connection.execute(select(Item).limit(1)).all()
-            connection.execute(select(Action).limit(1)).all()
             for model in (
                 FootballTeam,
                 FootballHistory,

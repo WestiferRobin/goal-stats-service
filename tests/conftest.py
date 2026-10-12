@@ -6,7 +6,6 @@ pytest_plugins = [
     "tests.fixtures.application",
     "tests.fixtures.database",
     "tests.fixtures.redis",
-    "tests.fixtures.item",
     "tests.fixtures.workflow",
     "tests.fixtures.scenarios",
 ]

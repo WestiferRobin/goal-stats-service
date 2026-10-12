@@ -104,10 +104,10 @@ See [development details](docs/service/development.md) and
 | Location | Purpose |
 | --- | --- |
 | `src/routers/football.py` | Flask football/API endpoints |
-| `src/schemas/football.py` | Request and response validation |
+| `src/schemas/` | Five normalized entity contracts, shared engine contracts, and prototype compatibility contracts |
 | `src/services/football.py` | Football application logic |
 | `src/football/` | Prediction model, import, and provider adapter |
-| `src/models/football.py` | Database models |
+| `src/models/` | Five normalized Goal Stats models; active prototype and template models under `hold/` |
 | `alembic/versions/` | Database migrations |
 | `data/` | Prototype compatibility inputs, approved manifests, ignored raw sources and verification evidence |
 | `tests/` | Unit and integration tests |
@@ -132,8 +132,13 @@ format checks, strict mypy, and maintained unit, integration, tooling and owners
 tests against disposable PostgreSQL/Redis. It does not run separate smoke, coverage
 or lifecycle certification modes.
 
-Alembic uses one consolidated `a7c93e25d104_init_models.py` baseline, retaining the
-previous head ID so current databases need no reset or restamp.
+Alembic retains the original `a7c93e25d104_init_models.py` baseline and adds guarded
+Item/Action retirement revision `c8d42f19e630`. The final schema has eight application
+tables: five normalized Goal Stats and three RoadToTheFinal tables. Item/Action APIs
+are removed in this checkout; the shared Redis provider remains without business caches.
+**Do not run startup preparation or deploy this checkout against persistent PostgreSQL
+until frontend Home consumers are retired and deployment is explicitly coordinated.**
+See the [retirement handoff](docs/testing/item-action-backend-retirement.md).
 `make run` and `make deploy` apply existing
 revisions before startup. Future revision generation requires a separately reviewed,
 explicitly authorized Alembic workflow; no additional Make command is provided.

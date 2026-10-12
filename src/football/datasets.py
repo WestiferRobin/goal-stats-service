@@ -21,7 +21,7 @@ from football.historical_dataset import (
     validate_checksum,
     validate_headers,
 )
-from models.football import FootballHistory, FootballTeam
+from models.hold.football import FootballHistory, FootballTeam
 
 DATA_DIRECTORY = Path(__file__).resolve().parents[2] / "data" / "prototype"
 

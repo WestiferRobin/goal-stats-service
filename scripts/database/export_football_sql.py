@@ -16,7 +16,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import insert
 
 from football.datasets import read_datasets
-from models.football import FootballHistory, FootballTeam
+from models.hold.football import FootballHistory, FootballTeam
 
 
 def export_schema(directory: Path) -> None:

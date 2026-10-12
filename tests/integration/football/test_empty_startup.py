@@ -63,7 +63,7 @@ def test_empty_database_startup_never_imports(
         for path in ("/health", "/ready", "/swagger", "/swagger/v1/swagger.json"):
             assert client.get(path).status_code == 200, path
         spec = client.get("/swagger/v1/swagger.json").json
-        assert len(spec["paths"]) == 25
+        assert len(spec["paths"]) == 20
         for path in (
             "/api/v1/catalog/teams",
             "/api/v1/catalog/matches",

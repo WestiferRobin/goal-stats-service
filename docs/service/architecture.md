@@ -1,104 +1,135 @@
 # Monolithic backend architecture
 
-The [football domain](football.md) is hosted in the same process and PostgreSQL
-database as the compatibility Item/Action resources below. Football uses the shared
-Database transaction boundary directly; its pure prediction model has no Flask or
-provider dependencies. PostgreSQL replaces browser-session timelines, CSV appends
-and per-worker live caches. All modules deploy together.
-
+The backend hosts five normalized Goal Stats domains and the retained RoadToTheFinal
+prototype in one Flask process and PostgreSQL database. The pure prediction model
+has no Flask or provider dependencies. All modules deploy together.
 
 ```text
 Route → Service → Repository → SQLAlchemy Session → PostgreSQL
-              └→ Resource Cache → Redis JSON adapter → Redis
-
-ORM entity → frozen Pydantic response → explicit JSON serialization → HTTP
+Readiness → shared Redis provider
 ```
 
-The application factory explicitly connects resources → caches → services → Blueprint
-factories. Each application owns its Engine/session factory, Redis pool, cache adapters
-and stateless services. Routers capture their service through a typed factory argument;
-each database operation creates its own Session and repositories. Services,
-repositories, and cache adapters do not depend on Flask globals. One requirements
-file and Python 3.12 remain the dependency/runtime contract.
+The application factory explicitly constructs resources and services, then injects
+services into Blueprint factories. Each application owns its Engine/session factory
+and Redis pool. Each database operation owns its session and repositories. Services
+and repositories do not depend on Flask globals. Python 3.12 and one requirements
+file remain the runtime contract.
 
-## Resource contracts
+## Normalized service ownership
 
-| Methods | Path | Behavior |
-| --- | --- | --- |
-| GET, POST | `/items` | List / create Item |
-| GET, PUT, DELETE | `/items/<item_id>` | Read / update / delete Item |
-| GET, POST | `/actions` | List / create Action with body `itemId` |
-| GET, PUT, DELETE | `/actions/<action_id>` | Read / update / delete Action |
-| GET, POST | `/items/<item_id>/actions` | List / create with parent from URL |
+`TeamService`, `CompetitionService`, `MatchService`, `ScenarioService`, and
+`PredictionService` live in singular modules under `src/services/`. Repositories
+own SQL construction; services own business validation, response serialization,
+and transaction boundaries. Scenario creation shares one session across team,
+match, and scenario repositories; updates validate combined state under a row lock.
 
-POST returns 201 plus canonical Location; Item Location is `/items/<id>` and either
-Action creation form uses `/actions/<id>`. GET/PUT return 200; DELETE returns an
-empty 204. Missing resources/parents return 404 Problem Details. An existing parent
-with no children returns an empty list. There are no nested Action get/update/delete
-routes. Requests reject unknown fields. Nested creation and Action update do not
-accept `itemId`. Action's parent is immutable through this API.
+Scenario and prediction services use the same `ScenarioRepository` projection for
+scenario values and participant names. Prediction generation captures those values
+inside a read transaction, closes it before calculation, validates the unchanged
+engine output, and appends a saved result in a separate transaction. Retrieval uses
+saved inputs and output without recalculation.
 
-Names are required, nonblank, and at most 200 characters. Names need not be unique.
-Item status is `active` or `archived`; new Items are active. Action type is `create`,
-`update`, or `delete`. Numeric and quoted-number enum values are rejected. IDs are
-UUIDs; input UUID zero is rejected. Malformed UUID paths are routing 404s, while
-invalid body UUIDs are validation 400s. Pydantic schemas convert to snake_case
-Python attributes, UUIDs, and StrEnums. Services receive validated command objects and validate ID arguments.
+The existing `football` blueprint injects `TeamService`, `CompetitionService`,
+and `MatchService` directly for the teams, competitions, and matches endpoints
+under `/api/v1/catalog` (including existing team/match detail routes).
+Its prototype endpoints continue using `FootballService`; normalized handlers
+never fall back to prototype data. Temporary catalog delegation methods are removed.
 
-Item JSON: `id`, `name`, `status`, `createdAt`, `updatedAt`.
-Action JSON: `id`, `itemId`, `name`, `type`, `createdAt`, `updatedAt`.
-No ORM state or relationship graphs are returned. Timestamps are UTC-aware; updates
-preserve creation time and advance modification time, including unchanged PUTs.
-Lists order by creation time and UUID as tie-breaker.
+The existing `scenarios` and `saved_predictions` blueprints import their singular
+service modules directly. The application factory constructs each service per app,
+sharing that app's database resource. Temporary plural service import shims are
+removed. Routers validate requests and serialize service responses; services own
+transactions and repositories own persistence. No normalized cache dependencies
+are introduced.
+
+All paths, converters, HTTP methods, blueprint/handler names, operation IDs,
+request/response schemas, status codes, and Location headers remain unchanged.
+Saved prediction generation remains a bodyless POST, separate from the prototype
+stateless prediction endpoint. Prototype routes remain active. The twelve Item/Action
+operations are retired in this checkout; frontend Home coordination remains pending.
+Do not deploy this removal or migrate persistent PostgreSQL before that coordination.
+
+## Schema ownership
+
+Historical team, competition, and match contracts live in `schemas/team.py`,
+`competition.py`, and `match.py`. Saved scenario and prediction contracts live in
+`scenario.py` and `prediction.py`. Existing class names and JSON/OpenAPI contracts
+are preserved; the former plural schema modules have no remaining consumers.
+
+`schemas/engine.py` owns shared statistics, modifiers, and prediction report
+components used by both normalized and prototype workflows. `schemas/football.py`
+retains prototype matchups, prediction requests, tournaments, and snapshots.
+`schemas/common.py` owns shared contract configuration, count/identity bounds,
+pagination, possession validation, and shared primitives. Problem Details remains unchanged.
+
+Schema-module separation changes no PostgreSQL definitions, historical imports,
+prediction formulas, or cache behavior. Router files retain their routes and
+handlers. Direct entity-service wiring preserves these same schema contracts.
+
+## Model ownership
+
+The five normalized models have individual modules under `src/models/`: `team.py`,
+`competition.py`, `match.py`, `scenario.py`, and `prediction.py`. The shared base,
+metadata naming convention, and nonblank constraint helper remain in `base.py`.
+
+`models/hold/football.py` maps the three active RoadToTheFinal tables; the directory
+otherwise contains only its package marker. Exactly eight application tables are
+registered by the database resource and Alembic environment. The prediction engine
+remains in `src/football/`.
 
 ## Database and transactions
 
-`items` has a UUID PK, required bounded/nonblank name, constrained string status,
-and non-null timezone-aware timestamp columns. `actions` has the same core fields,
-a constrained action type, and an indexed FK to `items` with ON DELETE CASCADE.
-No Python-side cascade graph is needed. The consolidated Alembic revision `a7c93e25d104` establishes
-this fresh Python schema. Python supplies UUID/timestamp defaults on ORM insertion;
-direct SQL writers must supply those values explicitly.
+Each operation owns a fresh transaction/session. Repositories query, add or flush,
+but do not commit. Successful context exit commits; failure rolls back and closes.
+Scenario updates lock their target row. Database foreign keys and check constraints
+remain the final relationship/state invariants. There is no generic repository,
+DI framework, or custom UnitOfWork class.
 
-Each service operation owns a fresh transaction/session. Repositories can query,
-add, delete, or flush, but do not commit. A successful context exit commits; any
-failure rolls back and closes. Pydantic responses are built inside the session; cache writes
-or invalidation happen after successful exit. A failed flush/commit cannot trigger
-successful mutation-related cache changes.
+The original `a7c93e25d104` migration remains unchanged. Forward revision
+`c8d42f19e630` locks both retired tables, refuses nonempty tables, and drops actions
+before items. It preserves the five normalized and three prototype tables.
+Downgrade recreates empty legacy tables with their original constraints and indexes;
+it does not recover data. See [retirement](../testing/item-action-backend-retirement.md).
 
-Update/delete lock their target rows. Action creation locks its parent before
-inserting, serializing it with parent deletion; the database FK remains the final
-relationship invariant. Overlapping operations may observe either legitimate
-ordering. There is no generic repository, DI framework, or custom UnitOfWork class.
+The [historical catalog](historical-catalog.md) supports nine approved Women's World
+Cup editions. Its explicit importer retains checksums, provenance, conflict rejection,
+idempotency and per-edition transactions. Startup never seeds data.
 
-The separate [historical catalog](historical-catalog.md) adds `teams`, `competitions`,
-and `matches`, included in the consolidated `a7c93e25d104` baseline alongside the prototype tables.
-Its pinned dataset contract is consumed by the explicit historical CLI importer;
-local acceptance verified 64 historical matches and restart persistence. See the
-[Task #2 evidence](task2-acceptance.md).
+## Normalized entity cache decisions
 
-## Cache behavior
+PostgreSQL remains authoritative for all five normalized entities. None currently
+has a demonstrated performance requirement for Redis caching. The existing shared
+Redis provider remains available; the retired adapters are removed. A model and
+repository do not imply that an entity needs a cache. No normalized cache modules,
+placeholder files, service dependencies, keys, or TTLs are introduced.
 
-RedisCache owns bounded GET/SET/DEL, JSON, and safe failure logging. Resource caches
-own `{prefix}:items:<uuid>` and `{prefix}:actions:<uuid>` keys, schema validation,
-identity checking, and TTL (default 300 seconds). Prefixes separate services and
-environments. Cache payloads use explicit scalar schemas, never pickle or ORM objects.
+| Entity | Decision | Reason and reconsideration criteria |
+| --- | --- | --- |
+| Team | DEFER | The 44-team catalog has no demonstrated database pressure. Future identity keys must distinguish normalized IDs from prototype identities; response schemas can serialize the catalog, but optional rating changes would require invalidation. Never substitute prototype ratings. |
+| Competition | DEFER | Nine editions are inexpensive to read directly. Seeding can change list membership; TTL-only caching would permit incomplete or stale lists. Reconsider only with measured demand and import-aware invalidation. |
+| Match | DEFER | The 348-match catalog already uses filtered, ordered, paginated repository reads. Caching adds filter/pagination key combinations and import invalidation without demonstrated benefit. Future caches must preserve every filter, ordering, identity, and source-provenance field. |
+| Scenario | NO CACHE | Mutable scenarios and prediction input capture require current database state, row locking, and preserved rating snapshots. Direct repository reads retain existing transaction and concurrency guarantees. |
+| Prediction | NO CACHE | Read saved inputs, model versions, and exact outputs directly without recalculation. New append-only records change history lists immediately; detail caching can be reconsidered if measured retrieval demand justifies it. |
 
-GET-by-ID is cache-aside; a miss queries PostgreSQL and fills Redis. Lists remain
-uncached. Creation does not fill the cache. Update/delete invalidate after commit.
-Malformed/incomplete/wrong-identity cache payloads are misses. Redis connection,
-permission, or serialization failures do not invalidate successful PostgreSQL work.
-Logs omit raw URLs, credentials, payloads, and provider error messages.
+A local read-only observation (one warmup and ten reads per query) found median
+repository times of approximately 0.82 ms for 44 teams, 0.61 ms for nine competitions,
+and 2.76 ms for the default 50-match page. These are warm local observations, not a
+production load benchmark or concurrency guarantee. They establish no reason to
+add cache complexity; production access patterns should guide any future decision.
 
-An Action cache hit still checks database row existence. If cascade deletion removed
-it, the service discards the cached child and returns 404, even if Redis deletion
-fails. Item deletion never scans child cache keys or couples itself to ActionCache.
-This existence check is not atomic with overlapping deletions.
+Historical imports continue writing PostgreSQL through the explicit importer.
+There are no normalized cache entries to invalidate after seeding. Prediction
+calculation continues outside database transactions using captured inputs, and
+retrieval returns the saved result. Redis outages cannot introduce stale normalized
+scenario state or alter prediction calculations.
 
-Cache and PostgreSQL are not one transaction. Failed invalidation or concurrent
-cache fills can leave stale values until TTL expiry. The child check protects
-absent Actions, not freshness of still-existing rows. Item cache hits do not query
-the database. Do not claim stronger consistency than these guarantees.
+## Shared Redis provider
+
+RedisCache retains bounded GET/SET/DEL, JSON serialization, namespace isolation,
+TTL support and safe failure logging. Connection, ACL and corrupt-payload failures
+remain safe misses where supported. Logs omit URLs, credentials, payloads and raw
+provider error messages. There are no active business cache adapters. Obsolete
+Item/Action keys may expire naturally; retirement does not flush Redis.
 
 ## Operations and errors
 
@@ -129,22 +160,18 @@ for runtime identities and cleanup.
 
 | Module/package | Responsibility |
 | --- | --- |
-| `main.py` | Factory, explicit resource/cache/service construction, Blueprint registration, direct LOCAL startup diagnostics |
-| `routers/item.py`, `routers/action.py` | Typed HTTP adapters; Action owns nested Item→Action operations |
+| `main.py` | Factory, explicit resource/service construction, Blueprint registration, direct LOCAL startup diagnostics |
 | `routers/infra.py` | Operational HTTP endpoints `/health` and `/ready` |
 | `exceptions/handlers.py` | HTTP error mapping and object-body request guard |
 | `routers/openapi.py` | Generated response metadata and native local Swagger Blueprint |
-| `schemas/item/`, `schemas/action/` | Domain Pydantic contracts: `request.py`, `response.py`, and `base.py` |
 | `schemas/common.py`, `schemas/problem.py` | Shared constraints/timestamp codec and Problem Details |
-| `services/item.py`, `services/action.py` | Independent application operations and transaction ownership |
 | `infra/base.py` | Infrastructure readiness/state evaluation; no HTTP handling |
 | `infra/repositories` | Concrete session-bound SQLAlchemy queries and writes |
-| `infra/caches` | Cache identity, Pydantic payload validation and serialization |
+| `infra/resources/redis.py` | Shared optional Redis provider and readiness |
 | `infra/resources` | Engine/sessionmaker and Redis ownership, readiness, disposal |
 | `models` | SQLAlchemy database models and one authoritative Base |
-| `enums` | ItemStatus and ActionType |
 | `settings` | Concern-based typed configuration with explicit private file loading |
-| `exceptions/base.py`, `exceptions/item.py`, `exceptions/action.py` | Application exceptions without HTTP status fields |
+| `exceptions/base.py`, `services/prediction.py` | Application exceptions without HTTP status fields |
 
 All paths are beneath flat `src/`. Package markers are empty; mapped classes are
 imported explicitly wherever metadata registration is required. There is no `src`
@@ -153,8 +180,7 @@ package, service-name package, global settings singleton or dependency-injection
 Pydantic commands reject unknown fields and internal snake_case HTTP aliases. Services
 construct frozen responses from ORM attributes before closing the transaction.
 Routes explicitly serialize responses with `model_dump(mode="json", by_alias=True)`.
-Cache adapters use the same response schemas and preserve UTC `+00:00` timestamps.
-They do not import services. Services never import Flask.
+Responses preserve their existing timestamp contracts. Services never import Flask.
 
 Request validation produces safe 400 responses through the extension callback.
 A small native guard refuses malformed/non-object/non-JSON bodies before binding.
@@ -169,18 +195,8 @@ sessions, authentication platform, queues, gRPC or provider registries are intro
 
 ### API schema naming
 
-Each domain owns a schema package: `request.py` contains `*Request` body DTOs,
-`response.py` contains `*Response` resource/list DTOs, and `base.py` contains
-`*Schema` path/query contracts or genuine reusable domain foundations. `base.py`
-does not require a generic domain base class: ItemPathSchema and ActionPathSchema
-are its current responsibilities. Additional domain files contain `*Schema`
-contracts only when a distinct responsibility requires them.
-
+The five normalized domains use singular schema modules; shared prediction components
+live in `schemas/engine.py`, and prototype contracts in `schemas/football.py`.
 Cross-domain primitives remain in `schemas/common.py`; singleton contracts such as
-`schemas/problem.py` remain flat. Package markers are empty, and callers import
-from defining modules explicitly, for example `schemas.item.request` and
-`schemas.item.response`. `ActionWriteRequest` is shared by Action updates and
-nested creation; `ActionCreateRequest` adds `itemId`.
-`ProblemDetailSchema` defines the unchanged Problem Details JSON contract.
-The request/problem component names follow these Python names in OpenAPI;
-fields, constraints, statuses and media types are unchanged.
+`schemas/problem.py` remain flat. Callers import defining modules explicitly.
+`ProblemDetailSchema` defines the unchanged safe error JSON contract.

@@ -1,0 +1,173 @@
+{
+  "openapi": "a04648f363bd50e42e69561b1998779ca770a0918ee57d9b2b127fa0e7b6eb17",
+  "schemas": {
+    "CatalogCompetitionResponse": {
+      "serialization": "f58d67ad9dd26be36c2ff0e74bfb9540177ff164b3c9dba7202a87e6ac047f54",
+      "validation": "f58d67ad9dd26be36c2ff0e74bfb9540177ff164b3c9dba7202a87e6ac047f54"
+    },
+    "CatalogCompetitionsResponse": {
+      "serialization": "d28aa0a780ad537e037202bc506d165d6378026d28dcddcb7efe1b6fb7883924",
+      "validation": "d28aa0a780ad537e037202bc506d165d6378026d28dcddcb7efe1b6fb7883924"
+    },
+    "CatalogMatchPath": {
+      "serialization": "d3c3cd04080cc06a8d45f611ba335719b78ebae66f74fa802289d9370265c2b1",
+      "validation": "d3c3cd04080cc06a8d45f611ba335719b78ebae66f74fa802289d9370265c2b1"
+    },
+    "CatalogMatchQuery": {
+      "serialization": "431aeeeb9a3202ca51fcec81a0b12f996b9bc8eb9ae81162e940999abad039eb",
+      "validation": "431aeeeb9a3202ca51fcec81a0b12f996b9bc8eb9ae81162e940999abad039eb"
+    },
+    "CatalogMatchResponse": {
+      "serialization": "590e81a04715f634c969618691bbb0dd2b2e79ab5372fa7bfad6bf729f17e1d9",
+      "validation": "590e81a04715f634c969618691bbb0dd2b2e79ab5372fa7bfad6bf729f17e1d9"
+    },
+    "CatalogMatchesResponse": {
+      "serialization": "d1465cde4ac6a3fd67d222f8c12184f09f6390b51070e98aa6f3025043bc1298",
+      "validation": "d1465cde4ac6a3fd67d222f8c12184f09f6390b51070e98aa6f3025043bc1298"
+    },
+    "CatalogTeamPath": {
+      "serialization": "a1873acc88bd7b16f7e224b5c92d04c842d8dcff925542ca7e90d585707f5bef",
+      "validation": "a1873acc88bd7b16f7e224b5c92d04c842d8dcff925542ca7e90d585707f5bef"
+    },
+    "CatalogTeamResponse": {
+      "serialization": "536fdf6c54952d4ce7d0f2f6fa175d0269b18b9b3e504f0c1f5aafafe3fa83c6",
+      "validation": "536fdf6c54952d4ce7d0f2f6fa175d0269b18b9b3e504f0c1f5aafafe3fa83c6"
+    },
+    "CatalogTeamsResponse": {
+      "serialization": "01b789c85b13447300a203d249fb1173e021e82eb59f24acfc3b8ac0260a6048",
+      "validation": "01b789c85b13447300a203d249fb1173e021e82eb59f24acfc3b8ac0260a6048"
+    },
+    "Confidence": {
+      "serialization": "fafc60f0bcd0c89ea378ba5a10d67d65d588aa5c08eead2ef373a7af555f52b4",
+      "validation": "fafc60f0bcd0c89ea378ba5a10d67d65d588aa5c08eead2ef373a7af555f52b4"
+    },
+    "Contract": {
+      "serialization": "41d211a0a587b9a996f3678bb8cdea20e3dcbcb4f36c7b7f6871b08db35a54da",
+      "validation": "41d211a0a587b9a996f3678bb8cdea20e3dcbcb4f36c7b7f6871b08db35a54da"
+    },
+    "ExpectedGoals": {
+      "serialization": "00e96885e7a0a8f36591da7ed994ab708b3e483574536b6c3bda1cfb00257f01",
+      "validation": "00e96885e7a0a8f36591da7ed994ab708b3e483574536b6c3bda1cfb00257f01"
+    },
+    "HistoryQuery": {
+      "serialization": "94290627989a0608727da82a019c7b23a5a513b012880d7e33413241fe8e4d3d",
+      "validation": "94290627989a0608727da82a019c7b23a5a513b012880d7e33413241fe8e4d3d"
+    },
+    "Matchup": {
+      "serialization": "7a24d85a173f2dbf3a9e688faaafb7e21d8cbc7375d0de692f6b55a7dcf4621c",
+      "validation": "7a24d85a173f2dbf3a9e688faaafb7e21d8cbc7375d0de692f6b55a7dcf4621c"
+    },
+    "Modifier": {
+      "serialization": "33e25ee808c6c2e8db8509648e4f2d5280f6f5cc8edb38eacdf62a22bd5d21f8",
+      "validation": "33e25ee808c6c2e8db8509648e4f2d5280f6f5cc8edb38eacdf62a22bd5d21f8"
+    },
+    "OutcomeProbabilities": {
+      "serialization": "8873667842f7c56f38d94f6e58b37e2a3fe93d7b3151e40566fedeeebd967a30",
+      "validation": "8873667842f7c56f38d94f6e58b37e2a3fe93d7b3151e40566fedeeebd967a30"
+    },
+    "Pair": {
+      "serialization": "45140657030aa3929cd4aee245b6a492ada615880a204f105d8154bd5cb935c2",
+      "validation": "45140657030aa3929cd4aee245b6a492ada615880a204f105d8154bd5cb935c2"
+    },
+    "PercentPair": {
+      "serialization": "094c931dab5415e98966020a2f8f3c3df0f4c2476416a27cda9556ef7e04bca9",
+      "validation": "094c931dab5415e98966020a2f8f3c3df0f4c2476416a27cda9556ef7e04bca9"
+    },
+    "PredictionHistoryQuery": {
+      "serialization": "9fee609a355941b134ef23c64c748e0e95ef601cacf6ea03355e2631c9ff85b5",
+      "validation": "9fee609a355941b134ef23c64c748e0e95ef601cacf6ea03355e2631c9ff85b5"
+    },
+    "PredictionInputs": {
+      "serialization": "69de619cbf1af976e6cba2b6e7059e98b81cc81ba412556ba86237411e9662ad",
+      "validation": "69de619cbf1af976e6cba2b6e7059e98b81cc81ba412556ba86237411e9662ad"
+    },
+    "PredictionPath": {
+      "serialization": "0c206cab77287f4e6e0124e85b3d1538ec5bbefb5a244942a84373986a069f38",
+      "validation": "0c206cab77287f4e6e0124e85b3d1538ec5bbefb5a244942a84373986a069f38"
+    },
+    "PredictionRequest": {
+      "serialization": "c3f6e9ea91a11a34c37c4d6d4fee22b3fe0c7ed5bc861aa6e756c1d334f3b31f",
+      "validation": "c3f6e9ea91a11a34c37c4d6d4fee22b3fe0c7ed5bc861aa6e756c1d334f3b31f"
+    },
+    "PredictionResponse": {
+      "serialization": "e4540e232e38aac32c5c6c4edb23e7b80551e2909f6e227a215817cce8837212",
+      "validation": "e4540e232e38aac32c5c6c4edb23e7b80551e2909f6e227a215817cce8837212"
+    },
+    "SavedEngineOutput": {
+      "serialization": "de6c8f336ef9fac646f71e7ff694ae94a64d2acd48b20157dbbe820697e93c86",
+      "validation": "de6c8f336ef9fac646f71e7ff694ae94a64d2acd48b20157dbbe820697e93c86"
+    },
+    "SavedPredictionResponse": {
+      "serialization": "210b0bd1a678b3389f67553e7abb4e25677686451baac81b010ed107a34c6b06",
+      "validation": "210b0bd1a678b3389f67553e7abb4e25677686451baac81b010ed107a34c6b06"
+    },
+    "SavedPredictionsResponse": {
+      "serialization": "9953ead21474b7d8764f2bef0ae08e134445e910cb2208b4cb2b6bbc5c38bd39",
+      "validation": "9953ead21474b7d8764f2bef0ae08e134445e910cb2208b4cb2b6bbc5c38bd39"
+    },
+    "ScenarioCreate": {
+      "serialization": "844e20c0f2656b3a26e90ea3a81a5ce2e7c0a7f617763261b8ea05234a25b0d1",
+      "validation": "844e20c0f2656b3a26e90ea3a81a5ce2e7c0a7f617763261b8ea05234a25b0d1"
+    },
+    "ScenarioPatch": {
+      "serialization": "6fe319e5300cbcb3cd36d0f0273195ef43a95c1617899f410917ec286129e9ac",
+      "validation": "6fe319e5300cbcb3cd36d0f0273195ef43a95c1617899f410917ec286129e9ac"
+    },
+    "ScenarioPath": {
+      "serialization": "77ac4ff4f1b352ba5c1b428a4af4d068395e93ae3c1c45b58fa91567b4277b13",
+      "validation": "77ac4ff4f1b352ba5c1b428a4af4d068395e93ae3c1c45b58fa91567b4277b13"
+    },
+    "ScenarioQuery": {
+      "serialization": "d5ff3609150b96ea6dc100f4282cae0d2e221d2dcb87ab706dac81195ad5927e",
+      "validation": "d5ff3609150b96ea6dc100f4282cae0d2e221d2dcb87ab706dac81195ad5927e"
+    },
+    "ScenarioResponse": {
+      "serialization": "8c4bb8db812ed11004669fc8cd09dfa86612dcbcef5531927eaa6040e08ae140",
+      "validation": "8c4bb8db812ed11004669fc8cd09dfa86612dcbcef5531927eaa6040e08ae140"
+    },
+    "ScenarioState": {
+      "serialization": "2530a9b492125e9e97cb143bc87bee51da597c1776102f4af9b8d03a6c224443",
+      "validation": "2530a9b492125e9e97cb143bc87bee51da597c1776102f4af9b8d03a6c224443"
+    },
+    "ScenariosResponse": {
+      "serialization": "810a3dafcfb4d97f09cba5b37f040a63d33e540195f5f93cb572f57d0c415a15",
+      "validation": "810a3dafcfb4d97f09cba5b37f040a63d33e540195f5f93cb572f57d0c415a15"
+    },
+    "Scoreline": {
+      "serialization": "b6c95599dddd1da79823316a3ad0272e4df123628d14d2805cf3fcc86779eb6a",
+      "validation": "b6c95599dddd1da79823316a3ad0272e4df123628d14d2805cf3fcc86779eb6a"
+    },
+    "SnapshotPath": {
+      "serialization": "6e7576fbc2d08d90a416cf56f01eec2aefc945934f3ec8ed038f4b35f59efa37",
+      "validation": "6e7576fbc2d08d90a416cf56f01eec2aefc945934f3ec8ed038f4b35f59efa37"
+    },
+    "SnapshotQuery": {
+      "serialization": "30254798a00aa03ee47d7e0f8468bf2303e59dbea0c770eee4ee19bfe0a4793a",
+      "validation": "30254798a00aa03ee47d7e0f8468bf2303e59dbea0c770eee4ee19bfe0a4793a"
+    },
+    "TeamStats": {
+      "serialization": "0b31f71a3be123785d283f0929707fb42a818f4ea06b060cad195a120d2b1433",
+      "validation": "0b31f71a3be123785d283f0929707fb42a818f4ea06b060cad195a120d2b1433"
+    },
+    "TournamentRequest": {
+      "serialization": "efb347899400f6d3f7884c54ef5ad73fa43818138cf66bb0d0edea69a2a4206d",
+      "validation": "efb347899400f6d3f7884c54ef5ad73fa43818138cf66bb0d0edea69a2a4206d"
+    },
+    "ValidConfidence": {
+      "serialization": "4672e9fb0a12f62ad0b102ed896bf95826f0bd332e87e6ad254d75b6fa83a2a5",
+      "validation": "4672e9fb0a12f62ad0b102ed896bf95826f0bd332e87e6ad254d75b6fa83a2a5"
+    },
+    "ValidPair": {
+      "serialization": "dab5edd84642978a125f2b51e388bf4f1b567158b67d4e006e6219ddb9b295db",
+      "validation": "dab5edd84642978a125f2b51e388bf4f1b567158b67d4e006e6219ddb9b295db"
+    },
+    "ValidProbabilities": {
+      "serialization": "35fe6c268888d58e5c9c038c83e9d34d3f7c1759916f1e0c9e20ee1e2d4a5193",
+      "validation": "35fe6c268888d58e5c9c038c83e9d34d3f7c1759916f1e0c9e20ee1e2d4a5193"
+    },
+    "ValidScoreline": {
+      "serialization": "dc465c3ca651cfea494ff76807a0d3428c930cb1d3e48a708ecd9d314e0d826c",
+      "validation": "dc465c3ca651cfea494ff76807a0d3428c930cb1d3e48a708ecd9d314e0d826c"
+    }
+  }
+}

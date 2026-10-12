@@ -37,23 +37,20 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from exceptions.handlers import register_error_handlers, request_validation
 from football.cli import register_commands
-from infra.caches.action import ActionCache
-from infra.caches.item import ItemCache
 from infra.resources.db import Database, is_ready
 from infra.resources.redis import RedisCache
-from routers.action import create_actions_blueprint
 from routers.football import create_football_blueprint
 from routers.infra import create_health_blueprint
-from routers.item import create_items_blueprint
 from routers.openapi import create_docs_blueprint
 from routers.predictions import create_predictions_blueprint
 from routers.scenarios import create_scenarios_blueprint
 from schemas.problem import ProblemDetailSchema
-from services.action import ActionService
+from services.competition import CompetitionService
 from services.football import FootballService
-from services.item import ItemService
-from services.predictions import PredictionService
-from services.scenarios import ScenarioService
+from services.match import MatchService
+from services.prediction import PredictionService
+from services.scenario import ScenarioService
+from services.team import TeamService
 from settings.base import ConfigurationError
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
 from settings.environment import Settings, load_application, load_local, local_runtime
@@ -77,24 +74,21 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.logger.addHandler(default_handler)
     database = Database(settings.database)
     cache = RedisCache(settings.redis, app.logger)
-    item_cache = ItemCache(cache, settings.redis.cache_key_prefix, settings.redis.cache_ttl_seconds)
-    action_cache = ActionCache(
-        cache, settings.redis.cache_key_prefix, settings.redis.cache_ttl_seconds
-    )
     app.extensions["goalstats_settings"] = settings
     app.extensions["goalstats_database"] = database
     app.extensions["goalstats_cache"] = cache
-    app.extensions["goalstats_item_cache"] = item_cache
-    app.extensions["goalstats_action_cache"] = action_cache
 
-    item_service = ItemService(database, item_cache)
-    action_service = ActionService(database, action_cache)
     if settings.redis.url is None:
         app.logger.warning("Redis is unconfigured; database fallback is available")
     app.register_api(create_health_blueprint(database, cache, settings.redis.cache_key_prefix))
-    app.register_api(create_items_blueprint(item_service))
-    app.register_api(create_actions_blueprint(action_service))
-    app.register_api(create_football_blueprint(FootballService(database)))
+    app.register_api(
+        create_football_blueprint(
+            FootballService(database),
+            team_service=TeamService(database),
+            competition_service=CompetitionService(database),
+            match_service=MatchService(database),
+        )
+    )
     app.register_api(create_scenarios_blueprint(ScenarioService(database)))
     app.register_api(create_predictions_blueprint(PredictionService(database)))
     register_commands(app, database)

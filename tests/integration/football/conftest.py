@@ -10,7 +10,8 @@ from alembic.config import Config
 from sqlalchemy import event, text
 
 from infra.resources.db import Database
-from models.catalog import Match, Team
+from models.match import Match
+from models.team import Team
 from settings.database import DatabaseSettings, ImportTarget, database_url
 
 

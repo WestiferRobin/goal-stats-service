@@ -15,7 +15,9 @@ from football.datasets import (
 )
 from football.historical_dataset import HistoricalMatchRecord, load_manifest
 from infra.resources.db import Database, verify_import_database
-from models.catalog import Competition, Match, Team
+from models.competition import Competition
+from models.match import Match
+from models.team import Team
 from settings.base import ConfigurationError
 from settings.database import ImportTarget
 

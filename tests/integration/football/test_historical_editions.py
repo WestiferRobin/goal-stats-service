@@ -13,8 +13,10 @@ from sqlalchemy import func, select, text
 from football.cli import register_commands
 from football.historical_dataset import APPROVED_DATASETS, load_manifest
 from football.historical_import import import_historical_dataset
-from models.catalog import Competition, Match, Team
-from models.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.competition import Competition
+from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.match import Match
+from models.team import Team
 
 pytestmark = pytest.mark.postgres
 

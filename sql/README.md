@@ -10,11 +10,13 @@ The schema export is for an **empty database only**:
 psql -X -v ON_ERROR_STOP=1 -f sql/001_fresh_database.sql
 ```
 
-It is generated from `a7c93e25d104_init_models.py`, the consolidated initial
-migration. The previous head ID is retained: databases already at that head need
-no changes. The four SQL upgrade exports for retired intermediate revisions have
-been removed. Older databases must finish the original chain using the previous
-checkout before switching; never stamp an incomplete schema as current.
+It is generated from the unchanged initial `a7c93e25d104` revision followed by
+`c8d42f19e630`, which safely retires empty Item/Action tables. The final schema has
+eight application tables and the new Alembic head. Existing databases use the forward
+Alembic migration, not this fresh export. Persistent upgrades and deployment remain
+blocked on frontend Home coordination; see the [handoff](../docs/testing/item-action-backend-retirement.md).
+Older intermediate revisions must finish the original chain with the previous
+checkout; never stamp an incomplete schema as current.
 
 Optional, explicitly invoked prototype compatibility operation (never part of startup):
 
@@ -24,7 +26,8 @@ psql -X -v ON_ERROR_STOP=1 -f sql/prototype/003_seed_football.sql
 
 The schema export runs once in its own transaction and records the Alembic head.
 The prototype seed is repeatable and preserves existing rows. Neither artifact
-drops tables or deletes records.
+deletes records. The schema export creates the original legacy tables and then
+drops them under the guarded forward migration, within the same transaction.
 
 The unchanged seed contains 32 prototype teams, 13 historical-result-shaped prototype
 rows, and 3 unlabeled snapshots. These are not verified historical matches. The
@@ -45,7 +48,7 @@ PYTHONPATH=src .venv/bin/python scripts/database/export_football_sql.py --mode s
 ## Normalized historical catalog
 
 The baseline includes `teams`, `competitions`, `matches`, `scenarios`, and
-`predictions`, as well as the prototype and Item/Action tables. SQL exports contain
+`predictions`, as well as the three retained prototype tables. SQL exports contain
 schema only; explicit `make seed` imports historical data through the guarded Flask
 importer. See the [dataset contract](../data/README.md) and
 [catalog schema](../docs/service/historical-catalog.md).

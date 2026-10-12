@@ -7,7 +7,9 @@ from sqlalchemy import event
 
 from football.datasets import import_datasets
 from football.historical_import import import_historical_dataset
-from models.catalog import Competition, Match, Team
+from models.competition import Competition
+from models.match import Match
+from models.team import Team
 
 pytestmark = pytest.mark.postgres
 BASE = "/api/v1/catalog"

@@ -291,5 +291,30 @@ CREATE INDEX ix_predictions_generated_at ON predictions (generated_at, predictio
 
 INSERT INTO alembic_version (version_num) VALUES ('a7c93e25d104') RETURNING alembic_version.version_num;
 
+-- Running upgrade a7c93e25d104 -> c8d42f19e630
+
+LOCK TABLE items, actions IN ACCESS EXCLUSIVE MODE;
+
+DO $guard$
+        DECLARE
+            has_items boolean;
+            has_actions boolean;
+        BEGIN
+            SELECT EXISTS (SELECT 1 FROM items) INTO has_items;
+            SELECT EXISTS (SELECT 1 FROM actions) INTO has_actions;
+            IF has_items OR has_actions THEN
+                RAISE EXCEPTION 'Item/Action retirement refused: items or actions contains records.'
+                    ' Preserve the data and coordinate retirement before retrying.'
+                    USING ERRCODE = 'check_violation';
+            END IF;
+        END
+        $guard$;;
+
+DROP TABLE actions;
+
+DROP TABLE items;
+
+UPDATE alembic_version SET version_num='c8d42f19e630' WHERE alembic_version.version_num = 'a7c93e25d104';
+
 COMMIT;
 

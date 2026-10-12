@@ -65,15 +65,20 @@ Ctrl-C or IDE Stop; inspect any other port owner before changing `APP_PORT`.
 
 Alembic remains authoritative. The initial migration is
 `alembic/versions/a7c93e25d104_init_models.py`, with no parent. It creates all ten
-application tables, constraints and indexes without seeding data. Both normal
+original application tables, constraints and indexes without seeding data. The forward
+`c8d42f19e630` revision removes empty Item/Action tables under exclusive locks,
+refuses any existing legacy records, and leaves eight application tables. Both normal
 startup commands apply migrations through the shared preparation function.
 
 The former five revisions were consolidated while retaining the previous head ID
-`a7c93e25d104`. Databases already at that head need no reset, restamp or data changes.
+`a7c93e25d104`. The new repository head is `c8d42f19e630`; persistent development
+PostgreSQL intentionally remains at the parent during frontend coordination.
+Do not run `make run`, `make deploy`, or persistent Alembic upgrades from this checkout
+before coordinated authorization: startup preparation applies pending migrations.
+Direct factory construction is lazy; readiness correctly rejects an old revision.
 Older intermediate revisions are no longer supported by this checkout: complete
 the original migration chain using the previous checkout before switching. Do not
-stamp an incomplete schema as current. Future migrations must be children of this
-baseline. Downgrading to `base` drops all application tables and is tested only in
+stamp an incomplete schema as current. Future migrations must extend the current head; preserve the initial baseline. Downgrading to `base` drops all application tables and is tested only in
 disposable databases.
 `make infra` starts providers without applying migrations or importing data.
 

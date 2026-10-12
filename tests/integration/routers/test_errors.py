@@ -91,7 +91,9 @@ def test_consistent_safe_problem_details(error_app, path, method, status, capsys
         )
 
 
-@pytest.mark.parametrize("path", ["/_json", "/_validation"])
+@pytest.mark.parametrize(
+    "path", ["/_json", "/_validation", "/api/v1/scenarios", "/api/v1/predictions"]
+)
 def test_malformed_json_uses_problem_details(error_app, path):
     response = error_app.test_client().post(
         path, data="{broken private_password", content_type="application/json"

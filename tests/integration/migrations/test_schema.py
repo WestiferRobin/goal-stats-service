@@ -32,8 +32,6 @@ def test_fresh_alembic_history_upgrade_downgrade_and_model_agreement(
         "matches",
         "scenarios",
         "predictions",
-        "items",
-        "actions",
         "football_teams",
         "football_history",
         "football_snapshots",
@@ -48,6 +46,4 @@ def test_fresh_alembic_history_upgrade_downgrade_and_model_agreement(
         "matches",
         "scenarios",
         "predictions",
-        "items",
-        "actions",
     }

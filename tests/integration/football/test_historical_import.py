@@ -4,8 +4,10 @@ from sqlalchemy.exc import IntegrityError
 
 from football.datasets import HistoricalImportError, import_datasets
 from football.historical_import import import_historical_dataset
-from models.catalog import Competition, Match, Team
-from models.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.competition import Competition
+from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
+from models.match import Match
+from models.team import Team
 
 pytestmark = pytest.mark.postgres
 

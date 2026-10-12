@@ -6,8 +6,8 @@ from sqlalchemy import func, select, text
 from sqlalchemy.exc import OperationalError
 
 from football.cli import register_commands
-from models.catalog import Match
-from models.football import FootballHistory, FootballTeam
+from models.hold.football import FootballHistory, FootballTeam
+from models.match import Match
 
 pytestmark = pytest.mark.postgres
 

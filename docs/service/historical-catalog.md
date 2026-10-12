@@ -4,8 +4,8 @@ PostgreSQL is the implementation database, following the compatibility audit and
 Task #2 schema/dataset contract. Older project drafts use MySQL terminology; the
 implementation uses PostgreSQL identity columns and signed types with checks.
 
-`src/models/catalog.py` defines three new tables, independent of the prototype
-prediction structures:
+`src/models/team.py`, `competition.py`, and `match.py` define the historical
+tables, independent of the prototype prediction structures:
 
 | Table | Identity | Relationships and rules |
 | --- | --- | --- |
@@ -29,8 +29,9 @@ the dataset contract; PostgreSQL enforces key uniqueness and nonblank values.
 
 The consolidated `a7c93e25d104_init_models.py` baseline creates all application
 models, including the historical catalog, scenarios, predictions and prototype
-tables. It contains no imports or backfills. Existing databases already at
-`a7c93e25d104` retain their schema and records without restamping. See
+tables. It contains no imports or backfills. Guarded forward revision `c8d42f19e630`
+retires empty Item/Action tables and preserves all eight retained application tables.
+Persistent upgrades are deferred until frontend coordination; no restamping is needed. See
 [development](development.md#schema-changes) for older-database compatibility.
 Downgrading this initial revision drops all application tables; migration tests
 exercise that operation only in disposable databases.

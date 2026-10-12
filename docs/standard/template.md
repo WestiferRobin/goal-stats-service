@@ -1,7 +1,7 @@
 # Repository identity and template history
 
 This repository now hosts the GoalStats monolithic backend, including the
-RoadToTheFinal football domain. Item/Action routes remain for compatibility.
+RoadToTheFinal football domain. The inherited Item/Action business domains are retired.
 New contributors should follow the [README](../../README.md), not scaffold another
 service. The repository, database and Docker names below are retained to preserve
 existing tooling, credentials and volumes.
@@ -32,10 +32,9 @@ Gunicorn from the original template. The identity table is a maintenance referen
 
 Later scaffolding must update identity producers, consumers, safety guards, fixtures,
 Docker/Compose references, and observations together. There is no Python package-directory identity to transform. Flat module names,
-source paths, the Item/Action reference domain and generic `goalstats_*` extension
-keys remain unchanged.
+source paths and generic `goalstats_*` resource extension keys remain stable.
 Do not use broad textual substitution. The migration revision is not an identity
-placeholder: preserve the current baseline ID `a7c93e25d104` unless a separately reviewed migration is needed.
+placeholder: preserve baseline `a7c93e25d104` and retirement child `c8d42f19e630`.
 
 Dependencies remain Python 3.12 and one pinned `requirements.txt`. No generic
 provider framework, async architecture, authentication platform, queues, or gRPC
@@ -44,7 +43,7 @@ is included. PostgreSQL and Redis are runtime providers; API-Football is optiona
 ## Flat Python execution contract
 
 `src/main.py` exports `create_app` and explicitly connects application-owned resources,
-cache adapters and services to typed Blueprint factories. Routes capture services directly;
+shared Redis provider and services to typed Blueprint factories. Routes capture services directly;
 `app.extensions` retains resource references for diagnostics and cleanup, not service lookup.
 Modules import directly from `enums`, `exceptions`, `settings`,
 `models`, `schemas`, `infra`, `services`, and `routers`. There is no
@@ -66,7 +65,7 @@ identities and unrelated-resource sentinels remain intentionally generic.
 ## Host development and propagation
 
 Host Flask is the public `make run` workflow; `make deploy` runs Docker Flask locally. Flat `src/`, `main:create_app()`, Python 3.12,
-one `requirements.txt`, Item/Action behavior, HTTP/OpenAPI, database schema/migration
+one `requirements.txt`, retained domain behavior, HTTP/OpenAPI, database schema/migration
 history, Redis semantics and health/readiness contracts stay unchanged. Direct
 `src/main.py` adds only a LOCAL development entrypoint. `src/` is not a package;
 script execution naturally exposes it, pytest uses its configured paths, Alembic
@@ -89,17 +88,14 @@ must validate this shared loader and preserve its source bytes without identity 
 
 API body DTOs use `*Request`, resource/list DTOs use `*Response`, and path/shared
 contracts use `*Schema` (including `ProblemDetailSchema`). Domain exceptions live
-in `exceptions/base.py`, `item.py`, and `action.py`; Flask handling lives in
-`exceptions/handlers.py`. Football uses its own domain module and flat `schemas/football.py` contracts.
+in `exceptions/base.py` (DomainError) and `services/prediction.py` (ScenarioNotReady); Flask handling lives in
+`exceptions/handlers.py`. Normalized Goal Stats contracts use singular entity modules under `schemas/`; shared
+calculation contracts live in `schemas/engine.py`, and prototype-specific requests
+remain in `schemas/football.py`.
 
-Domain API contracts live in `schemas/<domain>/request.py` (`*Request`),
-`response.py` (`*Response`), and `base.py` (`*Schema`). The latter owns path/query
-schemas and genuine shared domain foundations; it does not require a generic base
-class. Other domain schema files contain `*Schema` contracts only when genuinely
-needed. Shared primitives stay in `schemas/common.py`, and singleton cross-cutting
-contracts such as `schemas/problem.py` need no package hierarchy. Imports name the
-defining module explicitly; empty package markers do not re-export schemas.
-
+Shared primitives stay in `schemas/common.py`; singleton cross-cutting contracts
+such as `schemas/problem.py` need no package hierarchy. Imports name the defining
+module explicitly; empty package markers do not re-export schemas.
 
 ## Public lifecycle contract
 

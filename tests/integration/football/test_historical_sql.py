@@ -15,7 +15,9 @@ from football.historical_dataset import (
     name_key,
     source_record_key,
 )
-from models.catalog import Competition, Match, Team
+from models.competition import Competition
+from models.match import Match
+from models.team import Team
 
 pytestmark = pytest.mark.postgres
 SQL = (Path(__file__).resolve().parents[3] / "sql/verify_historical_import.sql").read_text()

@@ -8,7 +8,7 @@ No other GoalStats service or sibling repository is needed at runtime.
 The model came from the historical RoadToTheFinal `app.py`, `live_feed.py`, and
 three CSV datasets at revision `8f17bc42e30f436f5cd860f2791695421160ccd2`.
 The model was extracted without Flask, sessions, template rendering or import-time
-network/file writes. Existing Item/Action routes remain available for compatibility.
+network/file writes. RoadToTheFinal routes remain supported; Item/Action routes are retired.
 The directory and Compose project keep their existing names so local volumes and
 workspace tooling continue to work; this is now the backend application, not a
 requirement to scaffold more microservices.

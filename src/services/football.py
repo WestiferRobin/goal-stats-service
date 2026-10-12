@@ -4,25 +4,14 @@
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Select, or_, select
-from sqlalchemy.orm import aliased
+from sqlalchemy import select
 from werkzeug.exceptions import NotFound
 
 from football.engine import Match, Team, simulate_tournament
 from football.historical import apply_historical_row_to_match
 from infra.resources.db import Database
-from models.catalog import Competition
-from models.catalog import Match as CatalogMatch
-from models.catalog import Team as CatalogTeam
-from models.football import FootballHistory, FootballSnapshot, FootballTeam
-from schemas.football import (
-    CatalogCompetitionResponse,
-    CatalogMatchQuery,
-    CatalogMatchResponse,
-    CatalogTeamResponse,
-    PredictionRequest,
-    TournamentRequest,
-)
+from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
+from schemas.football import PredictionRequest, TournamentRequest
 
 
 def report(match: Any) -> dict[str, Any]:
@@ -51,107 +40,6 @@ def report(match: Any) -> dict[str, Any]:
 class FootballService:
     def __init__(self, database: Database) -> None:
         self.database = database
-
-    def catalog_teams(self) -> list[dict[str, Any]]:
-        with self.database.transaction() as session:
-            rows = session.scalars(
-                select(CatalogTeam).order_by(CatalogTeam.name, CatalogTeam.team_id)
-            )
-            return [
-                CatalogTeamResponse.model_validate(row, from_attributes=True).model_dump(
-                    mode="json"
-                )
-                for row in rows
-            ]
-
-    def catalog_team(self, team_id: int) -> dict[str, Any]:
-        with self.database.transaction() as session:
-            row = session.get(CatalogTeam, team_id)
-            if row is None:
-                raise NotFound()
-            # Ratings or a matching prototype name cannot establish catalog identity support.
-            return CatalogTeamResponse.model_validate(row, from_attributes=True).model_dump(
-                mode="json"
-            )
-
-    def catalog_competitions(self) -> list[dict[str, Any]]:
-        with self.database.transaction() as session:
-            rows = session.scalars(
-                select(Competition).order_by(
-                    Competition.name, Competition.edition_label, Competition.competition_id
-                )
-            )
-            return [
-                CatalogCompetitionResponse.model_validate(row, from_attributes=True).model_dump(
-                    mode="json"
-                )
-                for row in rows
-            ]
-
-    @staticmethod
-    def _catalog_matches_query() -> Select[Any]:
-        home, away = aliased(CatalogTeam), aliased(CatalogTeam)
-        return (
-            select(
-                CatalogMatch.match_id,
-                CatalogMatch.match_date,
-                CatalogMatch.competition_id,
-                Competition.name.label("competition_name"),
-                Competition.edition_label,
-                CatalogMatch.home_team_id,
-                home.name.label("home_team_name"),
-                CatalogMatch.away_team_id,
-                away.name.label("away_team_name"),
-                CatalogMatch.home_score,
-                CatalogMatch.away_score,
-                CatalogMatch.score_basis,
-                CatalogMatch.neutral,
-                CatalogMatch.city,
-                CatalogMatch.country,
-            )
-            .join(Competition, CatalogMatch.competition_id == Competition.competition_id)
-            .join(home, CatalogMatch.home_team_id == home.team_id)
-            .join(away, CatalogMatch.away_team_id == away.team_id)
-        )
-
-    def catalog_matches(self, query: CatalogMatchQuery) -> list[dict[str, Any]]:
-        statement = self._catalog_matches_query()
-        if query.team_id is not None:
-            statement = statement.where(
-                or_(
-                    CatalogMatch.home_team_id == query.team_id,
-                    CatalogMatch.away_team_id == query.team_id,
-                )
-            )
-        if query.competition_id is not None:
-            statement = statement.where(CatalogMatch.competition_id == query.competition_id)
-        if query.date_from is not None:
-            statement = statement.where(CatalogMatch.match_date >= query.date_from)
-        if query.date_to is not None:
-            statement = statement.where(CatalogMatch.match_date <= query.date_to)
-        statement = (
-            statement.order_by(CatalogMatch.match_date, CatalogMatch.match_id)
-            .limit(query.limit)
-            .offset(query.offset)
-        )
-        with self.database.transaction() as session:
-            return [
-                CatalogMatchResponse.model_validate(row).model_dump(mode="json")
-                for row in session.execute(statement).mappings()
-            ]
-
-    def catalog_match(self, match_id: int) -> dict[str, Any]:
-        with self.database.transaction() as session:
-            row = (
-                session.execute(
-                    self._catalog_matches_query().where(CatalogMatch.match_id == match_id)
-                )
-                .mappings()
-                .one_or_none()
-            )
-            if row is None:
-                raise NotFound()
-            return CatalogMatchResponse.model_validate(row).model_dump(mode="json")
 
     def teams(self) -> list[dict[str, Any]]:
         with self.database.transaction() as session:
@@ -322,7 +210,7 @@ class FootballService:
         from werkzeug.exceptions import ServiceUnavailable
 
         from football.live import get_real_live_data
-        from schemas.football import TeamStats
+        from schemas.engine import TeamStats
 
         first, second = self.team(team1).name, self.team(team2).name
         request = None

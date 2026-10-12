@@ -4,8 +4,8 @@
 from typing import Any
 
 from football.engine import Match, Team
-from schemas.football import TeamStats
-from schemas.predictions import PredictionInputs
+from schemas.engine import TeamStats
+from schemas.prediction import PredictionInputs
 from services.football import report
 
 

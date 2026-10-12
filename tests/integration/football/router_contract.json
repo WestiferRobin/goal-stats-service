@@ -1,0 +1,642 @@
+{
+  "body_rejected": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The request could not be understood.",
+      "status": 400,
+      "title": "Bad Request",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 400
+  },
+  "create": {
+    "content_type": "application/json",
+    "json": {
+      "created_at": "<timestamp>",
+      "match_id": null,
+      "match_minute": 65,
+      "prediction_ready": true,
+      "scenario_id": 1,
+      "team1_big_chances": 0,
+      "team1_clutch": 70.0,
+      "team1_corners": 0,
+      "team1_defender_blocks": 0,
+      "team1_defense": 70.0,
+      "team1_fifa_rank": null,
+      "team1_form": 70.0,
+      "team1_goalkeeper_saves": 0,
+      "team1_goals": 0,
+      "team1_id": 1,
+      "team1_modifier_total": 0.0,
+      "team1_name": "First",
+      "team1_offense": 70.0,
+      "team1_possession": 50.0,
+      "team1_red_cards": 0,
+      "team1_shots": 0,
+      "team1_shots_on_target": 0,
+      "team1_star_power": 70.0,
+      "team1_yellow_cards": 0,
+      "team2_big_chances": 0,
+      "team2_clutch": 70.0,
+      "team2_corners": 0,
+      "team2_defender_blocks": 0,
+      "team2_defense": 70.0,
+      "team2_fifa_rank": null,
+      "team2_form": 70.0,
+      "team2_goalkeeper_saves": 0,
+      "team2_goals": 0,
+      "team2_id": 2,
+      "team2_modifier_total": 0.0,
+      "team2_name": "Second",
+      "team2_offense": 70.0,
+      "team2_possession": 50.0,
+      "team2_red_cards": 0,
+      "team2_shots": 0,
+      "team2_shots_on_target": 0,
+      "team2_star_power": 70.0,
+      "team2_yellow_cards": 0,
+      "title": "Synthetic scenario fixture"
+    },
+    "location": "/api/v1/scenarios/1",
+    "status": 201
+  },
+  "generate_bodyless": {
+    "content_type": "application/json",
+    "json": {
+      "generated_at": "<timestamp>",
+      "input_snapshot": {
+        "adapter_version": "scenario-v1",
+        "created_at": "<timestamp>",
+        "extra_minute": 0,
+        "match_id": null,
+        "match_minute": 65,
+        "prediction_ready": true,
+        "scenario_id": 1,
+        "status": "",
+        "team1_big_chances": 0,
+        "team1_clutch": 70.0,
+        "team1_corners": 0,
+        "team1_defender_blocks": 0,
+        "team1_defense": 70.0,
+        "team1_fifa_rank": null,
+        "team1_form": 70.0,
+        "team1_goalkeeper_saves": 0,
+        "team1_goals": 0,
+        "team1_id": 1,
+        "team1_modifier_total": 0.0,
+        "team1_name": "First",
+        "team1_offense": 70.0,
+        "team1_possession": 50.0,
+        "team1_red_cards": 0,
+        "team1_shots": 0,
+        "team1_shots_on_target": 0,
+        "team1_star_power": 70.0,
+        "team1_yellow_cards": 0,
+        "team2_big_chances": 0,
+        "team2_clutch": 70.0,
+        "team2_corners": 0,
+        "team2_defender_blocks": 0,
+        "team2_defense": 70.0,
+        "team2_fifa_rank": null,
+        "team2_form": 70.0,
+        "team2_goalkeeper_saves": 0,
+        "team2_goals": 0,
+        "team2_id": 2,
+        "team2_modifier_total": 0.0,
+        "team2_name": "Second",
+        "team2_offense": 70.0,
+        "team2_possession": 50.0,
+        "team2_red_cards": 0,
+        "team2_shots": 0,
+        "team2_shots_on_target": 0,
+        "team2_star_power": 70.0,
+        "team2_yellow_cards": 0,
+        "title": "Synthetic scenario fixture"
+      },
+      "model_version": "road-to-the-final-heuristic-v1",
+      "output": {
+        "advancement": {
+          "team1": 0.5,
+          "team2": 0.5
+        },
+        "confidence": {
+          "label": "Medium",
+          "percent": 40.83102401748909
+        },
+        "expected_goals_remaining": {
+          "team1": 0.36111111111111116,
+          "team2": 0.36111111111111116
+        },
+        "minute": 65,
+        "model": "road-to-the-final-heuristic-v1",
+        "momentum_percent": {
+          "team1": 50.0,
+          "team2": 50.0
+        },
+        "most_likely_score": [
+          0,
+          0
+        ],
+        "probabilities": {
+          "draw": 0.5510987947599418,
+          "team1": 0.22445060262002908,
+          "team2": 0.22445060262002908
+        },
+        "reasoning": [
+          "The model is calculating remaining goals from minute 65."
+        ],
+        "status": "",
+        "team1": "First",
+        "team2": "Second",
+        "top_scorelines": [
+          {
+            "probability": 0.4856717852479504,
+            "team1_goals": 0,
+            "team2_goals": 0
+          },
+          {
+            "probability": 0.17538147800620432,
+            "team1_goals": 0,
+            "team2_goals": 1
+          },
+          {
+            "probability": 0.17538147800620432,
+            "team1_goals": 1,
+            "team2_goals": 0
+          },
+          {
+            "probability": 0.06333220039112934,
+            "team1_goals": 1,
+            "team2_goals": 1
+          },
+          {
+            "probability": 0.03166610019556467,
+            "team1_goals": 0,
+            "team2_goals": 2
+          }
+        ]
+      },
+      "prediction_id": 1,
+      "scenario_id": 1
+    },
+    "location": "/api/v1/predictions/1",
+    "status": 201
+  },
+  "get": {
+    "content_type": "application/json",
+    "json": {
+      "created_at": "<timestamp>",
+      "match_id": null,
+      "match_minute": 65,
+      "prediction_ready": true,
+      "scenario_id": 1,
+      "team1_big_chances": 0,
+      "team1_clutch": 70.0,
+      "team1_corners": 0,
+      "team1_defender_blocks": 0,
+      "team1_defense": 70.0,
+      "team1_fifa_rank": null,
+      "team1_form": 70.0,
+      "team1_goalkeeper_saves": 0,
+      "team1_goals": 0,
+      "team1_id": 1,
+      "team1_modifier_total": 0.0,
+      "team1_name": "First",
+      "team1_offense": 70.0,
+      "team1_possession": 50.0,
+      "team1_red_cards": 0,
+      "team1_shots": 0,
+      "team1_shots_on_target": 0,
+      "team1_star_power": 70.0,
+      "team1_yellow_cards": 0,
+      "team2_big_chances": 0,
+      "team2_clutch": 70.0,
+      "team2_corners": 0,
+      "team2_defender_blocks": 0,
+      "team2_defense": 70.0,
+      "team2_fifa_rank": null,
+      "team2_form": 70.0,
+      "team2_goalkeeper_saves": 0,
+      "team2_goals": 0,
+      "team2_id": 2,
+      "team2_modifier_total": 0.0,
+      "team2_name": "Second",
+      "team2_offense": 70.0,
+      "team2_possession": 50.0,
+      "team2_red_cards": 0,
+      "team2_shots": 0,
+      "team2_shots_on_target": 0,
+      "team2_star_power": 70.0,
+      "team2_yellow_cards": 0,
+      "title": "Synthetic scenario fixture"
+    },
+    "location": null,
+    "status": 200
+  },
+  "history": {
+    "content_type": "application/json",
+    "json": [
+      {
+        "generated_at": "<timestamp>",
+        "input_snapshot": {
+          "adapter_version": "scenario-v1",
+          "created_at": "<timestamp>",
+          "extra_minute": 0,
+          "match_id": null,
+          "match_minute": 65,
+          "prediction_ready": true,
+          "scenario_id": 1,
+          "status": "",
+          "team1_big_chances": 0,
+          "team1_clutch": 70.0,
+          "team1_corners": 0,
+          "team1_defender_blocks": 0,
+          "team1_defense": 70.0,
+          "team1_fifa_rank": null,
+          "team1_form": 70.0,
+          "team1_goalkeeper_saves": 0,
+          "team1_goals": 0,
+          "team1_id": 1,
+          "team1_modifier_total": 0.0,
+          "team1_name": "First",
+          "team1_offense": 70.0,
+          "team1_possession": 50.0,
+          "team1_red_cards": 0,
+          "team1_shots": 0,
+          "team1_shots_on_target": 0,
+          "team1_star_power": 70.0,
+          "team1_yellow_cards": 0,
+          "team2_big_chances": 0,
+          "team2_clutch": 70.0,
+          "team2_corners": 0,
+          "team2_defender_blocks": 0,
+          "team2_defense": 70.0,
+          "team2_fifa_rank": null,
+          "team2_form": 70.0,
+          "team2_goalkeeper_saves": 0,
+          "team2_goals": 0,
+          "team2_id": 2,
+          "team2_modifier_total": 0.0,
+          "team2_name": "Second",
+          "team2_offense": 70.0,
+          "team2_possession": 50.0,
+          "team2_red_cards": 0,
+          "team2_shots": 0,
+          "team2_shots_on_target": 0,
+          "team2_star_power": 70.0,
+          "team2_yellow_cards": 0,
+          "title": "Synthetic scenario fixture"
+        },
+        "model_version": "road-to-the-final-heuristic-v1",
+        "output": {
+          "advancement": {
+            "team1": 0.5,
+            "team2": 0.5
+          },
+          "confidence": {
+            "label": "Medium",
+            "percent": 40.83102401748909
+          },
+          "expected_goals_remaining": {
+            "team1": 0.36111111111111116,
+            "team2": 0.36111111111111116
+          },
+          "minute": 65,
+          "model": "road-to-the-final-heuristic-v1",
+          "momentum_percent": {
+            "team1": 50.0,
+            "team2": 50.0
+          },
+          "most_likely_score": [
+            0,
+            0
+          ],
+          "probabilities": {
+            "draw": 0.5510987947599418,
+            "team1": 0.22445060262002908,
+            "team2": 0.22445060262002908
+          },
+          "reasoning": [
+            "The model is calculating remaining goals from minute 65."
+          ],
+          "status": "",
+          "team1": "First",
+          "team2": "Second",
+          "top_scorelines": [
+            {
+              "probability": 0.4856717852479504,
+              "team1_goals": 0,
+              "team2_goals": 0
+            },
+            {
+              "probability": 0.17538147800620432,
+              "team1_goals": 0,
+              "team2_goals": 1
+            },
+            {
+              "probability": 0.17538147800620432,
+              "team1_goals": 1,
+              "team2_goals": 0
+            },
+            {
+              "probability": 0.06333220039112934,
+              "team1_goals": 1,
+              "team2_goals": 1
+            },
+            {
+              "probability": 0.03166610019556467,
+              "team1_goals": 0,
+              "team2_goals": 2
+            }
+          ]
+        },
+        "prediction_id": 1,
+        "scenario_id": 1
+      }
+    ],
+    "location": null,
+    "status": 200
+  },
+  "invalid_patch": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The request could not be understood.",
+      "status": 400,
+      "title": "Bad Request",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 400
+  },
+  "list": {
+    "content_type": "application/json",
+    "json": [
+      {
+        "created_at": "<timestamp>",
+        "match_id": null,
+        "match_minute": 65,
+        "prediction_ready": true,
+        "scenario_id": 1,
+        "team1_big_chances": 0,
+        "team1_clutch": 70.0,
+        "team1_corners": 0,
+        "team1_defender_blocks": 0,
+        "team1_defense": 70.0,
+        "team1_fifa_rank": null,
+        "team1_form": 70.0,
+        "team1_goalkeeper_saves": 0,
+        "team1_goals": 0,
+        "team1_id": 1,
+        "team1_modifier_total": 0.0,
+        "team1_name": "First",
+        "team1_offense": 70.0,
+        "team1_possession": 50.0,
+        "team1_red_cards": 0,
+        "team1_shots": 0,
+        "team1_shots_on_target": 0,
+        "team1_star_power": 70.0,
+        "team1_yellow_cards": 0,
+        "team2_big_chances": 0,
+        "team2_clutch": 70.0,
+        "team2_corners": 0,
+        "team2_defender_blocks": 0,
+        "team2_defense": 70.0,
+        "team2_fifa_rank": null,
+        "team2_form": 70.0,
+        "team2_goalkeeper_saves": 0,
+        "team2_goals": 0,
+        "team2_id": 2,
+        "team2_modifier_total": 0.0,
+        "team2_name": "Second",
+        "team2_offense": 70.0,
+        "team2_possession": 50.0,
+        "team2_red_cards": 0,
+        "team2_shots": 0,
+        "team2_shots_on_target": 0,
+        "team2_star_power": 70.0,
+        "team2_yellow_cards": 0,
+        "title": "Synthetic scenario fixture"
+      }
+    ],
+    "location": null,
+    "status": 200
+  },
+  "missing_match": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The requested resource was not found.",
+      "status": 404,
+      "title": "Not Found",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 404
+  },
+  "missing_prediction": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The requested resource was not found.",
+      "status": 404,
+      "title": "Not Found",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 404
+  },
+  "missing_scenario": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The requested resource was not found.",
+      "status": 404,
+      "title": "Not Found",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 404
+  },
+  "missing_team": {
+    "content_type": "application/problem+json",
+    "json": {
+      "detail": "The requested resource was not found.",
+      "status": 404,
+      "title": "Not Found",
+      "type": "about:blank"
+    },
+    "location": null,
+    "status": 404
+  },
+  "patch": {
+    "content_type": "application/json",
+    "json": {
+      "created_at": "<timestamp>",
+      "match_id": null,
+      "match_minute": 80,
+      "prediction_ready": true,
+      "scenario_id": 1,
+      "team1_big_chances": 0,
+      "team1_clutch": 70.0,
+      "team1_corners": 0,
+      "team1_defender_blocks": 0,
+      "team1_defense": 70.0,
+      "team1_fifa_rank": null,
+      "team1_form": 70.0,
+      "team1_goalkeeper_saves": 0,
+      "team1_goals": 0,
+      "team1_id": 1,
+      "team1_modifier_total": 0.0,
+      "team1_name": "First",
+      "team1_offense": 70.0,
+      "team1_possession": 50.0,
+      "team1_red_cards": 0,
+      "team1_shots": 0,
+      "team1_shots_on_target": 0,
+      "team1_star_power": 70.0,
+      "team1_yellow_cards": 0,
+      "team2_big_chances": 0,
+      "team2_clutch": 70.0,
+      "team2_corners": 0,
+      "team2_defender_blocks": 0,
+      "team2_defense": 70.0,
+      "team2_fifa_rank": null,
+      "team2_form": 70.0,
+      "team2_goalkeeper_saves": 0,
+      "team2_goals": 1,
+      "team2_id": 2,
+      "team2_modifier_total": 0.0,
+      "team2_name": "Second",
+      "team2_offense": 70.0,
+      "team2_possession": 50.0,
+      "team2_red_cards": 0,
+      "team2_shots": 0,
+      "team2_shots_on_target": 0,
+      "team2_star_power": 70.0,
+      "team2_yellow_cards": 0,
+      "title": "Synthetic scenario fixture"
+    },
+    "location": null,
+    "status": 200
+  },
+  "saved_prediction": {
+    "content_type": "application/json",
+    "json": {
+      "generated_at": "<timestamp>",
+      "input_snapshot": {
+        "adapter_version": "scenario-v1",
+        "created_at": "<timestamp>",
+        "extra_minute": 0,
+        "match_id": null,
+        "match_minute": 65,
+        "prediction_ready": true,
+        "scenario_id": 1,
+        "status": "",
+        "team1_big_chances": 0,
+        "team1_clutch": 70.0,
+        "team1_corners": 0,
+        "team1_defender_blocks": 0,
+        "team1_defense": 70.0,
+        "team1_fifa_rank": null,
+        "team1_form": 70.0,
+        "team1_goalkeeper_saves": 0,
+        "team1_goals": 0,
+        "team1_id": 1,
+        "team1_modifier_total": 0.0,
+        "team1_name": "First",
+        "team1_offense": 70.0,
+        "team1_possession": 50.0,
+        "team1_red_cards": 0,
+        "team1_shots": 0,
+        "team1_shots_on_target": 0,
+        "team1_star_power": 70.0,
+        "team1_yellow_cards": 0,
+        "team2_big_chances": 0,
+        "team2_clutch": 70.0,
+        "team2_corners": 0,
+        "team2_defender_blocks": 0,
+        "team2_defense": 70.0,
+        "team2_fifa_rank": null,
+        "team2_form": 70.0,
+        "team2_goalkeeper_saves": 0,
+        "team2_goals": 0,
+        "team2_id": 2,
+        "team2_modifier_total": 0.0,
+        "team2_name": "Second",
+        "team2_offense": 70.0,
+        "team2_possession": 50.0,
+        "team2_red_cards": 0,
+        "team2_shots": 0,
+        "team2_shots_on_target": 0,
+        "team2_star_power": 70.0,
+        "team2_yellow_cards": 0,
+        "title": "Synthetic scenario fixture"
+      },
+      "model_version": "road-to-the-final-heuristic-v1",
+      "output": {
+        "advancement": {
+          "team1": 0.5,
+          "team2": 0.5
+        },
+        "confidence": {
+          "label": "Medium",
+          "percent": 40.83102401748909
+        },
+        "expected_goals_remaining": {
+          "team1": 0.36111111111111116,
+          "team2": 0.36111111111111116
+        },
+        "minute": 65,
+        "model": "road-to-the-final-heuristic-v1",
+        "momentum_percent": {
+          "team1": 50.0,
+          "team2": 50.0
+        },
+        "most_likely_score": [
+          0,
+          0
+        ],
+        "probabilities": {
+          "draw": 0.5510987947599418,
+          "team1": 0.22445060262002908,
+          "team2": 0.22445060262002908
+        },
+        "reasoning": [
+          "The model is calculating remaining goals from minute 65."
+        ],
+        "status": "",
+        "team1": "First",
+        "team2": "Second",
+        "top_scorelines": [
+          {
+            "probability": 0.4856717852479504,
+            "team1_goals": 0,
+            "team2_goals": 0
+          },
+          {
+            "probability": 0.17538147800620432,
+            "team1_goals": 0,
+            "team2_goals": 1
+          },
+          {
+            "probability": 0.17538147800620432,
+            "team1_goals": 1,
+            "team2_goals": 0
+          },
+          {
+            "probability": 0.06333220039112934,
+            "team1_goals": 1,
+            "team2_goals": 1
+          },
+          {
+            "probability": 0.03166610019556467,
+            "team1_goals": 0,
+            "team2_goals": 2
+          }
+        ]
+      },
+      "prediction_id": 1,
+      "scenario_id": 1
+    },
+    "location": null,
+    "status": 200
+  }
+}

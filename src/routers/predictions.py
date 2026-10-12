@@ -6,14 +6,14 @@ from flask_openapi3.models.tag import Tag
 from werkzeug.exceptions import BadRequest
 
 from routers.openapi import created_response, errors
-from schemas.predictions import (
+from schemas.prediction import (
     PredictionHistoryQuery,
     PredictionPath,
     SavedPredictionResponse,
     SavedPredictionsResponse,
 )
-from schemas.scenarios import ScenarioPath
-from services.predictions import PredictionService
+from schemas.scenario import ScenarioPath
+from services.prediction import PredictionService
 
 
 def create_predictions_blueprint(service: PredictionService) -> APIBlueprint:

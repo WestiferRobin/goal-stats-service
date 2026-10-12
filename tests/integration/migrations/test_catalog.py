@@ -11,16 +11,16 @@ from alembic.migration import MigrationContext
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import IntegrityError
 
-from models.action import Action
 from models.base import Base
-from models.catalog import Competition, Match, Team
-from models.football import FootballSnapshot
-from models.item import Item
+from models.competition import Competition
+from models.hold.football import FootballSnapshot
+from models.match import Match
+from models.team import Team
 
 pytestmark = pytest.mark.postgres
 ROOT = Path(__file__).resolve().parents[3]
 CATALOG = {"teams", "competitions", "matches"}
-LEGACY = {"football_teams", "football_history", "football_snapshots", "items", "actions"}
+LEGACY = {"football_teams", "football_history", "football_snapshots"}
 
 
 @pytest.fixture
@@ -94,15 +94,6 @@ def test_repeated_upgrade_preserves_schema_and_records(isolated_schema):
     command.upgrade(config, "head")
     # Load the unchanged prototype seed into this test schema, never the development DB.
     run_sql(connection, "prototype/003_seed_football.sql")
-    # Populate every legacy table so preservation is checked with real records.
-    item_id = connection.execute(
-        Item.__table__.insert().values(name="preserved fixture", status="active").returning(Item.id)
-    ).scalar_one()
-    connection.execute(
-        Action.__table__.insert().values(
-            item_id=item_id, action_type="create", name="preserved fixture"
-        )
-    )
     connection.execute(
         FootballSnapshot.__table__.insert().values(
             team1="Spain", team2="England", state={"minute": 65}, prediction={"fixture": True}
@@ -131,7 +122,7 @@ def run_sql(connection, filename):
 def test_standalone_sql_matches_alembic_and_metadata(isolated_schema):
     connection, _ = isolated_schema
     run_sql(connection, "001_fresh_database.sql")
-    assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "a7c93e25d104"
+    assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "c8d42f19e630"
     assert_catalog(connection)
 
 

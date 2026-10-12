@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest
 
 from exceptions.handlers import object_body
 from routers.openapi import created_response, errors
-from schemas.scenarios import (
+from schemas.scenario import (
     ScenarioCreate,
     ScenarioPatch,
     ScenarioPath,
@@ -15,7 +15,7 @@ from schemas.scenarios import (
     ScenarioResponse,
     ScenariosResponse,
 )
-from services.scenarios import ScenarioService
+from services.scenario import ScenarioService
 
 
 def create_scenarios_blueprint(service: ScenarioService) -> APIBlueprint:
