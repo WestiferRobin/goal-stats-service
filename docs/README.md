@@ -14,7 +14,6 @@ PostgreSQL/Redis and the same development database. Setup prepares Python 3.12 `
 
 Maintainer-only references:
 
-- [Built-system smoke testing](testing/smoke.md).
 - [Workflow verification](testing/certification.md).
 - [Standalone SQL](../sql/README.md).
 

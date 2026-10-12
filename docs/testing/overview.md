@@ -4,6 +4,8 @@
 Docker/Compose and Python 3.12, builds the tooling image, runs Ruff lint and formatting
 checks and strict mypy, then executes `tests/unit` and `tests/integration`.
 
+Unit tests verify isolated behavior. Integration tests exercise Flask APIs, PostgreSQL,
+Redis and component interactions. Shared fixtures own disposable resources.
 The suite includes application contracts, prediction calculations, migration/schema
 checks, startup/configuration safety, provider ownership and runner cleanup tests.
 State-changing integration tests use disposable PostgreSQL and Redis. No dedicated
@@ -34,10 +36,14 @@ Alembic remains in use. Integration tests compare metadata, detect schema drift 
 outdated revisions, generate revisions only in temporary directories against disposable
 databases, and verify PostgreSQL read-only enforcement. Startup migration tests remain.
 
-Flask integration tests cover catalog, Scenario and Prediction APIs, immutable prediction
-inputs, history and compatibility endpoints. Retained HTTP reference tests under
-`tests/smoke` are excluded from collection and have no supported launcher; they are not
-claimed as executed by `make test`. See [HTTP testing scope](smoke.md).
+Flask test-client integration tests cover catalog, Scenario and Prediction APIs,
+immutable prediction inputs, history, compatibility endpoints, safe errors and local
+Swagger assets. Redis integration tests verify cache hits, contents, TTL and invalidation.
+These tests do not certify external networking or actual Docker application recreation.
+
+For a manual local availability check after `make run` or `make deploy`, inspect
+`/health`, `/ready` and `/swagger`. Use disposable databases for state-changing checks;
+do not create persistent records merely to validate the development workflow.
 
 ## Pinned historical source acceptance
 
@@ -53,7 +59,5 @@ read-only and ownership-verified disposable providers. It is outside the ordinar
   the ownership receipt before test execution.
 - `scripts/testing/test_ownership.py` validates that receipt and runner configuration
   before commands or database fixtures proceed.
-- `scripts/testing/http_client.py` supplies HTTP assertions to retained smoke fixtures;
-  those reference tests remain excluded from normal collection and have no launcher.
 
 These helpers support the single public test command; they do not add testing modes.

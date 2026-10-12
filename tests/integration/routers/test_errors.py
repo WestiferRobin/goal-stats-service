@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from flask import jsonify, request
 from flask_openapi3.blueprint import APIBlueprint
@@ -6,6 +8,13 @@ from werkzeug.exceptions import BadRequest
 
 from exceptions.base import DomainError
 from exceptions.handlers import object_body
+
+PRIVATE_DETAILS = (
+    "private_password internal_connection_failure psycopg.OperationalError "
+    "postgresql://user:secret@database/private "
+    "postgresql+psycopg://user:secret@database/private redis://cache:6379/0 "
+    "Traceback (most recent call last):"
+)
 
 
 @pytest.fixture
@@ -29,7 +38,7 @@ def error_app(app):
 
     @app.get("/_domain")
     def domain():
-        raise DomainError("SQL private_password")
+        raise DomainError(PRIVATE_DETAILS)
 
     @app.get("/_invalid_output")
     def invalid_output():
@@ -37,11 +46,11 @@ def error_app(app):
 
     @app.get("/_http")
     def http():
-        raise BadRequest("private_password")
+        raise BadRequest(PRIVATE_DETAILS)
 
     @app.get("/_unexpected")
     def unexpected():
-        raise RuntimeError("SQL private_password")
+        raise RuntimeError(PRIVATE_DETAILS)
 
     app.register_api(blueprint)
     return app
@@ -66,6 +75,15 @@ def test_consistent_safe_problem_details(error_app, path, method, status, capsys
     assert response.json["status"] == status
     assert response.json["type"] == "about:blank"
     assert "private_password" not in response.text
+    assert "internal_connection_failure" not in response.text
+    # Match concrete implementation identifiers/URL schemes, not ordinary
+    # user-facing words such as "database" or "connection".
+    assert not re.search(
+        r"traceback \(most recent call last\)|\bpsycopg\b|"
+        r"postgres(?:ql)?(?:\+psycopg)?://|rediss?://",
+        response.text,
+        re.IGNORECASE,
+    )
     assert "private_password" not in capsys.readouterr().err
     if status == 405:
         assert {"GET", "HEAD", "OPTIONS"} <= set(

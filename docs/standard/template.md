@@ -16,7 +16,6 @@ Gunicorn from the original template. The identity table is a maintenance referen
 | --- | --- |
 | Repository | `goal-stats-service` |
 | Source/import root | `src/` (flat modules; no service package directory) |
-| Coverage sources | `src`, `scripts` |
 | Factory | `main:create_app()` |
 | Image/runtime slug | `goal-stats-service` |
 | Image tags | `goal-stats-service:runtime`, `goal-stats-service:tooling` |
@@ -51,10 +50,10 @@ Modules import directly from `enums`, `exceptions`, `settings`,
 `models`, `schemas`, `infra`, `services`, and `routers`. There is no
 intermediate service package and no `src` package to import.
 
-Pytest declares `pythonpath = src scripts`; Alembic uses its configuration-relative
+Pytest declares `pythonpath = src scripts/development scripts/database scripts/testing`;
+Alembic uses its configuration-relative
 `prepend_sys_path`; mypy declares `mypy_path = src`. Docker explicitly sets
-`PYTHONPATH=/app/src`, shared by Gunicorn, LOCAL Flask CLI, migration/test runners
-and certification subprocesses. CI calls the same Make/Docker workflows. Host
+`PYTHONPATH=/app/src`, shared by Gunicorn, LOCAL Flask CLI and migration/test runners. CI calls the same Make/Docker workflows. Host
 factory commands must explicitly expose the source directory, for example
 `PYTHONPATH=src flask --app 'main:create_app()' run`. No developer shell path
 configuration is assumed by the public Make workflows.

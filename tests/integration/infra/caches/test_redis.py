@@ -1,3 +1,4 @@
+import json
 import time
 from urllib.parse import urlsplit, urlunsplit
 from uuid import UUID, uuid4
@@ -23,7 +24,14 @@ def test_real_cache_roundtrip_ttl_invalidation_and_stale_child(redis_app):
     assert client.get("/items").json == [item]
     assert redis.get(key) is None
     assert client.get(item_url).json == item
+    assert json.loads(redis.get(key)) == item
+    # The ownership-verified provider is unique to this serial test run; the
+    # fixture also gives this application a unique key prefix. INFO and health
+    # PINGs do not add key hits. Require exactly the repeated request's one GET.
+    before_hits = redis.info("stats")["keyspace_hits"]
     assert client.get(item_url).json == item
+    assert redis.info("stats")["keyspace_hits"] == before_hits + 1
+    assert json.loads(redis.get(key)) == item
     assert 0 < redis.ttl(key) <= 300
     cached = item_cache.get(UUID(item["id"]))
     assert str(cached.id) == item["id"]
