@@ -16,21 +16,19 @@ Gunicorn from the original template. The identity table is a maintenance referen
 | --- | --- |
 | Repository | `goal-stats-service` |
 | Source/import root | `src/` (flat modules; no service package directory) |
-| Coverage source | `src` |
+| Coverage sources | `src`, `scripts` |
 | Factory | `main:create_app()` |
 | Image/runtime slug | `goal-stats-service` |
 | Image tags | `goal-stats-service:runtime`, `goal-stats-service:tooling` |
 | Public local Compose project | `goalstats-service-local` |
-| Private legacy Compose projects | `goal-stats-service-local`, `goal-stats-service-dev` |
-| Disposable projects | `goal-stats-service-test-<hex>`, `goal-stats-service-cert-<hex>` |
+| Disposable projects | `goal-stats-service-test-<24 hex digits>` |
 | Public development database | `goal_stats_service_local` |
-| Private DEV database | `goal_stats_service_dev` |
 | TEST database | `goalstats_test_runtime` |
 | Cache namespace | `goal-stats-service:<env>:v1` |
 | API display title | `GoalStats Monolith API` |
 | Logger identity | `goal_stats_service` (service label, not an import/package) |
 | Internal Compose services | `app`, `runner`, `postgres`, `redis` |
-| Disposable tool container | `goal-stats-service-tool-<hex>` |
+| Disposable tool container | `<test-project>-quality`, `<test-project>-runner` |
 | CI concurrency | `goal-stats-service-${{ github.workflow }}-${{ github.ref }}` |
 
 Later scaffolding must update identity producers, consumers, safety guards, fixtures,
@@ -38,7 +36,7 @@ Docker/Compose references, and observations together. There is no Python package
 source paths, the Item/Action reference domain and generic `goalstats_*` extension
 keys remain unchanged.
 Do not use broad textual substitution. The migration revision is not an identity
-placeholder: preserve `b7f42e9c1a60` unless a separately reviewed migration is needed.
+placeholder: preserve the current baseline ID `a7c93e25d104` unless a separately reviewed migration is needed.
 
 Dependencies remain Python 3.12 and one pinned `requirements.txt`. No generic
 provider framework, async architecture, authentication platform, queues, or gRPC
@@ -62,7 +60,7 @@ factory commands must explicitly expose the source directory, for example
 configuration is assumed by the public Make workflows.
 
 The remaining `goal_stats_service` occurrences are intentional service identities:
-LOCAL/DEV database names (and their producers/ownership checks) and the isolated
+the local database name (and explicit prototype import compatibility checks) and the isolated
 application logger label. They are not Python package references. Generic TEST
 identities and unrelated-resource sentinels remain intentionally generic.
 
@@ -106,11 +104,11 @@ defining module explicitly; empty package markers do not re-export schemas.
 
 ## Public lifecycle contract
 
-The seven public commands are setup, infra, run, deploy, test, stop, and help.
-`scripts/local.sh` owns the public lifecycle. Both application locations share
+The eight public commands are setup, infra, run, deploy, seed, test, stop, and help.
+`scripts/development/local.sh` owns the public lifecycle. Both application locations share
 `goalstats-service-local_postgres-data`, `.env.local`, migrations, imports and cache
-namespace. Never substitute the differently spelled private legacy project identity.
+namespace. Tests use independently generated disposable project identities.
 Setup starts nothing; infra starts only providers; run/deploy share Docker preparation.
 Ctrl-C/IDE Stop ends host Flask; stop removes Docker resources without deleting data.
-Host development supports macOS/Linux/WSL and manual restart. Retained private DEV and
-host-test tooling does not define the public configuration or command contract.
+Host development supports macOS/Linux/WSL and manual restart. Disposable integration
+tests run inside the verified Docker runner; IDE pytest runs provider-free unit tests.

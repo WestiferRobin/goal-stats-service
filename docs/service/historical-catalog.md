@@ -27,24 +27,24 @@ the dataset contract; PostgreSQL enforces key uniqueness and nonblank values.
 
 ## Migration and compatibility
 
-Migration `e3a71c92b406` has parent `d94f81ab2301` and only creates `teams`,
-`competitions`, `matches`, their constraints and indexes. It has no backfill/import
-or legacy alterations. Its reverse removes only these three new tables; like any
-downgrade, it would discard their contents and is not a data-preserving operation.
-Migration tests use disposable databases only. During local acceptance on 2026-10-08,
-revision `e3a71c92b406` was applied additively to the existing development database;
-legacy schema and full-record digests remained unchanged.
+The consolidated `a7c93e25d104_init_models.py` baseline creates all application
+models, including the historical catalog, scenarios, predictions and prototype
+tables. It contains no imports or backfills. Existing databases already at
+`a7c93e25d104` retain their schema and records without restamping. See
+[development](development.md#schema-changes) for older-database compatibility.
+Downgrading this initial revision drops all application tables; migration tests
+exercise that operation only in disposable databases.
 
-`football_teams`, `football_history`, `football_snapshots`, `items`, `actions`, and
-existing migration files remain unchanged. Alembic continues to own `alembic_version`.
-The existing API, prediction engine and prototype importer continue to use their
-current tables and data formats. The additive migration contains no routes or CLI
-changes; the seven-command Make workflow is unchanged. Normal future startup will
-apply the new migration through its existing mechanism.
+During the original acceptance on 2026-10-08, the former catalog revision
+`e3a71c92b406` was applied additively; legacy schema and full-record digests remained
+unchanged. Those dated results describe the pre-consolidation history.
+The current API, prediction engine and prototype importer retain their tables and
+formats. Alembic continues to own `alembic_version`.
 
 Historical matches are observed facts; scenarios are user-supplied prediction state.
 Keeping them separate prevents a hypothetical score or minute from changing a real
-result. Normalized scenario/prediction persistence is deferred to later tasks.
+result. Normalized scenarios and saved predictions now use their own tables and APIs;
+they do not rewrite observed match results.
 
 ## Dataset and validation
 
@@ -59,3 +59,46 @@ Tests compare Alembic and all standalone SQL schema paths against SQLAlchemy met
 check constraints with real PostgreSQL writes, and verify a populated prototype
 schema upgrades without changing its structure or records. Existing football API,
 engine and importer regression tests continue through `make test`.
+
+
+## Nine-edition importer contracts
+
+The nine approved contracts live in `data/womens-world-cup/`; original source bytes
+remain in `data/raw/` and prototype inputs remain isolated in `data/prototype/`.
+The pinned source supports nine approved basic-results contracts for 1991–2023,
+covering 348 matches, 44 distinct teams and 1,081 goals. The 2011 edition has 16
+participants. See [approved dataset IDs](../../data/README.md#approved-runtime-dataset-ids)
+and [operator procedures](football.md#historical-import-operations).
+
+`load_manifest(dataset_id)` resolves only an explicit nine-ID allowlist. Each
+checked-in manifest is joined to its typed coverage approval entry; dataset/edition,
+dates, counts, exact participants, goals, source revision/checksum and identity/order
+policies are validated. Coverage's runtime flags are historical Prompt 2 evidence;
+all nine are now supported. Extra fields, unsupported sources and arbitrary paths
+are rejected. The nine manifest files themselves are unchanged.
+
+The CLI requires an explicit source directory and target/host/database authorization.
+It verifies the full source checksum before parsing and rejects duplicate/conflicting
+input identities. Each edition imports atomically under the existing advisory lock.
+Unchanged reimports preserve IDs, provenance and timestamps; dry-run uses a read-only
+transaction. Stored fact conflicts fail without overwriting records.
+
+The existing 2023 source identity algorithm and persistent records are unchanged.
+No additional editions have been imported into persistent development PostgreSQL.
+Historical imports never read prototype CSVs or write prototype tables. Prediction
+ratings remain unavailable; source ordering/venue limitations remain documented in
+the coverage evidence. No schema changes or supplementary metadata are introduced.
+
+
+## Startup isolation
+
+`make run` and `make deploy` apply existing Alembic migrations and start Flask without
+importing any dataset. Existing records are preserved; fresh catalogs are empty.
+The explicit prototype compatibility importer and guarded historical importer remain
+available independently of startup, readiness and the application factory.
+The existing `/demo` depends on prototype teams/ratings and may be unusable on a fresh
+database until prototype data is explicitly supplied or the frontend is migrated.
+Prototype examples are not verified historical facts. Explicit `make seed` uses the guarded historical importer; see the [Make interface](../interface/make.md#explicit-historical-seeding).
+
+See [Prompt 6 integration evidence](../testing/data-integration.md) for actual pinned-source
+imports into disposable PostgreSQL, ownership boundaries, and the certification handoff.

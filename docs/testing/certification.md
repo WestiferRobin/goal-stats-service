@@ -1,15 +1,18 @@
-# Release certification
+# Workflow verification
 
-This is maintainer material, not part of first-run onboarding.
+`make test` is the standard automated verification command. It runs quality checks,
+unit/integration tests and relevant tooling/resource-ownership tests. There is no
+separate lifecycle certification command or failure-injection runner.
 
-The internal `make _certify` target retains the repository's broader release and
-failure-path validation: quality checks, tooling tests, disposable runtime tests,
-coverage, smoke tests, lifecycle interruption, resource-ownership checks, and
-cleanup assertions. `make _coverage` runs application coverage separately.
+The normal test runner validates disposable provider ownership before migrations and
+fixtures, cleans its own project on completion/failure/signals, and verifies preservation
+of preexisting resources. Focused shell tests cover failure propagation and SIGINT/SIGTERM
+cleanup with recording executables; unit tests reject unsafe targets and malformed receipts.
 
-Migration authors can use internal `_migration` and `_migration-check` targets and
-must review generated Alembic revisions before sharing them. These commands may
-require the maintainer Python/tooling environment and intentionally do not appear in
-`make help`.
+For a separately requested manual lifecycle audit, record database digests and resource
+identities first, verify the eight public commands sequentially (use `DRY=true` for seed unless writes are explicitly authorized), verify readiness and data
+preservation, and restore the original running state. Never reset development PostgreSQL,
+remove persistent volumes, or signal arbitrary processes to force a passing result.
 
-Ordinary contributors should use `make test`.
+Dated backend certification reports describe historical executions. They are retained
+as evidence and do not define additional supported commands.

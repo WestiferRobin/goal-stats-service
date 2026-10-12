@@ -1,11 +1,14 @@
-# Built-system smoke testing
+# HTTP testing scope
 
-This is maintainer material, not part of first-run onboarding.
+`make test` is the supported verification command. Flask integration tests cover the
+application API using disposable providers, including catalog browsing, Scenario CRUD,
+saved Predictions, history, error responses and OpenAPI.
 
-The internal `make _smoke` target builds a production-style Gunicorn application
-and tests it through HTTP in uniquely named disposable Docker resources. It checks
-liveness, readiness, OpenAPI, representative Item/Action behavior, persistence,
-cache behavior, and safe cleanup. It does not use the Flask test client or the
-developer's local database.
+The older real-HTTP tests under `tests/smoke` remain as reference coverage, excluded
+from pytest collection. Their dedicated runner, synthetic-data preparation and disposable
+app profile are retired. They are not automatically run and have no supported Make or
+shell mode. Do not point these state-changing fixtures at development providers.
 
-Ordinary contributors should use `make test`.
+For a manual local availability check after `make run` or `make deploy`, inspect
+`/health`, `/ready` and `/swagger`. Use disposable databases for state-changing acceptance
+checks; do not create persistent records merely to validate the development workflow.

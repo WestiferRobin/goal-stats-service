@@ -1,5 +1,9 @@
 # Frontend API: historical catalog, scenarios and saved predictions
 
+Migration-history note: dated revision-chain evidence below predates consolidation
+into `a7c93e25d104_init_models.py`. The head ID and schema are preserved; see
+[the current migration workflow](development.md#schema-changes).
+
 Base URL for local development: `http://127.0.0.1:5100`.
 Interactive documentation: [Swagger](http://127.0.0.1:5100/swagger).
 Generated specification: `/swagger/v1/swagger.json`.

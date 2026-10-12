@@ -1,39 +1,30 @@
-# PostgreSQL fallback scripts
+# PostgreSQL schema exports and verification
 
 Run from this repository root using `psql` and your intended PostgreSQL database.
 `PGDATABASE`, `PGHOST`, `PGPORT`, `PGUSER` and a password file can supply connection
 settings. Do not put credentials in these checked-in files.
 
-Choose **one** schema path:
+The schema export is for an **empty database only**:
 
 ```sh
-# Empty database only: creates all tables and records the Alembic head.
 psql -X -v ON_ERROR_STOP=1 -f sql/001_fresh_database.sql
-
-# OR an existing template database at b7f42e9c1a60:
-psql -X -v ON_ERROR_STOP=1 -f sql/002_upgrade_template.sql
-
-# OR an existing football database at d94f81ab2301:
-psql -X -v ON_ERROR_STOP=1 -f sql/002_upgrade_existing.sql
-
-# OR an existing catalog database at e3a71c92b406:
-psql -X -v ON_ERROR_STOP=1 -f sql/004_upgrade_scenarios.sql
-
-# OR an existing scenario database at f6b82d14c903:
-psql -X -v ON_ERROR_STOP=1 -f sql/005_upgrade_predictions.sql
 ```
 
-Then load the bundled teams/history:
+It is generated from `a7c93e25d104_init_models.py`, the consolidated initial
+migration. The previous head ID is retained: databases already at that head need
+no changes. The four SQL upgrade exports for retired intermediate revisions have
+been removed. Older databases must finish the original chain using the previous
+checkout before switching; never stamp an incomplete schema as current.
+
+Optional, explicitly invoked prototype compatibility operation (never part of startup):
 
 ```sh
-psql -X -v ON_ERROR_STOP=1 -f sql/003_seed_football.sql
+psql -X -v ON_ERROR_STOP=1 -f sql/prototype/003_seed_football.sql
 ```
 
-The five schema scripts are alternatives, not sequential steps. They run once;
-the upgrade checks its starting revision. The seed is safe to repeat and preserves
-existing rows. Each file has its own transaction. Schema scripts include the same
-revision bookkeeping as Alembic, so the existing startup migration workflow can resume afterward.
-No script drops tables or deletes existing records.
+The schema export runs once in its own transaction and records the Alembic head.
+The prototype seed is repeatable and preserves existing rows. Neither artifact
+drops tables or deletes records.
 
 The unchanged seed contains 32 prototype teams, 13 historical-result-shaped prototype
 rows, and 3 unlabeled snapshots. These are not verified historical matches. The
@@ -41,35 +32,34 @@ source filename + row number identifies an imported historical record; keep sour
 row order stable on repeat imports. New rows append; existing ratings/history are
 not overwritten. Corrections need an explicit database change, not a reimport.
 
-To regenerate SQL after changing migrations or bundled data (offline; the dummy
+Alembic is authoritative for schema evolution. These SQL files are generated reviewable
+exports, not a second migration system. To regenerate schema exports only (offline; the dummy
 URL is only used to select the PostgreSQL dialect):
 
 ```sh
 APP_ENV=test \
 DATABASE_URL=postgresql+psycopg://sql_export:sql_export@127.0.0.1/goalstats_test_export \
-PYTHONPATH=src .venv/bin/python scripts/export_football_sql.py
+PYTHONPATH=src .venv/bin/python scripts/database/export_football_sql.py --mode schema
 ```
 
 ## Normalized historical catalog
 
-All schema paths include `teams`, `competitions`, and `matches` at revision
-`e3a71c92b406`, generated from the same additive Alembic migration as the ORM
-schema. `002_upgrade_existing.sql` requires exactly `d94f81ab2301`; the template
-upgrade retains its original starting revision. Each upgrade guards its revision
-before changing anything. No legacy schema is altered by the catalog migration.
-
-The legacy seed still targets only `football_teams` and `football_history` and is
-byte-for-byte unchanged. None of these scripts imports the selected 64 historical
-matches. The explicit historical CLI importer has now populated and verified the
-existing local development catalog. See the
-[dataset contract](../data/README.md) and [catalog schema](../docs/service/historical-catalog.md).
-
+The baseline includes `teams`, `competitions`, `matches`, `scenarios`, and
+`predictions`, as well as the prototype and Item/Action tables. SQL exports contain
+schema only; explicit `make seed` imports historical data through the guarded Flask
+importer. See the [dataset contract](../data/README.md) and
+[catalog schema](../docs/service/historical-catalog.md).
 
 ## Read-only historical acceptance
 
-`verify_historical_import.sql` checks actual PostgreSQL identity, revision, source
-counts, participating teams, duplicate identities, orphaned references, joins,
-legacy counts and a stable record digest. It uses a read-only transaction:
+`verify_historical_import.sql` uses SELECT statements inside a REPEATABLE READ,
+READ ONLY transaction. It never imports, migrates, repairs, advances sequences or
+writes records. `ON_ERROR_STOP` makes invalid states exit nonzero with failed-check
+names. Database identity and Alembic head are reported; an optional expected database
+name enables target assertion.
+
+Default **current** mode permits absent editions, but each present approved edition
+must be complete and consistent. The complete dataset contains 44 teams, nine competitions and 348 matches.
 
 ```sh
 docker compose --env-file .env.local -p goalstats-service-local \
@@ -78,38 +68,73 @@ docker compose --env-file .env.local -p goalstats-service-local \
   < sql/verify_historical_import.sql
 ```
 
-Verified local results on 2026-10-08: 32 teams, one competition, 64 matches;
-zero duplicate identity groups and zero orphaned matches. Reimport inserted zero
-records and preserved IDs/provenance. The same records survived stop/restart using
-the existing PostgreSQL volume. Legacy counts remained 32 teams, 16 history rows,
-zero snapshots. See [technical evidence](../docs/service/task2-acceptance.md).
+Explicit **complete** acceptance requires all nine editions, 348 matches and 44
+shared team identities. With an already configured `psql` connection:
 
-Do not rerun a fresh-schema script on the populated development database. Apply
-future additive migrations using the supported workflow. A failed import should be
-diagnosed and dry-run again; do not reset tables or delete volumes. Historical imports
-remain explicit one-off CLI operations. Cloud runtime is unverified.
+```sh
+PGOPTIONS='-c goalstats.verify_complete=true -c goalstats.verify_database=goal_stats_service_local' \
+  psql -X -v ON_ERROR_STOP=1 -f sql/verify_historical_import.sql
+```
 
+For the Docker invocation, place `-e PGOPTIONS='-c goalstats.verify_complete=true'`
+after `exec` and before `-T postgres`. Complete mode fails if any approved edition is missing or incomplete.
 
-## Scenario persistence
+Assertions cover edition/competition identity, counts, exact participant keys, goals,
+date bounds, source namespace/revision/checksum/URL, score semantics, source labels,
+duplicate identities and orphaned references. Expected facts mirror the checked-in
+coverage evidence and are checked for drift by tests. Historical validation scopes
+itself to the approved World Cup source and editions; other legitimate sources,
+competitions, scenarios and prototype data are not rejected.
 
-The scenario migration is `f6b82d14c903`, an additive child of `e3a71c92b406`.
-All full/upgrade schema exports now include `scenarios`; `004_upgrade_scenarios.sql`
-is the guarded upgrade specifically from the historical catalog revision.
-The scenario migration itself creates only its table and indexes, preserving
-catalog and prototype records. The generated upgrade continues through later
-migrations to the current head. No backfill or rating substitution is performed.
-Foreign keys restrict deletion of referenced teams/matches. Checks enforce distinct
-teams, statistic bounds, finite/ranged ratings and modifier totals, and possession
-totals. Match-participant agreement is validated transactionally by the API.
-See [the frontend contract](../docs/service/frontend-api.md#saved-scenarios-prompt-2).
+The `preservation` result contains counts and deterministic full-record MD5 digests
+for catalog, scenario, prediction and prototype tables, including IDs, timestamps
+and provenance. Save this JSON before a transition and compare afterward. For an
+automated assertion, supply that exact JSON as the session setting
+`goalstats.verify_preservation` (for example through a properly quoted libpq
+`options` value). Equality is enforced, including table names and row counts.
+Without a supplied baseline, digests are evidence only; a single snapshot cannot
+prove that earlier records were preserved. MD5 here is a change detector, not an
+authenticity or security certificate.
 
+No historical SQL INSERT generator exists. Real data uses the guarded Flask importer.
+No prediction ratings are inferred from historical results. Source ordering/venue
+limitations remain. Explicit historical `make seed` now invokes the guarded Flask importer; it does not execute these SQL exports. Dated local acceptance
+is retained in [Task #2 evidence](../docs/service/task2-acceptance.md).
 
-## Saved predictions
+## Export modes and artifact inventory
 
-The current head is `a7c93e25d104`, parent `f6b82d14c903`. All schema paths include
-`predictions`; `005_upgrade_predictions.sql` upgrades exactly the scenario revision.
-This additive table references scenarios with restrictive deletion, permits multiple
-predictions per scenario, and stores immutable effective inputs plus variable report
-details in JSONB. Explicit probability columns enforce 0–1 and sum-to-one within
-1e-9; expected-goals columns reject negative/nonfinite values and score columns
-reject negatives. The upgrade does not change or backfill any existing records.
+| Artifact | Responsibility |
+| --- | --- |
+| `001_fresh_database.sql` | Generated full schema, empty database only |
+| `prototype/003_seed_football.sql` | Explicit RoadToTheFinal compatibility inserts only |
+| `verify_historical_import.sql` | Read-only current/complete acceptance and preservation evidence |
+
+`--mode schema` generates only the initial schema file and does not read prototype CSVs.
+`--mode prototype` generates only `prototype/003_seed_football.sql`, without database
+access. `--mode all` retains the legacy no-option behavior of generating both kinds.
+Use `--output-directory /path/to/review-directory` to review output without overwriting
+checked-in artifacts. All modes are offline and deterministic. Schema modes require
+the explicit dialect configuration shown above; prototype-only mode needs no database
+configuration. None of these modes executes its generated SQL.
+
+## CS 514 evidence
+
+The course asks for relational design, database programming and appropriate SQL
+concepts, not a particular seed filename or use of every listed database feature.
+The schema exports retain primary/foreign keys, checks, indexes, nullable fields,
+transactions and schema evolution. Verification demonstrates SELECTs, joins,
+aggregations and subqueries. Prototype SQL remains explicit INSERT compatibility
+evidence; application services and their tests demonstrate updates and transactions.
+The five normalized entities remain teams, competitions, matches, scenarios and
+predictions. PostgreSQL is the implemented engine despite older MySQL planning text.
+The nine-edition expansion is the current implementation objective, not the Phase 1
+minimum stated in the planning documents. No useful SQL evidence has been discarded.
+
+## Scenario and prediction persistence
+
+Both tables are included in the initial baseline. Foreign keys restrict deletion
+of referenced teams, matches and scenarios. Scenario checks enforce statistic and
+rating bounds; the API validates match-participant agreement transactionally.
+Predictions retain immutable input snapshots and JSONB details, with probability,
+expected-goals and score constraints. No schema export imports or backfills data.
+See [the frontend contract](../docs/service/frontend-api.md).

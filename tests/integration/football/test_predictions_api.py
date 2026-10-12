@@ -20,12 +20,6 @@ from models.prediction import Prediction
 from models.scenario import Scenario
 from services.football import report
 from services.predictions import PredictionService
-from tests.integration.football.test_scenarios_api import (
-    scenario_body as scenario_body,
-)
-from tests.integration.football.test_scenarios_api import (
-    scenario_client as scenario_client,
-)
 
 pytestmark = pytest.mark.postgres
 
@@ -369,11 +363,12 @@ def test_database_constraints(scenario_client, saved_scenario, import_database, 
     assert scenario_client.get(f"/api/v1/predictions/{saved['prediction_id']}").json == saved
 
 
-def test_additive_migration_and_relationship(scenario_client, saved_scenario, import_database):
+def test_repeated_upgrade_preserves_data_and_relationship(
+    scenario_client, saved_scenario, import_database
+):
     config = Config(str(Path(__file__).resolve().parents[3] / "alembic.ini"))
     with import_database.engine.begin() as connection:
         config.attributes["connection"] = connection
-        command.downgrade(config, "f6b82d14c903")
         tables = set(inspect(connection).get_table_names()) - {"alembic_version"}
         before = {
             name: connection.execute(

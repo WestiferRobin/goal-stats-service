@@ -1,6 +1,7 @@
 # Football data contracts
 
-`teams.csv`, `match_history.csv`, and `historical_snapshots.csv` are bundled
+`prototype/teams.csv`, `prototype/match_history.csv`, and
+`prototype/historical_snapshots.csv` are bundled
 RoadToTheFinal **prototype inputs**, not a verified historical dataset. They contain
 32 team/model records, 13 historical-result-shaped rows, and three unlabeled
 historical snapshots. The existing `flask import-football` baseline importer still
@@ -8,10 +9,48 @@ loads them into `football_teams` and `football_history`; saved application snaps
 use `football_snapshots`. Their seed data and row-based legacy identity are unchanged.
 Do not promote those rows into verified historical `matches`.
 
+## Source organization
+
+```text
+data/
+├── prototype/       # Tracked RoadToTheFinal compatibility inputs
+├── womens-world-cup/       # Tracked approved contracts for nine editions
+├── raw/             # Ignored, original source bytes; excluded from Docker images
+└── verification/    # Small, reviewed coverage and provenance evidence
+```
+
+The prototype inputs are retained temporarily for compatibility, not as authoritative
+historical facts. Their filenames, bytes and row ordering must remain unchanged:
+prototype history identities depend on filename and source-row position.
+
+One pinned raw CSV supports all nine completed Women's World Cups (1991–2023):
+348 matches, 44 distinct participants and 1,081 goals. All nine approved basic-results
+contracts are supported by the guarded runtime importer, one edition per invocation.
+See [coverage and verification](verification/README.md) for the Prompt 2 source audit,
+exact participant sets, goals, fixture digests and limitations.
+
+The loader joins each checked-in manifest with its typed coverage approval entry by
+`dataset_id`. Both pieces are mandatory: participants, goals, identity/order policies
+and approval status are validated alongside edition-specific dates and counts.
+All manifest files, including 2023, remain byte-for-byte unchanged. Coverage's
+`runtime_supported` values describe the Prompt 2 verification-time state; the current
+runtime allowlist supports all nine editions. No source override or arbitrary
+manifest path is accepted. Supplementary match metadata remains deferred.
+
+Preserve downloaded source bytes; never edit or normalize the raw CSV in place.
+`data/raw/` is ignored by Git and excluded from Docker builds. Do not commit raw
+sources without explicit licensing review. Historical imports use an explicit
+read-only input mount; no historical data is imported automatically at startup.
+Prototype compatibility imports also require explicit invocation; startup never seeds data.
+
+The old ignored acceptance path remains a compatibility symlink to the relocated
+source so dated evidence and its existing read-only tooling still resolve. Historical
+reports retain their original paths. Current operations should use `data/raw/`.
+
 ## Selected historical source
 
 [Mart Jürisoo's Women's International Football Results](https://github.com/martj42/womens-international-results)
-is the selected source. [The manifest](manifests/womens-world-cup-2023.json) pins
+is the selected source. [The manifest](womens-world-cup/womens-world-cup-2023.json) pins
 revision `1855e313ae8bcd0330426e62c8e4cf15ce45077c` and full `results.csv` SHA-256
 `de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
 The attribution reference is the pinned upstream README; the license reference is
@@ -22,7 +61,7 @@ The selection is exactly `tournament = FIFA World Cup`, with inclusive dates
 bounded, relevant Phase 1 dataset with 64 matches, 32 senior women's national teams,
 and one competition. These counts describe the **subset**, not the full upstream
 CSV. The pinned full file contains 11,650 result rows. It has been verified in memory;
-it is not packaged in this repository.
+it is available locally under `data/raw/`, but is not tracked or packaged in images.
 
 The explicit mapping is `FIFA World Cup` → `FIFA Women's World Cup`, edition `2023`,
 category `women_senior_national`. No edition is inferred from arbitrary dates.
@@ -39,7 +78,7 @@ network requests, database writes, import transactions, or CLI selection changes
 The historical adapter in `src/football/datasets.py` enforces this contract:
 
 1. Verify the **full upstream bytes** against the manifest SHA-256 before selecting
-   rows. Decode CSV as UTF-8 (an optional BOM is allowed); reject missing or duplicate
+   rows. Decode CSV as UTF-8 (an optional BOM is allowed); reject missing, extra, reordered or duplicate
    required headers, malformed CSV rows, and extra unheaded fields.
 2. Select only the declared tournament and inclusive date interval. Invalid dates
    in candidate tournament rows must be reported, not silently filtered out. Pass
@@ -97,12 +136,13 @@ survived a Goal Stats stop/restart with the same PostgreSQL volume. Legacy proto
 records remain separate and unchanged. See the [acceptance evidence](../docs/service/task2-acceptance.md).
 
 The full downloaded CSV remains ignored at
-`.host-sessions/task2-acceptance/input/results.csv`; it is not packaged or staged.
+`data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv`; it is not packaged or staged.
 Automated tests use synthetic fixtures in disposable PostgreSQL. Cloud execution
 has not been attempted: **CLOUD RUNTIME: UNVERIFIED**.
 Historical matches describe observed fixtures/results; future scenarios describe
 user prediction inputs and may reference a match without changing its facts.
-Scenario/prediction persistence and normalized-catalog REST endpoints remain later work.
+Scenario/prediction persistence and normalized-catalog REST endpoints are implemented.
+Historical catalog ratings remain NULL; scenarios require explicit model-input snapshots.
 
 See [schema design](../docs/service/historical-catalog.md) and
 [standalone SQL](../sql/README.md).
@@ -122,8 +162,9 @@ or missing selection values are rejected instead of silently excluded. Other
 competitions and valid dates outside the selected interval are filtered out; invalid
 or future dates in the source tournament are rejected. Optional blank values are
 NULL, while zero scores remain zero. Selected distinct counts must match the manifest.
-Exact duplicate identities with unchanged facts are counted once and retain the first
-source record's provenance. Conflicting input identities abort the batch.
+Exact duplicate input identities and conflicting input facts both abort the batch.
+Exact participant identities and total goals must also match the approved contract.
+This differs from reimporting an unchanged edition, which safely inserts zero rows.
 
 After validation, the importer verifies the configured and connected host/database,
 connected user, migration head, and required mapped columns. It never applies
@@ -164,4 +205,35 @@ comparison safely reveals any already-committed records. Do not delete tables or
 reset the database to recover an import.
 
 See [local and cloud procedures](../docs/service/football.md#historical-import-operations)
-for exact commands, TLS requirements and Prompt 3 acceptance steps.
+for exact commands, TLS requirements and acceptance steps.
+
+
+## Approved runtime dataset IDs
+
+- `womens-world-cup-1991`
+- `womens-world-cup-1995`
+- `womens-world-cup-1999`
+- `womens-world-cup-2003`
+- `womens-world-cup-2007`
+- `womens-world-cup-2011` (16 participants)
+- `womens-world-cup-2015`
+- `womens-world-cup-2019`
+- `womens-world-cup-2023`
+
+All use the same pinned full CSV. Historical `--directory` must be explicitly
+provided and contain `results.csv`; prototype files are never a fallback. Each
+edition has one atomic transaction. Enabling these IDs does not import them:
+the persistent development catalog still contains only the existing 2023 edition.
+Historical imports do not populate prediction ratings or modify prototype tables.
+
+## Explicit historical seeding
+
+`make seed DATASET=womens-world-cup DRY=true` previews all nine editions.
+Use `DRY=false` to write, or select an individual ID such as `womens-world-cup-2023`.
+Omitted `DRY` means `false`; empty/other values and legacy `DRY_RUN` are rejected.
+Contracts remain in `data/womens-world-cup/`, with pinned source in `data/raw/`.
+The command requires prepared infrastructure and schema; it never starts services,
+migrates or selects prototype data. Each edition commits separately, so earlier
+commits survive later failure and unchanged imports can be safely retried. Dry-run
+team estimates are edition-local, not additive. Startup imports nothing.
+See [seed prerequisites, safeguards and reporting](../docs/interface/make.md#explicit-historical-seeding) for the full contract.

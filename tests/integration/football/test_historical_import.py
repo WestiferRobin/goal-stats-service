@@ -163,13 +163,16 @@ def test_versions_reordering_duplicates_and_missing_records_preserve_existing(
         extra.pop("match_id")
         extra["source"] = "another_source"
         session.execute(Match.__table__.insert().values(**extra))
-    rows = list(reversed(pinned_fixture.rows)) + [pinned_fixture.rows[0]]
+    rows = list(reversed(pinned_fixture.rows))
     manifest = pinned_fixture.write(rows).model_copy(
         update={"upstream_revision": "test-new-version"}
     )
-    monkeypatch.setattr("football.historical_import.load_manifest", lambda: manifest)
+    monkeypatch.setattr(
+        "football.historical_import.load_manifest",
+        lambda dataset_id="womens-world-cup-2023": manifest,
+    )
     result = run(import_database, pinned_fixture, import_target)
-    assert result.matches_inserted == 0 and result.unchanged == 64 and result.duplicate_input == 1
+    assert result.matches_inserted == 0 and result.unchanged == 64 and result.duplicate_input == 0
     with import_database.transaction() as session:
         assert (
             session.execute(

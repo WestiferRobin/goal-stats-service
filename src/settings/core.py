@@ -9,8 +9,6 @@ API_TITLE = "GoalStats Monolith API"
 API_VERSION = "v1"
 LOGGER_NAME = "goal_stats_service"
 POLICY_DEFAULTS = {"LOG_LEVEL": "INFO", "OPENAPI_ENABLED": "true"}
-# Retained private workflow defaults; public host settings use APP_PORT.
-PORT_DEFAULTS = {"HOST_APP_PORT": "5300", "LOCAL_APP_PORT": "5100", "DEV_APP_PORT": "5200"}
 
 
 def log_level(value: str) -> str:

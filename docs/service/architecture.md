@@ -56,7 +56,7 @@ Lists order by creation time and UUID as tie-breaker.
 `items` has a UUID PK, required bounded/nonblank name, constrained string status,
 and non-null timezone-aware timestamp columns. `actions` has the same core fields,
 a constrained action type, and an indexed FK to `items` with ON DELETE CASCADE.
-No Python-side cascade graph is needed. Alembic revision `b7f42e9c1a60` establishes
+No Python-side cascade graph is needed. The consolidated Alembic revision `a7c93e25d104` establishes
 this fresh Python schema. Python supplies UUID/timestamp defaults on ORM insertion;
 direct SQL writers must supply those values explicitly.
 
@@ -72,7 +72,7 @@ relationship invariant. Overlapping operations may observe either legitimate
 ordering. There is no generic repository, DI framework, or custom UnitOfWork class.
 
 The separate [historical catalog](historical-catalog.md) adds `teams`, `competitions`,
-and `matches` at revision `e3a71c92b406`, without changing the prototype tables.
+and `matches`, included in the consolidated `a7c93e25d104` baseline alongside the prototype tables.
 Its pinned dataset contract is consumed by the explicit historical CLI importer;
 local acceptance verified 64 historical matches and restart persistence. See the
 [Task #2 evidence](task2-acceptance.md).

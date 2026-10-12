@@ -13,7 +13,7 @@ The directory and Compose project keep their existing names so local volumes and
 workspace tooling continue to work; this is now the backend application, not a
 requirement to scaffold more microservices.
 
-## Start and import
+## Startup and explicit imports
 
 ```sh
 make setup
@@ -21,15 +21,16 @@ make run
 ```
 
 `make run` starts host Flask; `make deploy` starts Docker Flask. Both apply the same
-migrations and import bundled CSVs through one-off Docker app commands before startup.
-Imports preserve existing rows. Stop host Flask before repeating `make run` or switching
+migrations through one-off Docker app commands before startup. Neither imports datasets.
+Existing records remain available; fresh databases contain no historical or prototype
+records. Stop host Flask before repeating `make run` or switching
 to `make deploy`. `make infra` starts providers only and does not import.
 
-The three source CSVs live in the project-root `data/` folder. Both host and
+The three source CSVs live in the project-root `data/prototype/` folder. Both host and
 container importers use that folder by default, independently of the working
 directory. The SQL exporter reads the same files.
 
-The importer validates all three files before writing and commits the batch
+The explicitly invoked prototype importer validates all three files before writing and commits the batch
 atomically. File order is part of imported record identity. Maintainers can run the
 Flask `import-football` command inside the application container for a nonstandard
 data directory. [SQL alternatives](../../sql/README.md) are advanced reference only.
@@ -39,6 +40,9 @@ data directory. [SQL alternatives](../../sql/README.md) are advanced reference o
 Swagger is at `/swagger`; football routes use `/api/v1`. JSON field names are
 snake_case. Validation failures return 400 Problem Details; unknown teams or
 snapshots return 404. POST bodies must be JSON objects.
+
+The following routes are the retained prototype compatibility API. Their ratings and
+history come from prototype tables, not the verified historical catalog.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -95,6 +99,16 @@ Provider team matching requires exact normalized names; aliases need an explicit
 mapping if the provider's names differ. Production provider access has not been
 verified with a real key by this change.
 
+## Normalized Goal Stats APIs
+
+Historical catalog routes under `/api/v1/catalog/teams`, `/api/v1/catalog/competitions`
+and `/api/v1/catalog/matches` use `teams`, `competitions` and `matches`.
+Scenario creation/list/detail routes under `/api/v1/scenarios` persist user-supplied
+state. Scenario prediction creation/history and `/api/v1/predictions/{prediction_id}`
+provide saved predictions. See `/swagger` for request and response contracts.
+These APIs coexist with prototype compatibility routes; the original prediction engine
+and calculations remain unchanged. Historical results do not supply prototype ratings.
+
 ## Data and model limits
 
 Bundled prototype data has 32 teams, 13 historical-result-shaped rows, and 3 unlabeled
@@ -125,19 +139,42 @@ The [normalized catalog](historical-catalog.md) and [pinned dataset contract](..
 prepare real 2023 Women's World Cup records for `teams`, `competitions`, and `matches`.
 Local acceptance completed on **2026-10-08 (America/Los_Angeles)**: the catalog contains
 32 teams, one competition and 64 verified historical matches. Reimport and restart
-preserved every record. Existing APIs and prediction behavior still use prototype
-structures; no normalized-catalog REST endpoint has been added. Historical ratings
-remain NULL. Scenario and prediction persistence remain subsequent work.
+preserved every record. Normalized catalog, scenario and prediction APIs coexist
+with prototype compatibility APIs. Historical ratings remain NULL. The nine-edition
+importer expansion does not change API contracts or prediction calculations.
 See [Task #2 evidence](task2-acceptance.md) for actual counts, SQL/API results and safety checks.
 
 
 ## Historical import operations
 
 The no-option `import-football` command remains the prototype importer. The historical
-path requires all of `--dataset`, `--target`, `--expect-host`, and
-`--expect-database`. `--directory` identifies the folder containing the pinned
+path requires all of `--dataset`, `--directory`, `--target`, `--expect-host`, and
+`--expect-database`. The explicitly supplied directory contains the pinned
 `results.csv`; `--dry-run` performs read-only comparison. Historical safety/dry-run
 flags without `--dataset` are rejected. No new Make command or REST route exists.
+
+The supported IDs are `womens-world-cup-1991`, `womens-world-cup-1995`,
+`womens-world-cup-1999`, `womens-world-cup-2003`, `womens-world-cup-2007`,
+`womens-world-cup-2011`, `womens-world-cup-2015`, `womens-world-cup-2019`, and
+`womens-world-cup-2023`. Each resolves a checked-in manifest plus typed approval
+metadata, and all share the same pinned CSV and exact full-file checksum.
+
+For a configured host environment, an explicit read-only invocation is:
+
+```bash
+flask --app 'main:create_app()' import-football \
+  --dataset womens-world-cup-1991 \
+  --directory data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c \
+  --target local --expect-host 127.0.0.1 --expect-database goal_stats_service_local \
+  --dry-run
+```
+
+Without `--dry-run`, a separately authorized invocation writes one edition in one
+atomic transaction. Duplicate input fixtures or conflicting stored facts abort;
+unchanged repeat imports insert zero rows and preserve provenance/timestamps.
+No historical import falls back to prototype inputs or writes prototype tables.
+The expansion has not imported additional editions into persistent PostgreSQL.
+Source ordering and venue limitations remain; no prediction ratings are supplied.
 
 Local authorization requires `goalstats` and `goal_stats_service_local` at either
 `postgres:5432` (Docker) or `127.0.0.1:55432` (host). The configured URL must exactly
@@ -184,8 +221,10 @@ PYTHON
 
 gs_compose run --rm --no-deps -T app alembic upgrade head
 
-# Download outside the repository and verify the full file using the manifest.
-IMPORT_INPUT=$(mktemp -d "${TMPDIR:-/tmp}/goalstats-input.XXXXXX")
+# Reuse the ignored pinned source, or explicitly acquire it if absent.
+# Verify the full file before use; never overwrite an existing source.
+IMPORT_INPUT="$PWD/data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c"
+mkdir -p "$IMPORT_INPUT"
 export IMPORT_INPUT
 PYTHONPATH=src .venv/bin/python - <<'PYTHON'
 import os
@@ -196,10 +235,14 @@ from football.historical_dataset import load_manifest, validate_checksum
 manifest = load_manifest()
 url = manifest.source_url.replace("https://github.com/", "https://raw.githubusercontent.com/")
 url = url.replace("/blob/", "/")
-with urllib.request.urlopen(url, timeout=60) as response:
-    content = response.read()
-validate_checksum(content, manifest)
-(Path(os.environ["IMPORT_INPUT"]) / manifest.source_filename).write_bytes(content)
+source = Path(os.environ["IMPORT_INPUT"]) / manifest.source_filename
+if source.exists():
+    validate_checksum(source.read_bytes(), manifest)
+else:
+    with urllib.request.urlopen(url, timeout=60) as response:
+        content = response.read()
+    validate_checksum(content, manifest)
+    source.write_bytes(content)
 print("Pinned CSV checksum verified.")
 PYTHON
 
@@ -244,9 +287,10 @@ proposes 32 teams, one competition and 64 matches. The first successful write re
 those committed inserts; both subsequent runs report 64 unchanged matches and zero
 inserts. A populated catalog may legitimately require fewer new teams/competitions.
 Expected SQL counts are 64 matches, 32 participating teams and one competition.
-Compare IDs, `imported_at` and legacy table counts before/after reimport during Prompt 3.
+Compare IDs, `imported_at` and legacy table counts before/after an authorized reimport.
 When Flask is running, `/api/v1/teams` and existing prediction endpoints should retain
-their prototype contract; the new historical catalog adds no API endpoint.
+their prototype contract. Normalized historical records are served separately through
+`/api/v1/catalog/teams`, `/api/v1/catalog/competitions` and `/api/v1/catalog/matches`.
 
 For a host command, explicitly supply the validated local host `DATABASE_URL` through
 the process environment and use `--expect-host 127.0.0.1` with the same database name.
@@ -308,3 +352,33 @@ and host Flask stopped.
 Cloud configuration safeguards passed automated tests, but no cloud database was
 contacted: **CLOUD RUNTIME: UNVERIFIED**. Local certification does not certify cloud
 networking, provider credentials or certificate deployment.
+
+
+## Startup isolation
+
+`make run` and `make deploy` apply existing Alembic migrations and start Flask without
+importing any dataset. Existing records are preserved; fresh catalogs are empty.
+The explicit prototype compatibility importer and guarded historical importer remain
+available independently of startup, readiness and the application factory.
+The existing `/demo` depends on prototype teams/ratings and may be unusable on a fresh
+database until prototype data is explicitly supplied or the frontend is migrated.
+Prototype examples are not verified historical facts. Historical seeding is available through the explicit `make seed` command.
+
+
+The SQL verification command defaults to current partial coverage. Complete nine-edition
+acceptance is explicitly selected with `goalstats.verify_complete=true`; it is expected
+to fail until all approved editions are imported. See [SQL verification modes](../../sql/README.md#read-only-historical-acceptance)
+for target assertions and full-record preservation digests. Prototype compatibility SQL
+now lives at `sql/prototype/003_seed_football.sql`; it is never historical seed data.
+
+## Explicit historical seeding
+
+`make seed DATASET=womens-world-cup DRY=true` previews all nine editions.
+Use `DRY=false` to write, or select an individual ID such as `womens-world-cup-2023`.
+Omitted `DRY` means `false`; empty/other values and legacy `DRY_RUN` are rejected.
+Contracts remain in `data/womens-world-cup/`, with pinned source in `data/raw/`.
+The command requires prepared infrastructure and schema; it never starts services,
+migrates or selects prototype data. Each edition commits separately, so earlier
+commits survive later failure and unchanged imports can be safely retried. Dry-run
+team estimates are edition-local, not additive. Startup imports nothing.
+See [seed prerequisites, safeguards and reporting](../interface/make.md#explicit-historical-seeding) for the full contract.

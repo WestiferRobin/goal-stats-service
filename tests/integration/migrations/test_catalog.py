@@ -89,11 +89,11 @@ def assert_catalog(connection):
     assert compare_metadata(context, Base.metadata) == []
 
 
-def test_additive_upgrade_preserves_legacy_schema_and_records(isolated_schema):
+def test_repeated_upgrade_preserves_schema_and_records(isolated_schema):
     connection, config = isolated_schema
-    command.upgrade(config, "d94f81ab2301")
+    command.upgrade(config, "head")
     # Load the unchanged prototype seed into this test schema, never the development DB.
-    run_sql(connection, "003_seed_football.sql")
+    run_sql(connection, "prototype/003_seed_football.sql")
     # Populate every legacy table so preservation is checked with real records.
     item_id = connection.execute(
         Item.__table__.insert().values(name="preserved fixture", status="active").returning(Item.id)
@@ -128,34 +128,33 @@ def run_sql(connection, filename):
     connection.exec_driver_sql(sql)
 
 
-@pytest.mark.parametrize(
-    "filename,parent",
-    [
-        ("001_fresh_database.sql", None),
-        ("002_upgrade_template.sql", "b7f42e9c1a60"),
-        ("002_upgrade_existing.sql", "d94f81ab2301"),
-        ("004_upgrade_scenarios.sql", "e3a71c92b406"),
-        ("005_upgrade_predictions.sql", "f6b82d14c903"),
-    ],
-)
-def test_standalone_sql_matches_alembic_and_metadata(isolated_schema, filename, parent):
-    connection, config = isolated_schema
-    if parent:
-        command.upgrade(config, parent)
-    run_sql(connection, filename)
+def test_standalone_sql_matches_alembic_and_metadata(isolated_schema):
+    connection, _ = isolated_schema
+    run_sql(connection, "001_fresh_database.sql")
     assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "a7c93e25d104"
     assert_catalog(connection)
 
 
-def test_upgrade_sql_refuses_wrong_revision(isolated_schema):
+def test_initial_migration_round_trip(isolated_schema):
     connection, config = isolated_schema
-    command.upgrade(config, "b7f42e9c1a60")
-    from sqlalchemy.exc import DBAPIError
+    command.upgrade(config, "head")
+    assert_catalog(connection)
+    command.downgrade(config, "base")
+    assert set(inspect(connection).get_table_names()) == {"alembic_version"}
+    command.upgrade(config, "head")
+    assert_catalog(connection)
 
-    with pytest.raises(DBAPIError, match="Expected starting revision"):
-        with connection.begin_nested():
-            run_sql(connection, "002_upgrade_existing.sql")
-    assert not CATALOG & set(inspect(connection).get_table_names())
+
+def test_removed_intermediate_revision_is_rejected(isolated_schema):
+    from alembic.util.exc import CommandError
+
+    connection, config = isolated_schema
+    command.upgrade(config, "head")
+    connection.execute(text("UPDATE alembic_version SET version_num='f6b82d14c903'"))
+    before = {name: signature(connection, name) for name in Base.metadata.tables}
+    with pytest.raises(CommandError, match="Can't locate revision"):
+        command.upgrade(config, "head")
+    assert {name: signature(connection, name) for name in Base.metadata.tables} == before
 
 
 @pytest.fixture

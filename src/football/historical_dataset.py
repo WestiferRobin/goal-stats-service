@@ -7,11 +7,38 @@ import unicodedata
 from collections.abc import Iterable, Mapping
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Self, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-MANIFEST_PATH = Path(__file__).resolve().parents[2] / "data/manifests/womens-world-cup-2023.json"
+MANIFEST_PATH = (
+    Path(__file__).resolve().parents[2] / "data/womens-world-cup/womens-world-cup-2023.json"
+)
+Edition = Literal["1991", "1995", "1999", "2003", "2007", "2011", "2015", "2019", "2023"]
+DatasetID = Literal[
+    "womens-world-cup-1991",
+    "womens-world-cup-1995",
+    "womens-world-cup-1999",
+    "womens-world-cup-2003",
+    "womens-world-cup-2007",
+    "womens-world-cup-2011",
+    "womens-world-cup-2015",
+    "womens-world-cup-2019",
+    "womens-world-cup-2023",
+]
+APPROVED_DATASETS: tuple[str, ...] = get_args(DatasetID)
+EDITION_SPECS = {
+    "1991": ("1991-11-16", "1991-11-30", 26, 12, 99),
+    "1995": ("1995-06-05", "1995-06-18", 26, 12, 99),
+    "1999": ("1999-06-19", "1999-07-10", 32, 16, 123),
+    "2003": ("2003-09-20", "2003-10-12", 32, 16, 107),
+    "2007": ("2007-09-10", "2007-09-30", 32, 16, 111),
+    "2011": ("2011-06-26", "2011-07-17", 32, 16, 86),
+    "2015": ("2015-06-06", "2015-07-05", 52, 24, 146),
+    "2019": ("2019-06-07", "2019-07-07", 52, 24, 146),
+    "2023": ("2023-07-20", "2023-08-20", 64, 32, 164),
+}
+COVERAGE_PATH = MANIFEST_PATH.parent.parent / "verification/womens-world-cup-coverage.json"
 REQUIRED_COLUMNS = (
     "date",
     "home_team",
@@ -46,8 +73,10 @@ class Selection(ContractModel):
 
     @model_validator(mode="after")
     def pinned_dates(self) -> Self:
-        if (self.date_from, self.date_to) != (date(2023, 7, 20), date(2023, 8, 20)):
-            raise ValueError("Selection must be the inclusive 2023 Women's World Cup interval")
+        if (self.date_from.isoformat(), self.date_to.isoformat()) not in {
+            spec[:2] for spec in EDITION_SPECS.values()
+        }:
+            raise ValueError("Selection must be an approved inclusive Women's World Cup interval")
         return self
 
 
@@ -55,18 +84,37 @@ class CompetitionRecord(ContractModel):
     source_tournament: Literal["FIFA World Cup"]
     name: Literal["FIFA Women's World Cup"]
     name_key: Literal["fifa women's world cup"]
-    edition_label: Literal["2023"]
+    edition_label: Edition
     category: Literal["women_senior_national"]
 
 
 class ExpectedCounts(ContractModel):
-    matches: Literal[64]
-    teams: Literal[32]
+    matches: Literal[26, 32, 52, 64]
+    teams: Literal[12, 16, 24, 32]
     competitions: Literal[1]
 
 
+class EditionApproval(ContractModel):
+    """Typed companion entry from the reviewed, checked-in coverage evidence."""
+
+    dataset_id: DatasetID
+    date_from: date
+    date_to: date
+    matches: Annotated[int, Field(strict=True, gt=0)]
+    participant_count: Annotated[int, Field(strict=True, gt=0)]
+    participants: tuple[Nonblank, ...]
+    total_goals: Annotated[int, Field(strict=True, ge=0)]
+    fixture_sha256: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    approval_status: Literal["approved_pinned_basic_results"]
+    # Historical verification-time fact, not current runtime capability selection.
+    runtime_supported: bool
+    identity_policy: Literal["source-record-key-v1"]
+    home_away_policy: Literal["preserve_source_order"]
+    score_basis: Literal["including_extra_time_no_shootout"]
+
+
 class DatasetManifest(ContractModel):
-    dataset_id: Literal["womens-world-cup-2023"]
+    dataset_id: DatasetID
     source: Literal["martj42_womens_results"]
     source_name: Nonblank
     author: Literal["Mart Jürisoo"]
@@ -83,9 +131,29 @@ class DatasetManifest(ContractModel):
     score_basis: Literal["including_extra_time_no_shootout"]
     expected_counts: ExpectedCounts
     reviewed_team_aliases: dict[str, str]
+    approval: EditionApproval
 
     @model_validator(mode="after")
     def coherent_contract(self) -> Self:
+        year = self.competition.edition_label
+        start, end, matches, teams, goals = EDITION_SPECS[year]
+        a = self.approval
+        if (
+            self.dataset_id != f"womens-world-cup-{year}"
+            or a.dataset_id != self.dataset_id
+            or (self.selection.date_from.isoformat(), self.selection.date_to.isoformat())
+            != (start, end)
+            or (a.date_from, a.date_to) != (self.selection.date_from, self.selection.date_to)
+            or (self.expected_counts.matches, self.expected_counts.teams) != (matches, teams)
+            or (a.matches, a.participant_count, a.total_goals) != (matches, teams, goals)
+        ):
+            raise ValueError("Edition, selection, counts and approval must agree")
+        if (
+            tuple(sorted(set(a.participants))) != a.participants
+            or len(a.participants) != teams
+            or len({name_key(p) for p in a.participants}) != teams
+        ):
+            raise ValueError("Exact approved participant identities must be unique and complete")
         if self.required_columns != REQUIRED_COLUMNS:
             raise ValueError("Required source columns differ from the pinned contract")
         base = "https://github.com/martj42/womens-international-results/blob/"
@@ -97,13 +165,29 @@ class DatasetManifest(ContractModel):
         return self
 
 
-def load_manifest(path: Path = MANIFEST_PATH) -> DatasetManifest:
-    return DatasetManifest.model_validate_json(path.read_text(encoding="utf-8"))
+def load_manifest(dataset_id: str = "womens-world-cup-2023") -> DatasetManifest:
+    """Only allowlisted repository contracts; no path or source override."""
+    if dataset_id not in APPROVED_DATASETS:
+        raise ValueError("Unknown historical dataset; arbitrary manifest paths are not allowed")
+    path = MANIFEST_PATH.parent / f"{dataset_id}.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    coverage = json.loads(COVERAGE_PATH.read_text(encoding="utf-8"))
+    if (
+        coverage["source_revision"] != data["upstream_revision"]
+        or coverage["source_sha256"] != data["sha256"]
+        or data["dataset_id"] != dataset_id
+        or "approval" in data
+    ):
+        raise ValueError("Manifest and checked-in approval provenance differ")
+    entries = [e for e in coverage["editions"] if e["dataset_id"] == dataset_id]
+    if len(entries) != 1:
+        raise ValueError("Dataset requires exactly one approved coverage entry")
+    return DatasetManifest.model_validate({**data, "approval": entries[0]})
 
 
 def validate_headers(headers: Iterable[str] | None, manifest: DatasetManifest) -> None:
     columns = list(headers or ())
-    if len(columns) != len(set(columns)) or not set(manifest.required_columns) <= set(columns):
+    if tuple(columns) != manifest.required_columns:
         raise ValueError("Missing required or duplicate CSV headers")
 
 

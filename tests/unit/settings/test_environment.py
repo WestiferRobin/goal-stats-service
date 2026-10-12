@@ -3,25 +3,7 @@ import os
 import pytest
 
 from settings.base import ConfigurationError
-from settings.environment import LOCAL_KEYS, application, load_application, machine, read_private
-from settings.environment import test_policy as load_test_policy
-
-
-def test_context_changes_address_not_identity():
-    values = machine(
-        {"POSTGRES_PASSWORD": "abcdefghijklmnop", "DEV_POSTGRES_PASSWORD": "ponmlkjihgfedcba"}
-    )
-    host = application(values, "local", host=True)
-    docker = application(values, "local")
-    assert (
-        host["DATABASE_URL"].replace("127.0.0.1:55432", "postgres:5432") == docker["DATABASE_URL"]
-    )
-    assert host["REDIS_URL"].replace("127.0.0.1:56379", "redis:6379") == docker["REDIS_URL"]
-    assert host["CACHE_KEY_PREFIX"] == docker["CACHE_KEY_PREFIX"]
-    assert "ponmlkjihgfedcba" in application(values, "dev")["DATABASE_URL"]
-    for mode in ("dev", "test"):
-        with pytest.raises(ConfigurationError):
-            application(values, mode, host=True)
+from settings.environment import DEVELOPMENT_KEYS, load_application, policy, read_private
 
 
 @pytest.mark.parametrize(
@@ -32,16 +14,25 @@ def test_active_private_parser_rejects_lines(tmp_path, content):
     path.write_text(content)
     path.chmod(0o600)
     with pytest.raises(ConfigurationError, match=r".env.local:\d"):
-        read_private(path, LOCAL_KEYS)
+        read_private(path, DEVELOPMENT_KEYS)
 
 
-def test_policy_does_not_authorize_providers(tmp_path):
-    assert load_test_policy(tmp_path)["OPENAPI_ENABLED"] == "true"
-    path = tmp_path / ".env.test"
-    path.write_text("DATABASE_URL=private")
-    path.chmod(0o600)
-    with pytest.raises(ConfigurationError):
-        load_test_policy(tmp_path)
+@pytest.mark.parametrize(
+    "key",
+    [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "POSTGRES_PASSWORD",
+        "APP_PORT",
+        "TEST_DATABASE_DISPOSABLE",
+        "TEST_SESSION_MANIFEST",
+    ],
+)
+def test_policy_does_not_authorize_providers(key):
+    assert policy({})["OPENAPI_ENABLED"] == "true"
+    with pytest.raises(ConfigurationError) as error:
+        policy({key: "private-value"})
+    assert "private-value" not in str(error.value)
 
 
 def test_typed_factory_bypasses_loading(monkeypatch):

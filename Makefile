@@ -1,4 +1,5 @@
-# GoalStats public developer interface. Advanced maintenance targets are private.
+# GoalStats developer interface: exactly eight supported commands.
+PYTHON ?= python3.12
 ifeq ($(OS),Windows_NT)
 BASH := C:/Progra~1/Git/bin/bash.exe
 else
@@ -6,27 +7,26 @@ BASH := /bin/bash
 endif
 .DEFAULT_GOAL := help
 
-.PHONY: setup infra run deploy test stop help
+.PHONY: setup infra run deploy seed test stop help
 setup infra run deploy stop:
-	@PYTHON="$(PYTHON)" $(BASH) scripts/local.sh $@
+	@PYTHON="$(PYTHON)" $(BASH) scripts/development/local.sh $@
 
 test:
-	@$(BASH) scripts/test.sh
+	@$(BASH) scripts/testing/test.sh
 
 help:
-	@$(BASH) scripts/local.sh help
+	@$(BASH) scripts/development/local.sh help
 
-# Internal maintenance interface. These targets intentionally do not appear in help.
-PYTHON ?= python3.12
-MESSAGE ?=
-.PHONY: _migration _migration-check _smoke _coverage _certify
-_migration:
-	@ENV=local MESSAGE="$(MESSAGE)" $(PYTHON) scripts/workflow.py migration
-_migration-check:
-	@ENV=local $(PYTHON) scripts/workflow.py migration-check
-_smoke:
-	@$(PYTHON) scripts/workflow.py smoke
-_coverage:
-	@$(PYTHON) scripts/workflow.py coverage
-_certify:
-	@$(PYTHON) scripts/workflow.py certify
+# Values travel through the environment, never through shell source interpolation.
+override DATASET := $(value DATASET)
+export DATASET
+ifneq ($(origin DRY_RUN),undefined)
+override DRY_RUN := $(value DRY_RUN)
+export DRY_RUN
+endif
+DRY ?= false
+override DRY := $(value DRY)
+export DRY
+export PYTHON
+seed:
+	@$(BASH) scripts/development/local.sh seed

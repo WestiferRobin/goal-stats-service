@@ -1,14 +1,13 @@
 """HTTP clients and read-only observations of the smoke runner's owned providers."""
 
 import os
-import re
 from dataclasses import dataclass
-from urllib.parse import urlsplit
 
 import psycopg
 import pytest
 from http_client import request
 from redis import Redis
+from test_ownership import verify_test_providers
 
 
 @dataclass
@@ -28,22 +27,15 @@ class SmokeClient:
 
 @pytest.fixture(scope="session")
 def smoke_client():
-    project = os.environ.get("SMOKE_PROJECT", "")
+    verify_test_providers()
     url = os.environ.get("SMOKE_BASE_URL", "")
-    database_url = os.environ.get("SMOKE_DATABASE_URL", "")
-    redis_url = os.environ.get("SMOKE_REDIS_URL", "")
-    prefix = os.environ.get("SMOKE_CACHE_PREFIX", "")
-    if not (
-        re.fullmatch(r"goal-stats-service-cert-[a-f0-9]+", project)
-        and url == "http://app:8000"
-        and urlsplit(database_url).hostname == "postgres"
-        and urlsplit(database_url).path == "/goal_stats_service_dev"
-        and redis_url == "redis://redis:6379/0"
-        and prefix == "goal-stats-service:dev:v1"
-    ):
-        pytest.fail(
-            "Smoke requires the disposable stack configuration from make smoke", pytrace=False
-        )
+    if url != "http://app:8000":
+        pytest.fail("Smoke requires the canonical owned TEST application", pytrace=False)
+    database_url = os.environ["TEST_DATABASE_URL"].replace(
+        "postgresql+psycopg://", "postgresql://", 1
+    )
+    redis_url = os.environ["TEST_REDIS_URL"]
+    prefix = "goal-stats-service:test:v1"
     cache = Redis.from_url(
         redis_url, decode_responses=True, socket_timeout=3, socket_connect_timeout=3
     )

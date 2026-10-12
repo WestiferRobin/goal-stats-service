@@ -1,5 +1,9 @@
 # Goal Stats backend certification — October 10, 2026
 
+Migration-history note: dated revision-chain evidence below predates consolidation
+into `a7c93e25d104_init_models.py`. The head ID and schema are preserved; see
+[the current migration workflow](development.md#schema-changes).
+
 Certification date uses America/Los_Angeles; recorded API timestamps use UTC.
 Scope: Wes's October 12 backend milestone, Prompts 1–4. This certifies backend
 HTTP/database integration, not connected React screens or a hosted deployment.
@@ -73,7 +77,7 @@ Source: Mart Jürisoo's women's international results, pinned revision
 `1855e313ae8bcd0330426e62c8e4cf15ce45077c`.
 Full CSV SHA-256:
 `de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
-See [manifest](../../data/manifests/womens-world-cup-2023.json) and
+See [manifest](../../data/womens-world-cup/womens-world-cup-2023.json) and
 [historical catalog documentation](historical-catalog.md).
 
 Independently selected the original CSV row using each stored `source_row` and

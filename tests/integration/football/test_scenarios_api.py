@@ -22,75 +22,6 @@ pytestmark = pytest.mark.postgres
 URL = "/api/v1/scenarios"
 
 
-@pytest.fixture
-def scenario_body():
-    body = {
-        "title": "Synthetic scenario fixture",
-        "team1_id": 1,
-        "team2_id": 2,
-        "match_id": None,
-        "match_minute": 65,
-    }
-    for side in (1, 2):
-        for field in (
-            "goals",
-            "shots",
-            "shots_on_target",
-            "big_chances",
-            "defender_blocks",
-            "goalkeeper_saves",
-            "corners",
-            "yellow_cards",
-            "red_cards",
-        ):
-            body[f"team{side}_{field}"] = 0
-        body[f"team{side}_possession"] = 50
-        for field in ("offense", "defense", "form", "star_power", "clutch"):
-            body[f"team{side}_{field}"] = 70
-    return body
-
-
-@pytest.fixture
-def scenario_client(import_database, app_factory, postgres_config, monkeypatch):
-    with import_database.transaction() as session:
-        session.add_all(
-            [
-                Team(team_id=i, name=name, name_key=name.lower(), category="test")
-                for i, name in [(1, "First"), (2, "Second"), (3, "Third")]
-            ]
-        )
-        session.execute(
-            text(
-                "INSERT INTO competitions (competition_id,name,name_key,edition_label,category) "
-                "VALUES (1,'Test','test','2023','test')"
-            )
-        )
-        session.flush()
-        session.add(
-            Match(
-                match_id=1,
-                competition_id=1,
-                home_team_id=1,
-                away_team_id=2,
-                match_date=datetime(2023, 8, 20).date(),
-                home_score=1,
-                away_score=0,
-                score_basis="including_extra_time_no_shootout",
-                source="test",
-                source_record_key="a" * 64,
-                source_file_sha256="b" * 64,
-                source_row=1,
-                source_version="test",
-                source_url="https://example.com/test",
-                source_home_team="First",
-                source_away_team="Second",
-                source_tournament="Test",
-            )
-        )
-    monkeypatch.setattr("main.Database", lambda _: import_database)
-    return app_factory(postgres_config).test_client()
-
-
 def create(client, body):
     response = client.post(URL, json=body)
     assert response.status_code == 201, response.json
@@ -323,7 +254,6 @@ def test_schema_migration_preserves_existing_data(scenario_client, scenario_body
     config = Config(str(Path(__file__).resolve().parents[3] / "alembic.ini"))
     with import_database.engine.begin() as connection:
         config.attributes["connection"] = connection
-        command.downgrade(config, "e3a71c92b406")  # Disposable schema only.
         tables = set(inspect(connection).get_table_names()) - {"alembic_version"}
         before = {
             table: connection.execute(

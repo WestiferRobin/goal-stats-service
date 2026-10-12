@@ -1,41 +1,15 @@
-"""PostgreSQL machine derivation and validated runtime configuration."""
+"""Validated PostgreSQL runtime configuration and import authorization."""
 
 from __future__ import annotations
 
-import re
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import TYPE_CHECKING
 
-from settings.base import ConfigurationError, ExecutionContext
+from settings.base import ConfigurationError
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import URL
-
-DATABASE = "goal_stats_service"
-PORT_DEFAULTS = {"LOCAL_POSTGRES_PORT": "55432"}
-PASSWORD_KEYS = frozenset({"POSTGRES_PASSWORD", "DEV_POSTGRES_PASSWORD"})
-
-
-def credentials(values: Mapping[str, str]) -> None:
-    for key in PASSWORD_KEYS:
-        if not re.fullmatch(r"[a-zA-Z0-9_-]{16,128}", values.get(key, "")):
-            raise ConfigurationError(
-                f"{key} must be 16–128 URL-safe characters; preserve existing credentials."
-            )
-
-
-def derive_database_url(values: Mapping[str, str], mode: str, *, context: ExecutionContext) -> str:
-    if context not in {"host", "container"}:
-        raise ConfigurationError("Execution context must be host or container.")
-    if mode not in {"local", "dev"} or (context == "host" and mode != "local"):
-        raise ConfigurationError(
-            "Machine database configuration supports LOCAL/DEV; host is LOCAL."
-        )
-    password = values["POSTGRES_PASSWORD" if mode == "local" else "DEV_POSTGRES_PASSWORD"]
-    address = "127.0.0.1:" + values["LOCAL_POSTGRES_PORT"] if context == "host" else "postgres:5432"
-    return f"postgresql+psycopg://goalstats:{password}@{address}/{DATABASE}_{mode}"
 
 
 def database_url(value: str | URL) -> URL:

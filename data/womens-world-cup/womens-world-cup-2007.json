@@ -1,0 +1,43 @@
+{
+  "dataset_id": "womens-world-cup-2007",
+  "source": "martj42_womens_results",
+  "source_name": "Women's International Football Results",
+  "author": "Mart Jürisoo",
+  "source_url": "https://github.com/martj42/womens-international-results/blob/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv",
+  "upstream_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+  "sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+  "attribution_reference": "https://github.com/martj42/womens-international-results/blob/1855e313ae8bcd0330426e62c8e4cf15ce45077c/README.md",
+  "license_reference": "https://www.kaggle.com/datasets/martj42/womens-international-football-results",
+  "source_filename": "results.csv",
+  "required_columns": [
+    "date",
+    "home_team",
+    "away_team",
+    "home_score",
+    "away_score",
+    "tournament",
+    "city",
+    "country",
+    "neutral"
+  ],
+  "selection": {
+    "tournament": "FIFA World Cup",
+    "date_from": "2007-09-10",
+    "date_to": "2007-09-30"
+  },
+  "competition": {
+    "source_tournament": "FIFA World Cup",
+    "name": "FIFA Women's World Cup",
+    "name_key": "fifa women's world cup",
+    "edition_label": "2007",
+    "category": "women_senior_national"
+  },
+  "team_category": "women_senior_national",
+  "score_basis": "including_extra_time_no_shootout",
+  "expected_counts": {
+    "matches": 32,
+    "teams": 16,
+    "competitions": 1
+  },
+  "reviewed_team_aliases": {}
+}

@@ -148,12 +148,13 @@ def import_historical_dataset(
     target: ImportTarget,
     *,
     dry_run: bool = False,
+    dataset_id: str = "womens-world-cup-2023",
 ) -> ImportSummary:
     """No schema changes, updates, deletes or partial commits. Report only after commit."""
     # The only runtime manifest comes from the checked-in contract, not a CLI override.
     try:
-        manifest = load_manifest()
-    except (OSError, ValueError):
+        manifest = load_manifest(dataset_id)
+    except (OSError, ValueError, KeyError, TypeError):
         raise HistoricalImportError(
             "Pinned dataset manifest is missing or invalid.", ImportSummary("unavailable")
         ) from None

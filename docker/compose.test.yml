@@ -1,4 +1,4 @@
-# Identity comes from the explicit Compose project selected by scripts/workflow.py.
+# Disposable resources owned exclusively by scripts/testing/test.sh.
 services:
   postgres:
     image: postgres:17-alpine@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73
@@ -31,6 +31,8 @@ services:
     stop_grace_period: 15s
     environment:
       APP_ENV: test
+      TEST_PROJECT: ${TEST_PROJECT:?Owned test project required}
+      PYTHONPATH: /app/src:/app/scripts:/app
       DATABASE_URL: postgresql+psycopg://goalstats:${POSTGRES_PASSWORD}@postgres:5432/goalstats_test_runtime
       REDIS_URL: redis://redis:6379/0
       CACHE_KEY_PREFIX: goal-stats-service:test:v1
@@ -41,7 +43,6 @@ services:
       TEST_DATABASE_DISPOSABLE: "1"
       TEST_REDIS_URL: redis://redis:6379/0
       TEST_REDIS_DISPOSABLE: "1"
-      COVERAGE_FILE: /tmp/.coverage
     depends_on:
       postgres: {condition: service_healthy}
       redis: {condition: service_healthy}

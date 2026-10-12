@@ -81,11 +81,10 @@ def test_empty_selection_and_unmapped_tournament(historical_csv):
 
 def test_duplicates_are_counted_but_conflicts_abort(historical_csv):
     manifest = historical_csv.write([*historical_csv.rows, historical_csv.rows[0]])
-    batch = read_historical_dataset(historical_csv.directory, manifest)
-    assert len(batch.records) == 64
-    assert batch.summary.duplicate_input == 1
-    assert batch.summary.rows_selected == 65
-    assert next(r for r in batch.records if r.source_home_team == "Team 0").source_row == 2
+    with pytest.raises(HistoricalImportError, match="Duplicate") as error:
+        read_historical_dataset(historical_csv.directory, manifest)
+    assert error.value.summary.duplicate_input == 1
+    assert error.value.summary.rows_selected == 65
     manifest = historical_csv.write(
         [*historical_csv.rows, {**historical_csv.rows[0], "home_score": "5"}]
     )
@@ -120,6 +119,18 @@ def test_optional_blanks_unicode_and_reviewed_aliases(historical_csv):
     ]
     manifest = historical_csv.write(rows).model_copy(
         update={"reviewed_team_aliases": {"team 0": "Reviewed Name"}}
+    )
+    manifest = manifest.model_copy(
+        update={
+            "approval": manifest.approval.model_copy(
+                update={
+                    "participants": tuple(
+                        "Reviewed Name" if p == "Team 0" else p
+                        for p in manifest.approval.participants
+                    )
+                }
+            )
+        }
     )
     batch = read_historical_dataset(historical_csv.directory, manifest)
     first = batch.records[0]

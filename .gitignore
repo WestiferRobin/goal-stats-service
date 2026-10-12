@@ -13,7 +13,7 @@ htmlcov/
 venv/
 .env
 .env.local
-# Legacy configuration names remain ignored during workflow migration.
+# Retired configuration names stay ignored to prevent accidental secret commits.
 .env.test
 .env.dev
 .env.host.local
@@ -23,3 +23,6 @@ build/
 dist/
 *.egg-info/
 .DS_Store
+
+# Original historical sources stay local and outside application packaging.
+/data/raw/

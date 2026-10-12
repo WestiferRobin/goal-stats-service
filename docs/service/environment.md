@@ -16,7 +16,7 @@ when `.env.local` does not exist; it never overwrites developer values.
 | `API_FOOTBALL_KEY` | empty | Optional live-data provider key |
 
 Tests generate ephemeral credentials and ownership state. They do not use
-`.env.local`, do not require `.env.test`, and cannot target development providers.
+`.env.local`, never load `.env.test`, and cannot target development providers.
 Internal container URLs are derived automatically.
 
 
@@ -66,3 +66,7 @@ checks schema readiness but never migrates automatically.
 
 See [historical import operations](football.md#historical-import-operations) for local
 and cloud one-off commands. No production credentials belong in the repository.
+
+Legacy configuration conversion and host-session discovery are retired. Old secret-file
+names remain ignored by Git; they do not authorize a runtime target. `APP_ENV=dev` remains
+an explicitly injected application label for compatibility, with no separate DEV lifecycle.

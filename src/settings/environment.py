@@ -8,28 +8,15 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
-from settings.base import ConfigurationError, ExecutionContext, boolean, port
+from settings.base import ConfigurationError, boolean, port
 from settings.core import POLICY_DEFAULTS as CORE_POLICY
-from settings.core import PORT_DEFAULTS as CORE_PORTS
-from settings.core import SERVICE as SERVICE
 from settings.core import CoreSettings, environment, log_level
-from settings.database import DATABASE as DATABASE
-from settings.database import (
-    PASSWORD_KEYS,
-    DatabaseSettings,
-    credentials,
-    database_url,
-    derive_database_url,
-)
-from settings.database import PORT_DEFAULTS as DB_PORTS
+from settings.database import DatabaseSettings, database_url
 from settings.redis import POLICY_DEFAULTS as REDIS_POLICY
-from settings.redis import PORT_DEFAULTS as REDIS_PORTS
-from settings.redis import RedisSettings, cache_ttl, default_prefix, derive_redis_url
+from settings.redis import RedisSettings, cache_ttl, default_prefix
 
 # These mappings are views of concern-owned defaults, also used by stdlib tooling.
 POLICY_DEFAULTS = {**CORE_POLICY, **REDIS_POLICY}
-PORT_DEFAULTS = {**CORE_PORTS, **DB_PORTS, **REDIS_PORTS}
-LOCAL_KEYS = frozenset(PORT_DEFAULTS) | frozenset(POLICY_DEFAULTS) | PASSWORD_KEYS
 LOCAL_FILE = Path(__file__).resolve().parents[2] / ".env.local"
 DIRECT_KEYS = frozenset(
     {
@@ -57,9 +44,8 @@ def read_private(path: Path, keys: frozenset[str]) -> dict[str, str]:
                 )
             content = stream.read()
     except FileNotFoundError:
-        kind = "LOCAL" if path.name == ".env.local" else "TEST"
         raise ConfigurationError(
-            f"{path.name}: {kind} configuration is missing. Run make setup."
+            f"{path.name}: configuration is missing. Run make setup."
         ) from None
     except (OSError, UnicodeError):
         raise ConfigurationError(
@@ -81,67 +67,13 @@ def read_private(path: Path, keys: frozenset[str]) -> dict[str, str]:
 def policy(values: Mapping[str, str]) -> dict[str, str]:
     if set(values) - POLICY_DEFAULTS.keys():
         raise ConfigurationError(
-            "TEST policy contains unsupported keys; provider configuration is forbidden."
+            "Runtime policy contains unsupported keys; provider configuration is forbidden."
         )
     result = {**POLICY_DEFAULTS, **values}
     result["LOG_LEVEL"] = log_level(result["LOG_LEVEL"])
     boolean(result["OPENAPI_ENABLED"])
     cache_ttl(result["CACHE_TTL_SECONDS"])
     return result
-
-
-def test_policy(root: Path) -> dict[str, str]:
-    path = root / ".env.test"
-    values = (
-        read_private(path, frozenset(POLICY_DEFAULTS)) if path.exists() or path.is_symlink() else {}
-    )
-    try:
-        return policy(values)
-    except ConfigurationError as exc:
-        raise ConfigurationError(f"{path.name}: {exc}") from None
-
-
-def machine(values: Mapping[str, str]) -> dict[str, str]:
-    if set(values) - LOCAL_KEYS:
-        raise ConfigurationError(
-            "Unsupported LOCAL machine key; run make setup to migrate legacy configuration."
-        )
-    result = {
-        **PORT_DEFAULTS,
-        **policy({k: v for k, v in values.items() if k in POLICY_DEFAULTS}),
-        **values,
-    }
-    credentials(result)
-    for key in PORT_DEFAULTS:
-        port(result[key], key)
-    if len({int(result[k]) for k in PORT_DEFAULTS}) != len(PORT_DEFAULTS):
-        raise ConfigurationError("Machine app/provider ports must be distinct.")
-    return result
-
-
-def load_machine(path: Path) -> dict[str, str]:
-    values = read_private(path, LOCAL_KEYS)
-    try:
-        return machine(values)
-    except ConfigurationError as exc:
-        raise ConfigurationError(f"{path.name}: {exc}") from None
-
-
-def application(values: Mapping[str, str], mode: str, *, host: bool = False) -> dict[str, str]:
-    if mode not in {"local", "dev"} or (host and mode != "local"):
-        raise ConfigurationError(
-            "Machine configuration supports LOCAL/DEV only; host execution is LOCAL."
-        )
-    context: ExecutionContext = "host" if host else "container"
-    return {
-        **policy({k: v for k, v in values.items() if k in POLICY_DEFAULTS}),
-        "APP_ENV": mode,
-        "DATABASE_URL": derive_database_url(values, mode, context=context),
-        "REDIS_URL": derive_redis_url(values, context=context),
-        "CACHE_KEY_PREFIX": default_prefix(mode),
-        "HOST_APP_PORT": values["HOST_APP_PORT"],
-        "FLASK_DEBUG": "0",
-    }
 
 
 @dataclass(frozen=True)
@@ -178,7 +110,7 @@ def load_application(values: Mapping[str, str] | None = None) -> Settings:
     )
 
 
-# The public local contract is intentionally separate from retained private DEV tooling.
+# Persistent development configuration; application jobs use explicit injected settings.
 DEVELOPMENT_DEFAULTS = {
     "APP_PORT": "5100",
     "POSTGRES_PORT": "55432",

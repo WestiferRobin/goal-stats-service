@@ -1,4 +1,4 @@
-# The public local stack is owned by scripts/local.sh through one fixed project.
+# The public local stack is owned by scripts/development/local.sh through one fixed project.
 services:
   postgres:
     ports: ["127.0.0.1:${POSTGRES_PORT:-55432}:5432"]

@@ -15,6 +15,7 @@ from football.historical_dataset import (
     DatasetManifest,
     HistoricalMatchRecord,
     identity_issues,
+    name_key,
     parse_match_date,
     parse_selected_record,
     validate_checksum,
@@ -22,7 +23,7 @@ from football.historical_dataset import (
 )
 from models.football import FootballHistory, FootballTeam
 
-DATA_DIRECTORY = Path(__file__).resolve().parents[2] / "data"
+DATA_DIRECTORY = Path(__file__).resolve().parents[2] / "data" / "prototype"
 
 
 class Ratings(BaseModel):
@@ -229,6 +230,9 @@ def read_historical_dataset(directory: Path, manifest: DatasetManifest) -> Histo
         raise HistoricalImportError(
             "Conflicting input facts share a stable match identity.", summary
         )
+    if summary.duplicate_input:
+        summary.rejected += summary.duplicate_input
+        raise HistoricalImportError("Duplicate input match identities are not allowed.", summary)
     unique: dict[str, HistoricalMatchRecord] = {}
     for record in records:
         unique.setdefault(record.source_record_key, record)
@@ -247,4 +251,11 @@ def read_historical_dataset(directory: Path, manifest: DatasetManifest) -> Histo
             "the manifest; no import is allowed.",
             summary,
         )
+    expected_teams = {name_key(p) for p in manifest.approval.participants}
+    if teams != expected_teams:
+        summary.rejected += 1
+        raise HistoricalImportError("Selected participant set differs from the manifest.", summary)
+    if sum(r.home_score + r.away_score for r in unique.values()) != manifest.approval.total_goals:
+        summary.rejected += 1
+        raise HistoricalImportError("Selected total goals differ from the manifest.", summary)
     return HistoricalBatch(manifest, tuple(unique.values()), summary)

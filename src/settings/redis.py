@@ -1,22 +1,13 @@
 """Optional Redis endpoint and cache policy."""
 
 import re
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
-from settings.base import ConfigurationError, ExecutionContext
+from settings.base import ConfigurationError
 from settings.core import SERVICE
 
-PORT_DEFAULTS = {"LOCAL_REDIS_PORT": "56379"}
 POLICY_DEFAULTS = {"CACHE_TTL_SECONDS": "300"}
-
-
-def derive_redis_url(values: Mapping[str, str], *, context: ExecutionContext) -> str:
-    if context not in {"host", "container"}:
-        raise ConfigurationError("Execution context must be host or container.")
-    address = "127.0.0.1:" + values["LOCAL_REDIS_PORT"] if context == "host" else "redis:6379"
-    return f"redis://{address}/0"
 
 
 def default_prefix(mode: str) -> str:

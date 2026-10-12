@@ -8,7 +8,7 @@ from flask import Flask
 from sqlalchemy.exc import SQLAlchemyError
 
 from football.datasets import DATA_DIRECTORY, HistoricalImportError, import_datasets
-from football.historical_dataset import load_manifest
+from football.historical_dataset import APPROVED_DATASETS
 from football.historical_import import import_historical_dataset
 from infra.resources.db import Database
 from settings.base import ConfigurationError
@@ -53,20 +53,19 @@ def register_commands(app: Flask, database: Database) -> None:
                 ) from None
             click.echo(f"Import complete: {result}")
             return
-        try:
-            manifest = load_manifest()
-        except (ValueError, OSError):
-            raise click.ClickException("Pinned dataset manifest is missing or invalid.") from None
-        if dataset != manifest.dataset_id:
+        if dataset not in APPROVED_DATASETS:
             raise click.UsageError(
-                "Unknown historical dataset; use the checked-in manifest identifier."
+                "Unknown historical dataset; use an approved dataset identifier."
             )
+        context = click.get_current_context()
+        if context.get_parameter_source("directory") != click.core.ParameterSource.COMMANDLINE:
+            raise click.UsageError("Historical imports require an explicit --directory.")
         authorization = ImportTarget(
             target or "", expect_host or "", expect_database or "", confirm_production
         )
         try:
             result_summary = import_historical_dataset(
-                database, directory, authorization, dry_run=dry_run
+                database, directory, authorization, dry_run=dry_run, dataset_id=dataset
             )
         except HistoricalImportError as exc:
             click.echo(json.dumps(exc.summary.as_dict(), sort_keys=True))

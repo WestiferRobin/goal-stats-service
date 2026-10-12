@@ -91,7 +91,7 @@ def test_live_fallback_is_shared_and_does_not_add_false_history(
 
 
 def test_standalone_sql_seed_matches_python_import(football_client, postgres_app):
-    path = Path(__file__).resolve().parents[3] / "sql" / "003_seed_football.sql"
+    path = Path(__file__).resolve().parents[3] / "sql" / "prototype" / "003_seed_football.sql"
     database = postgres_app.extensions["goalstats_database"]
     # Execute generated SQL using psycopg's simple query protocol on the owned TEST database.
     with database.engine.connect() as connection:
@@ -102,8 +102,7 @@ def test_standalone_sql_seed_matches_python_import(football_client, postgres_app
         assert session.scalar(select(func.count()).select_from(FootballHistory)) == 16
 
 
-@pytest.mark.parametrize("upgrade_existing", [False, True])
-def test_standalone_schema_paths(postgres_app, upgrade_existing):
+def test_standalone_schema_path(postgres_app):
     from uuid import uuid4
 
     from alembic.autogenerate import compare_metadata
@@ -120,14 +119,11 @@ def test_standalone_schema_paths(postgres_app, upgrade_existing):
         connection.commit()
         try:
             sql = (directory / "001_fresh_database.sql").read_text()
-            if upgrade_existing:
-                baseline = sql.split("-- Running upgrade b7f42e9c1a60")[0] + "COMMIT;"
-                connection.exec_driver_sql(baseline)
-                connection.commit()
-                sql = (directory / "002_upgrade_template.sql").read_text()
             connection.exec_driver_sql(sql)
             connection.commit()
-            connection.exec_driver_sql((directory / "003_seed_football.sql").read_text())
+            connection.exec_driver_sql(
+                (directory / "prototype" / "003_seed_football.sql").read_text()
+            )
             connection.commit()
             assert connection.scalar(text("SELECT count(*) FROM football_teams")) == 32
             assert connection.scalar(text("SELECT count(*) FROM football_history")) == 16

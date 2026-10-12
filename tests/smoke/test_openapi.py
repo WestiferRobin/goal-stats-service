@@ -20,6 +20,15 @@ def test_built_system_swagger_and_openapi(smoke_client):
         "/api/v1/backtests",
         "/api/v1/tournaments/simulate",
         "/api/v1/live/refresh",
+        "/api/v1/catalog/teams",
+        "/api/v1/catalog/teams/{team_id}",
+        "/api/v1/catalog/competitions",
+        "/api/v1/catalog/matches",
+        "/api/v1/catalog/matches/{match_id}",
+        "/api/v1/scenarios",
+        "/api/v1/scenarios/{scenario_id}",
+        "/api/v1/scenarios/{scenario_id}/predictions",
+        "/api/v1/predictions/{prediction_id}",
         "/health",
         "/ready",
         "/items",
@@ -28,3 +37,5 @@ def test_built_system_swagger_and_openapi(smoke_client):
         "/actions/{action_id}",
         "/items/{item_id}/actions",
     }
+
+    assert sum(len(methods) for methods in spec["paths"].values()) == 36
