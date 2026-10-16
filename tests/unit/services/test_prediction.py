@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
-from pydantic import ValidationError
 from werkzeug.exceptions import NotFound
 
 from football.scenario_prediction import predict_inputs
@@ -13,12 +12,27 @@ from services import prediction
 
 def setup(context, projection):
     saved = []
-    context.bind(
-        prediction,
-        "ScenarioRepository",
+
+    def require_exists(*, scenario_id):
+        if scenario_id != 7:
+            raise NotFound()
+
+    def capture(*, scenario_id):
+        require_exists(scenario_id=scenario_id)
+        return {
+            **{
+                column.name: getattr(projection.scenario, column.name)
+                for column in projection.scenario.__table__.columns
+            },
+            "team1_name": projection.team1_name,
+            "team2_name": projection.team2_name,
+        }
+
+    context.service(
+        "ScenarioService",
         SimpleNamespace(
-            get_projection=lambda identity: projection if identity == 7 else None,
-            exists=lambda identity: identity == 7,
+            capture_state_in_transaction=capture,
+            require_exists_in_transaction=require_exists,
         ),
     )
 
@@ -32,8 +46,7 @@ def setup(context, projection):
             kw["offset"] : kw["offset"] + kw["limit"]
         ]
     )
-    context.bind(
-        prediction,
+    context.repository(
         "PredictionRepository",
         SimpleNamespace(
             add=add,
@@ -43,7 +56,17 @@ def setup(context, projection):
             history=history,
         ),
     )
-    return prediction.PredictionService(context.database), saved, history
+    return (
+        prediction.PredictionService(
+            repo=context.repositories["PredictionRepository"],
+            scenario_service=context.services["ScenarioService"],
+            team_service=SimpleNamespace(
+                database=context.repositories["PredictionRepository"].database
+            ),
+        ),
+        saved,
+        history,
+    )
 
 
 def test_prediction_capture_compute_append_and_saved_retrieval(
@@ -104,7 +127,7 @@ def test_prediction_failure_never_opens_write_transaction(
         return output
 
     monkeypatch.setattr(prediction, "predict_inputs", compute)
-    with pytest.raises((ValidationError, ValueError, RuntimeError)):
+    with pytest.raises(prediction.PredictionGenerationError):
         service.generate(7)
     assert saved == []
     assert service_context.events == ["begin", "commit"]
@@ -118,3 +141,40 @@ def test_prediction_missing_or_invalid_scenario(service_context, scenario_projec
     with pytest.raises(prediction.ScenarioNotReady):
         service.generate(7)
     assert saved == []
+
+
+def test_prediction_rejects_mismatched_database_dependencies():
+    with pytest.raises(ValueError, match="same Database"):
+        prediction.PredictionService(
+            repo=SimpleNamespace(database=object()),
+            scenario_service=SimpleNamespace(database=object()),
+            team_service=SimpleNamespace(database=object()),
+        )
+
+
+def test_preview_captures_ids_then_computes_without_writes(
+    service_context, scenario_projection, scenario_body, monkeypatch
+):
+    from football.scenario_prediction import predict_state
+    from schemas.prediction.request import PredictionPreview
+
+    service, saved, _ = setup(service_context, scenario_projection)
+
+    def names(*, session, team_ids):
+        assert service_context.state.active and team_ids == (1, 2)
+        return {1: "Spain", 2: "England"}
+
+    service.team_service.capture_names_in_transaction = names
+
+    def calculate(values, **kwargs):
+        assert not service_context.state.active
+        assert values["team1_name"] == "Spain"
+        assert values["team1_shots"] == 4
+        return predict_state(values, **kwargs)
+
+    monkeypatch.setattr(prediction, "predict_state", calculate)
+    body = {k: v for k, v in scenario_body.items() if k not in {"title", "match_id"}}
+    body["team1_shots_on_target"] = 4
+    result = service.preview(PredictionPreview(**body))
+    assert result["team1"] == "Spain" and saved == []
+    assert service_context.events == ["begin", "commit"]

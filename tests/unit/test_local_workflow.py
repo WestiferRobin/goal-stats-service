@@ -17,7 +17,7 @@ def test_help_has_exact_public_contract(workflow):
     run, _ = workflow
     result, calls = run("help")
     assert result.returncode == 0
-    for name in ("setup", "infra", "run", "deploy", "seed", "test", "stop", "help"):
+    for name in ("setup", "infra", "run", "deploy", "seed", "test", "certify", "stop", "help"):
         assert "make " + name in result.stdout
     assert "No cloud deployment" in result.stdout
     assert calls == []
@@ -138,8 +138,9 @@ def test_make_dispatch_keeps_test_independent():
     assert "setup infra run deploy stop:" in content
     assert "scripts/development/local.sh $@" in content
     assert "test:\n\t@$(BASH) scripts/testing/test.sh" in content
+    assert "certify:\n\t@$(BASH) scripts/testing/test.sh certify" in content
     assert "help:\n\t@$(BASH) scripts/development/local.sh help" in content
-    assert ".PHONY: setup infra run deploy seed test stop help" in content
+    assert ".PHONY: setup infra run deploy seed test certify stop help" in content
 
 
 def test_gnu_make_version_check_does_not_close_pipe_early(workflow):

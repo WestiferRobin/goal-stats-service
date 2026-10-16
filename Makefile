@@ -1,4 +1,4 @@
-# GoalStats developer interface: exactly eight supported commands.
+# GoalStats developer interface: exactly nine supported commands.
 PYTHON ?= python3.12
 ifeq ($(OS),Windows_NT)
 BASH := C:/Progra~1/Git/bin/bash.exe
@@ -7,12 +7,15 @@ BASH := /bin/bash
 endif
 .DEFAULT_GOAL := help
 
-.PHONY: setup infra run deploy seed test stop help
+.PHONY: setup infra run deploy seed test certify stop help
 setup infra run deploy stop:
 	@PYTHON="$(PYTHON)" $(BASH) scripts/development/local.sh $@
 
 test:
 	@$(BASH) scripts/testing/test.sh
+
+certify:
+	@$(BASH) scripts/testing/test.sh certify
 
 help:
 	@$(BASH) scripts/development/local.sh help

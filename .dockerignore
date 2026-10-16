@@ -24,3 +24,9 @@
 
 # Original historical sources stay local and outside application packaging.
 data/raw/
+
+!.coveragerc
+
+# Retired prototype assets must never re-enter runtime packaging.
+data/prototype/
+sql/prototype/

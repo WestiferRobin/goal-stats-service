@@ -1,51 +1,8 @@
-# Football data contracts
+# Approved Women's World Cup data
 
-`prototype/teams.csv`, `prototype/match_history.csv`, and
-`prototype/historical_snapshots.csv` are bundled
-RoadToTheFinal **prototype inputs**, not a verified historical dataset. They contain
-32 team/model records, 13 historical-result-shaped rows, and three unlabeled
-historical snapshots. The existing `flask import-football` baseline importer still
-loads them into `football_teams` and `football_history`; saved application snapshots
-use `football_snapshots`. Their seed data and row-based legacy identity are unchanged.
-Do not promote those rows into verified historical `matches`.
-
-## Source organization
-
-```text
-data/
-├── prototype/       # Tracked RoadToTheFinal compatibility inputs
-├── womens-world-cup/       # Tracked approved contracts for nine editions
-├── raw/             # Ignored, original source bytes; excluded from Docker images
-└── verification/    # Small, reviewed coverage and provenance evidence
-```
-
-The prototype inputs are retained temporarily for compatibility, not as authoritative
-historical facts. Their filenames, bytes and row ordering must remain unchanged:
-prototype history identities depend on filename and source-row position.
-
-One pinned raw CSV supports all nine completed Women's World Cups (1991–2023):
-348 matches, 44 distinct participants and 1,081 goals. All nine approved basic-results
-contracts are supported by the guarded runtime importer, one edition per invocation.
-See [coverage and verification](verification/README.md) for the Prompt 2 source audit,
-exact participant sets, goals, fixture digests and limitations.
-
-The loader joins each checked-in manifest with its typed coverage approval entry by
-`dataset_id`. Both pieces are mandatory: participants, goals, identity/order policies
-and approval status are validated alongside edition-specific dates and counts.
-All manifest files, including 2023, remain byte-for-byte unchanged. Coverage's
-`runtime_supported` values describe the Prompt 2 verification-time state; the current
-runtime allowlist supports all nine editions. No source override or arbitrary
-manifest path is accepted. Supplementary match metadata remains deferred.
-
-Preserve downloaded source bytes; never edit or normalize the raw CSV in place.
-`data/raw/` is ignored by Git and excluded from Docker builds. Do not commit raw
-sources without explicit licensing review. Historical imports use an explicit
-read-only input mount; no historical data is imported automatically at startup.
-Prototype compatibility imports also require explicit invocation; startup never seeds data.
-
-The old ignored acceptance path remains a compatibility symlink to the relocated
-source so dated evidence and its existing read-only tooling still resolve. Historical
-reports retain their original paths. Current operations should use `data/raw/`.
+Only approved historical manifests and verification evidence are packaged. Raw source
+bytes remain under `data/raw/` and are excluded from runtime images. Prototype CSVs
+and their importer have been retired; reference mathematics uses explicit inputs.
 
 ## Selected historical source
 
@@ -127,32 +84,17 @@ revision and file checksum are excluded. Reordering CSV records or correcting sc
 therefore preserves identity; a correction is a reportable conflict. Home/away order
 is significant. The database uniqueness boundary is `(source, source_record_key)`.
 
-## Import status and next step
+## Import status
 
-The verified historical dataset was imported into local development PostgreSQL on
-**2026-10-08 (America/Los_Angeles)**: 32 teams, one competition and 64 matches.
-The repeat import inserted zero rows and reported 64 unchanged matches. All records
-survived a Goal Stats stop/restart with the same PostgreSQL volume. Legacy prototype
-records remain separate and unchanged. See the [acceptance evidence](../docs/service/task2-acceptance.md).
-
-The full downloaded CSV remains ignored at
-`data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv`; it is not packaged or staged.
-Automated tests use synthetic fixtures in disposable PostgreSQL. Cloud execution
-has not been attempted: **CLOUD RUNTIME: UNVERIFIED**.
-Historical matches describe observed fixtures/results; future scenarios describe
-user prediction inputs and may reference a match without changing its facts.
-Scenario/prediction persistence and normalized-catalog REST endpoints are implemented.
-Historical catalog ratings remain NULL; scenarios require explicit model-input snapshots.
-
-See [schema design](../docs/service/historical-catalog.md) and
-[standalone SQL](../sql/README.md).
-
+Source verification is separate from persistent database contents. This phase does
+not seed development data or assert that it is loaded. Verify the selected database
+read-only before any separately authorized import. Startup never seeds.
 
 ## Historical import behavior
 
 Use the canonical `flask --app 'main:create_app()' import-football` command with
 `--dataset womens-world-cup-2023`, `--directory`, `--target`, `--expect-host`, and
-`--expect-database`. Omit all historical options to retain the prototype importer.
+`--expect-database`. Omitted dataset/directory selections fail; no prototype import mode remains.
 Historical import never runs automatically during `make run` or `make deploy`.
 The importer reads an existing file; downloading is an explicit operator step.
 There is no alternate manifest or checksum-bypass CLI flag.

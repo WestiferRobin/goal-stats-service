@@ -1,25 +1,34 @@
 """Append and read saved predictions within a caller-owned transaction."""
 
+from contextlib import AbstractContextManager
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from infra.resources.db import Database
 from models.prediction import Prediction
 
 
 class PredictionRepository:
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self, database: Database) -> None:
+        self.database = database
 
-    def add(self, prediction: Prediction) -> None:
-        self.session.add(prediction)
-        self.session.flush()
+    def transaction(self) -> AbstractContextManager[Session]:
+        """Provide a context whose boundary is chosen by the calling service."""
+        return self.database.transaction()
 
-    def get_by_id(self, prediction_id: int) -> Prediction | None:
-        return self.session.get(Prediction, prediction_id)
+    def add(self, session: Session, prediction: Prediction) -> None:
+        session.add(prediction)
+        session.flush()
 
-    def history(self, scenario_id: int, *, limit: int = 50, offset: int = 0) -> list[Prediction]:
+    def get_by_id(self, session: Session, prediction_id: int) -> Prediction | None:
+        return session.get(Prediction, prediction_id)
+
+    def history(
+        self, session: Session, scenario_id: int, *, limit: int = 50, offset: int = 0
+    ) -> list[Prediction]:
         return list(
-            self.session.scalars(
+            session.scalars(
                 select(Prediction)
                 .where(Prediction.scenario_id == scenario_id)
                 .order_by(Prediction.generated_at.desc(), Prediction.prediction_id.desc())

@@ -1,11 +1,13 @@
 import hashlib
 import json
 from datetime import date
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 from football.historical_dataset import (
+    APPROVED_DATASETS,
     REQUIRED_COLUMNS,
     DatasetManifest,
     HistoricalTeamRecord,
@@ -18,32 +20,6 @@ from football.historical_dataset import (
     validate_checksum,
     validate_headers,
 )
-
-
-@pytest.fixture
-def manifest():
-    return load_manifest()
-
-
-@pytest.fixture
-def row():
-    return dict(
-        zip(
-            REQUIRED_COLUMNS,
-            [
-                "2023-08-20",
-                "Spain",
-                "England",
-                "1",
-                "0",
-                "FIFA World Cup",
-                "Sydney",
-                "Australia",
-                "TRUE",
-            ],
-            strict=True,
-        )
-    )
 
 
 def test_pinned_manifest(manifest):
@@ -61,6 +37,11 @@ def test_pinned_manifest(manifest):
     assert manifest.reviewed_team_aliases == {}
     assert manifest.attribution_reference.endswith("/README.md")
     assert manifest.license_reference.startswith("https://")
+
+
+@pytest.fixture
+def manifest():
+    return load_manifest()
 
 
 @pytest.mark.parametrize(
@@ -105,6 +86,27 @@ def test_canonical_identity_and_score_corrections(manifest, row):
     assert [i.kind for i in issues] == ["duplicate", "conflict"]
     assert [i.source_row for i in issues] == [66, 9]
     assert all(i.first_row == 2 for i in issues)
+
+
+@pytest.fixture
+def row():
+    return dict(
+        zip(
+            REQUIRED_COLUMNS,
+            [
+                "2023-08-20",
+                "Spain",
+                "England",
+                "1",
+                "0",
+                "FIFA World Cup",
+                "Sydney",
+                "Australia",
+                "TRUE",
+            ],
+            strict=True,
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -200,3 +202,62 @@ def test_reviewed_aliases_only(manifest, row):
     assert aliased.home_team.name == "España"
     assert aliased.source_record_key == original.source_record_key
     assert original.home_team.name == "Spain"
+
+
+@pytest.mark.parametrize("dataset", APPROVED_DATASETS)
+def test_supported_edition_schema(dataset):
+    manifest = load_manifest(dataset)
+    assert manifest.dataset_id == dataset
+    assert manifest.competition.edition_label == dataset.rsplit("-", 1)[1]
+    assert len(manifest.approval.participants) == manifest.expected_counts.teams
+    assert manifest.approval.identity_policy == "source-record-key-v1"
+
+
+@pytest.mark.parametrize(
+    "dataset",
+    [
+        "womens-world-cup-2027",
+        "../2023.json",
+        Path("data/womens-world-cup/womens-world-cup-2023.json"),
+        "all-approved",
+        "",
+    ],
+)
+def test_unknown_dataset_and_arbitrary_path_rejected(dataset):
+    with pytest.raises(ValueError, match="Unknown historical dataset"):
+        load_manifest(dataset)
+
+
+@pytest.mark.parametrize(
+    "section,field,value",
+    [
+        (None, "sha256", "0" * 64),
+        (None, "upstream_revision", "0" * 40),
+        (None, "source", "other"),
+        (None, "dataset_id", "womens-world-cup-1991"),
+        (None, "unexpected", True),
+        ("competition", "edition_label", "2027"),
+        ("competition", "edition_label", "1991"),
+        ("selection", "tournament", "Friendly"),
+        ("selection", "date_from", "2023-07-19"),
+        ("expected_counts", "matches", 52),
+        ("expected_counts", "teams", 16),
+        ("approval", "total_goals", 163),
+        ("approval", "approval_status", "pending"),
+        ("approval", "identity_policy", "v2"),
+        ("approval", "participants", ["Spain", "England"]),
+    ],
+)
+def test_invalid_runtime_contract(section, field, value):
+    data = load_manifest().model_dump()
+    target = data if section is None else data[section]
+    target[field] = value
+    with pytest.raises(ValueError):
+        DatasetManifest.model_validate(data)
+
+
+def test_2011_rejects_32_participants():
+    data = load_manifest("womens-world-cup-2011").model_dump()
+    data["expected_counts"]["teams"] = 32
+    with pytest.raises(ValueError, match="must agree"):
+        DatasetManifest.model_validate(data)

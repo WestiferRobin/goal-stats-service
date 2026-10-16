@@ -316,5 +316,36 @@ DROP TABLE items;
 
 UPDATE alembic_version SET version_num='c8d42f19e630' WHERE alembic_version.version_num = 'a7c93e25d104';
 
+-- Running upgrade c8d42f19e630 -> d91e6a4b208f
+
+LOCK TABLE football_snapshots, football_history, football_teams IN ACCESS EXCLUSIVE MODE;
+
+DO $guard$
+        DECLARE t text;
+        BEGIN
+            FOREACH t IN ARRAY ARRAY['football_teams','football_history','football_snapshots'] LOOP
+                IF NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+                    WHERE c.oid=to_regclass(t) AND n.nspname=current_schema()
+                    AND c.relkind='r' AND pg_get_userbyid(c.relowner)=current_user) THEN
+                    RAISE EXCEPTION 'Prototype retirement refused: unexpected table owner.';
+                END IF;
+            END LOOP;
+            IF EXISTS (SELECT 1 FROM football_teams) OR EXISTS (SELECT 1 FROM football_history)
+                OR EXISTS (SELECT 1 FROM football_snapshots) THEN
+                RAISE EXCEPTION 'Prototype retirement refused: populated tables.'
+                    ' Inventory, verify backups and coordinate archival before retrying.'
+                    USING ERRCODE='check_violation';
+            END IF;
+        END
+        $guard$;;
+
+DROP TABLE football_snapshots;
+
+DROP TABLE football_history;
+
+DROP TABLE football_teams;
+
+UPDATE alembic_version SET version_num='d91e6a4b208f' WHERE alembic_version.version_num = 'c8d42f19e630';
+
 COMMIT;
 

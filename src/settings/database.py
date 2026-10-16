@@ -110,15 +110,3 @@ class ImportTarget:
             url.database or ""
         ).startswith("goalstats_test_"):
             raise ConfigurationError("Test target requires a local goalstats_test_* database.")
-
-
-def validate_prototype_target(value: URL) -> None:
-    """Retain no-option machine/test imports, without authorizing implicit cloud writes."""
-    url = database_url(value)
-    if url.host not in {"127.0.0.1", "localhost", "postgres"} or not (
-        url.database in {"goal_stats_service_local", "goal_stats_service_dev"}
-        or (url.database or "").startswith("goalstats_test_")
-    ):
-        raise ConfigurationError(
-            "Prototype import is restricted to established local/test targets."
-        )

@@ -4,21 +4,21 @@ from typing import Any
 
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import Conflict, NotFound
+from werkzeug.exceptions import Conflict, HTTPException, NotFound
 
-from exceptions.base import DomainError
-from football.scenario_prediction import predict_inputs
+from exceptions.base import DomainError, PredictionGenerationError
+from football.scenario_prediction import predict_inputs, predict_state
 from infra.repositories.prediction import PredictionRepository
-from infra.repositories.scenario import ScenarioRepository
-from infra.resources.db import Database
 from models.prediction import Prediction
-from models.scenario import Scenario
 from schemas.prediction import (
     PredictionHistoryQuery,
     PredictionInputs,
     SavedEngineOutput,
     SavedPredictionResponse,
 )
+from schemas.prediction.request import PredictionPreview
+from services.scenario import ScenarioService
+from services.team import TeamService
 
 
 class ScenarioNotReady(DomainError):
@@ -40,20 +40,29 @@ class ScenarioNotReady(DomainError):
 
 
 class PredictionService:
-    def __init__(self, database: Database) -> None:
-        self.database = database
+    def __init__(
+        self,
+        *,
+        repo: PredictionRepository,
+        scenario_service: ScenarioService,
+        team_service: TeamService,
+    ) -> None:
+        if (
+            repo.database is not scenario_service.database
+            or repo.database is not team_service.database
+        ):
+            raise ValueError("Repositories must share the same Database instance")
+        self.repo = repo
+        self.scenario_service = scenario_service
+        self.team_service = team_service
 
     def _load_scenario(self, scenario_id: int) -> dict[str, Any]:
-        with self.database.transaction() as session:
-            row = ScenarioRepository(session).get_projection(scenario_id)
-            if row is None:
-                raise NotFound()
-            values = {
-                column.name: getattr(row.scenario, column.name)
-                for column in Scenario.__table__.columns
-            }
-            values.update(team1_name=row.team1_name, team2_name=row.team2_name)
-            return values
+        with self.repo.transaction() as session:
+            return dict(
+                self.scenario_service.capture_state_in_transaction(
+                    session=session, scenario_id=scenario_id
+                )
+            )
 
     @staticmethod
     def _capture(values: dict[str, Any]) -> PredictionInputs:
@@ -61,7 +70,7 @@ class PredictionService:
             inputs = PredictionInputs.model_validate(values)
         except ValidationError as error:
             raise ScenarioNotReady(error) from None
-        # Match the existing FootballService.match() adapter, without mutating the scenario.
+        # Preserve reference shot normalization without mutating the saved scenario.
         inputs.team1_shots = max(inputs.team1_shots, inputs.team1_shots_on_target)
         inputs.team2_shots = max(inputs.team2_shots, inputs.team2_shots_on_target)
         return inputs
@@ -97,6 +106,14 @@ class PredictionService:
         ).model_dump(mode="json")
 
     def generate(self, scenario_id: int) -> dict[str, Any]:
+        try:
+            return self._generate(scenario_id)
+        except (DomainError, HTTPException):
+            raise
+        except Exception:
+            raise PredictionGenerationError() from None
+
+    def _generate(self, scenario_id: int) -> dict[str, Any]:
         inputs = self._capture(self._load_scenario(scenario_id))
         # The SELECT transaction has ended. No locks/connections are held during computation.
         output = SavedEngineOutput.model_validate(predict_inputs(inputs))
@@ -121,7 +138,7 @@ class PredictionService:
             },
         )
         try:
-            with self.database.transaction() as session:
+            with self.repo.transaction() as session:
                 row = Prediction(
                     scenario_id=scenario_id,
                     model_version=output.model,
@@ -135,7 +152,7 @@ class PredictionService:
                     input_snapshot=inputs.model_dump(mode="json"),
                     details=details,
                 )
-                PredictionRepository(session).add(row)
+                self.repo.add(session, row)
                 result = self._response(row)
             return result
         except IntegrityError:
@@ -143,17 +160,31 @@ class PredictionService:
             raise Conflict() from None
 
     def get(self, prediction_id: int) -> dict[str, Any]:
-        with self.database.transaction() as session:
-            row = PredictionRepository(session).get_by_id(prediction_id)
+        with self.repo.transaction() as session:
+            row = self.repo.get_by_id(session, prediction_id)
             if row is None:
                 raise NotFound()
             return self._response(row)
 
     def history(self, scenario_id: int, query: PredictionHistoryQuery) -> list[dict[str, Any]]:
-        with self.database.transaction() as session:
-            if not ScenarioRepository(session).exists(scenario_id):
-                raise NotFound()
-            rows = PredictionRepository(session).history(
-                scenario_id, limit=query.limit, offset=query.offset
+        with self.repo.transaction() as session:
+            self.scenario_service.require_exists_in_transaction(
+                session=session, scenario_id=scenario_id
             )
+            rows = self.repo.history(session, scenario_id, limit=query.limit, offset=query.offset)
             return [self._response(row) for row in rows]
+
+    def preview(self, body: PredictionPreview) -> dict[str, Any]:
+        with self.repo.transaction() as session:
+            names = self.team_service.capture_names_in_transaction(
+                session=session, team_ids=(body.team1_id, body.team2_id)
+            )
+        values = body.model_dump()
+        for side in (1, 2):
+            values[f"team{side}_name"] = names[values[f"team{side}_id"]]
+            values[f"team{side}_shots"] = max(
+                values[f"team{side}_shots"], values[f"team{side}_shots_on_target"]
+            )
+        return SavedEngineOutput.model_validate(
+            predict_state(values, extra_minute=body.extra_minute, status=body.status.upper())
+        ).model_dump(mode="json")

@@ -1,8 +1,8 @@
 # Monolithic backend architecture
 
-The backend hosts five normalized Goal Stats domains and the retained RoadToTheFinal
-prototype in one Flask process and PostgreSQL database. The pure prediction model
-has no Flask or provider dependencies. All modules deploy together.
+The backend hosts five normalized Goal Stats domains in one Flask process and
+PostgreSQL database. RoadToTheFinal supplies reusable mathematics, not production
+records. The pure engine has no Flask or provider dependency.
 
 ```text
 Route → Service → Repository → SQLAlchemy Session → PostgreSQL
@@ -29,36 +29,38 @@ inside a read transaction, closes it before calculation, validates the unchanged
 engine output, and appends a saved result in a separate transaction. Retrieval uses
 saved inputs and output without recalculation.
 
-The existing `football` blueprint injects `TeamService`, `CompetitionService`,
-and `MatchService` directly for the teams, competitions, and matches endpoints
-under `/api/v1/catalog` (including existing team/match detail routes).
-Its prototype endpoints continue using `FootballService`; normalized handlers
-never fall back to prototype data. Temporary catalog delegation methods are removed.
+The five domain routers are registered independently. There is no FootballService
+or prototype router. The 15 application operations include the original normalized
+catalog/scenario/prediction APIs plus preview, historical insights and hypothetical
+knockout simulation. See [the exact API contracts](frontend-api.md).
 
-The existing `scenarios` and `saved_predictions` blueprints import their singular
-service modules directly. The application factory constructs each service per app,
-sharing that app's database resource. Temporary plural service import shims are
-removed. Routers validate requests and serialize service responses; services own
-transactions and repositories own persistence. No normalized cache dependencies
-are introduced.
-
-All paths, converters, HTTP methods, blueprint/handler names, operation IDs,
-request/response schemas, status codes, and Location headers remain unchanged.
-Saved prediction generation remains a bodyless POST, separate from the prototype
-stateless prediction endpoint. Prototype routes remain active. The twelve Item/Action
-operations are retired in this checkout; frontend Home coordination remains pending.
-Do not deploy this removal or migrate persistent PostgreSQL before that coordination.
+MatchService and CompetitionService receive TeamService directly. PredictionService
+receives ScenarioService and TeamService. Each retains only its own repository.
+Preview and simulation capture normalized names in a short caller-owned transaction,
+then calculate without holding database connections. Insights validates IDs and reads
+all three result lists within one caller-owned transaction.
 
 ## Schema ownership
 
-Historical team, competition, and match contracts live in `schemas/team.py`,
-`competition.py`, and `match.py`. Saved scenario and prediction contracts live in
-`scenario.py` and `prediction.py`. Existing class names and JSON/OpenAPI contracts
-are preserved; the former plural schema modules have no remaining consumers.
+The five normalized domains own packages under `schemas/team/`, `competition/`,
+`match/`, `scenario/`, and `prediction/`. Path, query, create, and patch contracts
+live in `request.py`; output contracts live in `response.py`. Competition requests describe explicit simulation assumptions. Prediction requests
+include preview inputs; saved prediction generation remains bodyless.
+
+Only Scenario needs `base.py`: it owns shared state, constrained types, configuration,
+and examples. `ScenarioResponse` still inherits `ScenarioCreate`, and prediction
+input snapshots still inherit `ScenarioResponse`. Prediction's nested saved-output
+contracts remain together in its response module. Existing class names, validators,
+field annotations, and validation/serialization JSON schemas are preserved.
+
+Package initializers explicitly re-export the original domain objects, so public
+imports such as `from schemas.scenario import ScenarioCreate` remain stable. Internal
+sibling imports target defining modules to avoid package initialization cycles.
+There are no duplicate definitions or conflicting flat domain schema files.
 
 `schemas/engine.py` owns shared statistics, modifiers, and prediction report
-components used by both normalized and prototype workflows. `schemas/football.py`
-retains prototype matchups, prediction requests, tournaments, and snapshots.
+components used by the normalized workflows. Legacy validation has moved to the
+corresponding domain contracts; there is no active `schemas/football.py`.
 `schemas/common.py` owns shared contract configuration, count/identity bounds,
 pagination, possession validation, and shared primitives. Problem Details remains unchanged.
 
@@ -72,10 +74,9 @@ The five normalized models have individual modules under `src/models/`: `team.py
 `competition.py`, `match.py`, `scenario.py`, and `prediction.py`. The shared base,
 metadata naming convention, and nonblank constraint helper remain in `base.py`.
 
-`models/hold/football.py` maps the three active RoadToTheFinal tables; the directory
-otherwise contains only its package marker. Exactly eight application tables are
-registered by the database resource and Alembic environment. The prediction engine
-remains in `src/football/`.
+Exactly five application mappings are registered: teams, competitions, matches,
+scenarios and predictions. Alembic adds only normal migration metadata. Reusable
+calculation and source-parsing code remains in `src/football/`.
 
 ## Database and transactions
 
@@ -87,7 +88,8 @@ DI framework, or custom UnitOfWork class.
 
 The original `a7c93e25d104` migration remains unchanged. Forward revision
 `c8d42f19e630` locks both retired tables, refuses nonempty tables, and drops actions
-before items. It preserves the five normalized and three prototype tables.
+before items. The subsequent `d91e6a4b208f` revision retires only empty, current-user-owned
+prototype tables without CASCADE, preserving all five normalized tables.
 Downgrade recreates empty legacy tables with their original constraints and indexes;
 it does not recover data. See [retirement](../testing/item-action-backend-retirement.md).
 
@@ -173,14 +175,18 @@ for runtime identities and cleanup.
 | `settings` | Concern-based typed configuration with explicit private file loading |
 | `exceptions/base.py`, `services/prediction.py` | Application exceptions without HTTP status fields |
 
-All paths are beneath flat `src/`. Package markers are empty; mapped classes are
+All paths are beneath flat `src/`. Domain schema package initializers provide explicit
+public exports; other existing package markers retain their roles. Mapped classes are
 imported explicitly wherever metadata registration is required. There is no `src`
 package, service-name package, global settings singleton or dependency-injection framework.
 
-Pydantic commands reject unknown fields and internal snake_case HTTP aliases. Services
-construct frozen responses from ORM attributes before closing the transaction.
-Routes explicitly serialize responses with `model_dump(mode="json", by_alias=True)`.
-Responses preserve their existing timestamp contracts. Services never import Flask.
+Shared `Contract` configuration rejects unknown fields and non-finite numbers.
+Domain contracts preserve their individual strictness, defaults, nullability, and
+validators; no new field aliases are introduced. Normalized services validate response
+contracts and serialize them with `model_dump(mode="json")`; routers return the service
+results through `jsonify`. Response contracts are not generally frozen; Problem Details
+is explicitly frozen. Responses preserve their existing timestamp contracts. Services
+never import Flask.
 
 Request validation produces safe 400 responses through the extension callback.
 A small native guard refuses malformed/non-object/non-JSON bodies before binding.
@@ -195,8 +201,10 @@ sessions, authentication platform, queues, gRPC or provider registries are intro
 
 ### API schema naming
 
-The five normalized domains use singular schema modules; shared prediction components
-live in `schemas/engine.py`, and prototype contracts in `schemas/football.py`.
+The five normalized domains use singular schema packages; shared prediction components
+live in `schemas/engine.py`. Preview, simulation and comparison contracts belong
+to their respective domain packages.
 Cross-domain primitives remain in `schemas/common.py`; singleton contracts such as
-`schemas/problem.py` remain flat. Callers import defining modules explicitly.
+`schemas/problem.py` remain flat. Consumers can retain the stable domain-package imports;
+schema package internals import defining modules directly.
 `ProblemDetailSchema` defines the unchanged safe error JSON contract.

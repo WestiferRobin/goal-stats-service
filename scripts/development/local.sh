@@ -196,9 +196,10 @@ case "$action" in
       '  make run     Host Flask + Docker PostgreSQL/Redis; foreground development' \
       '  make deploy  Deploy the complete backend locally in Docker. No cloud deployment.' \
       '  make seed    Import approved history; DATASET required, DRY=true|false (default false)' \
-      '  make test    Run lint, format, types, and isolated unit/integration tests' \
+      '  make test    Run host lint, format, types, and Unit + Integration tests' \
+      '  make certify Run host tests and the 95% branch-aware coverage gate' \
       '  make stop    Stop Docker resources; preserve data. Stop host Flask with Ctrl-C or IDE Stop.' \
-      '  make help    Show these eight commands' \
+      '  make help    Show these nine commands' \
       '' 'First run: make setup && make run' \
       'Swagger: http://127.0.0.1:5100/swagger' \
       'Run lifecycle commands sequentially, not concurrently.'
@@ -257,5 +258,5 @@ case "$action" in
     echo 'Docker resources stopped. PostgreSQL data preserved.'
     echo 'Stop host Flask with Ctrl-C or IDE Stop; a running host process has lost its providers.'
     ;;
-  *) fail 'Use setup, infra, run, deploy, seed, test, stop, or help.' ;;
+  *) fail 'Use setup, infra, run, deploy, seed, test, certify, stop, or help.' ;;
 esac

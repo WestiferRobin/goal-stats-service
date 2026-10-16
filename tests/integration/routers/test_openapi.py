@@ -1,5 +1,93 @@
+import hashlib
+import json
 from html.parser import HTMLParser
+from pathlib import Path
 from urllib.parse import urlsplit
+
+import pytest
+
+from schemas.scenario import ScenarioState
+
+
+def test_full_openapi_matches_original_contract(app):
+    baseline = json.loads(
+        (
+            Path(__file__).resolve().parents[2] / "unit/schemas/contract_fingerprints.json"
+        ).read_text()
+    )
+    response = app.test_client().get("/swagger/v1/swagger.json")
+    assert response.status_code == 200
+    assert (
+        hashlib.sha256(
+            json.dumps(response.json, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        == baseline["openapi"]
+    )
+
+
+@pytest.mark.postgres
+def test_openapi_saved_predictions(scenario_client):
+    spec = scenario_client.get("/swagger/v1/swagger.json").json
+    assert set(spec["paths"]["/api/v1/predictions/preview"]) == {"post"}
+    assert set(spec["paths"]["/api/v1/predictions/{prediction_id}"]) == {"get"}
+    op = spec["paths"]["/api/v1/scenarios/{scenario_id}/predictions"]
+    assert set(op) == {"post", "get"}
+    assert "requestBody" not in op["post"]
+    assert "Location" in op["post"]["responses"]["201"]["headers"]
+    for method in ["get", "post"]:
+        assert {"400", "404", "500"} <= set(op[method]["responses"])
+    assert (
+        "input_snapshot" in spec["components"]["schemas"]["SavedPredictionResponse"]["properties"]
+    )
+
+
+@pytest.mark.postgres
+def test_openapi_scenario_contract(scenario_client):
+    spec = scenario_client.get("/swagger/v1/swagger.json").json
+    assert set(spec["paths"][URL]) == {"get", "post"}
+    assert set(spec["paths"][URL + "/{scenario_id}"]) == {"get", "patch"}
+    assert "201" in spec["paths"][URL]["post"]["responses"]
+    assert "Location" in spec["paths"][URL]["post"]["responses"]["201"]["headers"]
+    schemas = spec["components"]["schemas"]
+    for path, method in [(URL, "post"), (URL + "/{scenario_id}", "patch")]:
+        assert spec["paths"][path][method]["requestBody"]["content"]["application/json"]["example"]
+    for path, method, status in [(URL, "post", "201"), (URL + "/{scenario_id}", "get", "200")]:
+        assert spec["paths"][path][method]["responses"][status]["content"]["application/json"][
+            "example"
+        ]
+    assert "team1_offense" in schemas["ScenarioCreate"]["required"]
+    assert "team1_id" not in schemas["ScenarioPatch"]["properties"]
+    assert set(ScenarioState.model_fields) == set(schemas["ScenarioPatch"]["properties"])
+
+
+URL = "/api/v1/scenarios"
+
+
+@pytest.mark.postgres
+def test_catalog_openapi(catalog_client):
+    assert catalog_client.get("/swagger").status_code == 200
+    spec = catalog_client.get("/swagger/v1/swagger.json").json
+    for path in ("teams", "teams/{team_id}", "competitions", "matches", "matches/{match_id}"):
+        operation = spec["paths"][f"{BASE}/{path}"]["get"]
+        assert operation.get("summary") or operation.get("description")
+        assert "200" in operation["responses"] and "400" in operation["responses"]
+        assert "schema" in operation["responses"]["200"]["content"]["application/json"]
+        if "{" in path:
+            assert "404" in operation["responses"]
+    parameters = spec["paths"][f"{BASE}/matches"]["get"]["parameters"]
+    assert {p["name"] for p in parameters} == {
+        "team_id",
+        "competition_id",
+        "date_from",
+        "date_to",
+        "limit",
+        "offset",
+    }
+    for path in ("/teams", "/predictions", "/history", "/snapshots", "/backtests", "/insights"):
+        assert f"/api/v1{path}" not in spec["paths"]
+
+
+BASE = "/api/v1/catalog"
 
 
 def test_exact_route_and_openapi_resource_contract(app):
@@ -14,15 +102,9 @@ def test_exact_route_and_openapi_resource_contract(app):
         "/api/v1/catalog/competitions": {"get"},
         "/api/v1/catalog/matches": {"get"},
         "/api/v1/catalog/matches/{match_id}": {"get"},
-        "/api/v1/teams": {"get"},
-        "/api/v1/predictions": {"post"},
-        "/api/v1/snapshots": {"get", "post"},
-        "/api/v1/snapshots/{snapshot_id}": {"get"},
-        "/api/v1/history": {"get"},
-        "/api/v1/insights": {"get"},
-        "/api/v1/backtests": {"get"},
-        "/api/v1/tournaments/simulate": {"post"},
-        "/api/v1/live/refresh": {"post"},
+        "/api/v1/predictions/preview": {"post"},
+        "/api/v1/catalog/matches/insights": {"get"},
+        "/api/v1/competitions/simulate": {"post"},
     }
     assert set(spec["paths"]) == set(football) | {"/health", "/ready"}
     for path, methods in football.items():

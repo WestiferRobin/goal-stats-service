@@ -102,7 +102,7 @@ def test_production_safeguards_independent_of_app_environment(monkeypatch):
 
 
 def test_no_implicit_cloud_fallback_or_local_file_read(monkeypatch):
-    from settings.database import DatabaseSettings, validate_prototype_target
+    from settings.database import DatabaseSettings
     from settings.environment import load_application
 
     def forbidden(*args, **kwargs):
@@ -119,8 +119,9 @@ def test_no_implicit_cloud_fallback_or_local_file_read(monkeypatch):
     )
     assert isinstance(settings.database, DatabaseSettings)
     assert "secret" not in repr(settings)
-    with pytest.raises(ConfigurationError):
-        validate_prototype_target(settings.database.url)
+    from settings import database
+
+    assert not hasattr(database, "validate_prototype_target")
 
 
 def test_tls_parameters_reach_shared_engine_without_network(monkeypatch):

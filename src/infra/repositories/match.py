@@ -1,12 +1,14 @@
 """Historical match projections and participant lookups; no historical writes."""
 
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
-from sqlalchemy import Select, or_, select
+from sqlalchemy import Select, and_, or_, select
 from sqlalchemy.orm import Session, aliased
 
+from infra.resources.db import Database
 from models.competition import Competition
 from models.match import Match
 from models.team import Team
@@ -32,8 +34,12 @@ class MatchProjection:
 
 
 class MatchRepository:
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self, database: Database) -> None:
+        self.database = database
+
+    def transaction(self) -> AbstractContextManager[Session]:
+        """Provide a context whose boundary is chosen by the calling service."""
+        return self.database.transaction()
 
     @staticmethod
     def _projection_query() -> Select[Any]:
@@ -63,8 +69,10 @@ class MatchRepository:
 
     def list(
         self,
+        session: Session,
         *,
         team_id: int | None = None,
+        opponent_team_id: int | None = None,
         competition_id: int | None = None,
         date_from: date | None = None,
         date_to: date | None = None,
@@ -76,6 +84,13 @@ class MatchRepository:
             statement = statement.where(
                 or_(Match.home_team_id == team_id, Match.away_team_id == team_id)
             )
+        if opponent_team_id is not None:
+            statement = statement.where(
+                or_(
+                    and_(Match.home_team_id == team_id, Match.away_team_id == opponent_team_id),
+                    and_(Match.away_team_id == team_id, Match.home_team_id == opponent_team_id),
+                )
+            )
         if competition_id is not None:
             statement = statement.where(Match.competition_id == competition_id)
         if date_from is not None:
@@ -83,18 +98,20 @@ class MatchRepository:
         if date_to is not None:
             statement = statement.where(Match.match_date <= date_to)
         statement = statement.order_by(Match.match_date, Match.match_id).limit(limit).offset(offset)
-        return [MatchProjection(**row) for row in self.session.execute(statement).mappings()]
+        return [MatchProjection(**row) for row in session.execute(statement).mappings()]
 
-    def get_projection(self, match_id: int) -> MatchProjection | None:
+    def get_projection(self, session: Session, match_id: int) -> MatchProjection | None:
         row = (
-            self.session.execute(self._projection_query().where(Match.match_id == match_id))
+            session.execute(self._projection_query().where(Match.match_id == match_id))
             .mappings()
             .one_or_none()
         )
         return MatchProjection(**row) if row is not None else None
 
-    def get_by_id(self, match_id: int, *, for_share: bool = False) -> Match | None:
+    def get_by_id(
+        self, session: Session, match_id: int, *, for_share: bool = False
+    ) -> Match | None:
         statement = select(Match).where(Match.match_id == match_id)
         if for_share:
             statement = statement.with_for_update(read=True)
-        return self.session.scalar(statement)
+        return session.scalar(statement)

@@ -75,7 +75,7 @@ Neither transition changes credentials or deletes data. Run lifecycle commands s
 | `make seed DATASET=… DRY=true` | Preview approved historical imports; omit DRY or use false to write. |
 | `make test` | Lint, format-check, type-check, and run isolated unit/integration tests. |
 | `make stop` | Stop Docker resources and preserve PostgreSQL data. |
-| `make help` | Explain these eight commands. |
+| `make help` | Explain these nine commands. |
 
 `make test` needs Docker and Make, not the host venv or `.env.local`. Tests use
 independently owned disposable providers. They never use the development database.
@@ -104,10 +104,10 @@ See [development details](docs/service/development.md) and
 | Location | Purpose |
 | --- | --- |
 | `src/routers/football.py` | Flask football/API endpoints |
-| `src/schemas/` | Five normalized entity contracts, shared engine contracts, and prototype compatibility contracts |
+| `src/schemas/` | Five normalized entity contracts and shared engine contracts |
 | `src/services/football.py` | Football application logic |
 | `src/football/` | Prediction model, import, and provider adapter |
-| `src/models/` | Five normalized Goal Stats models; active prototype and template models under `hold/` |
+| `src/models/` | Five normalized Goal Stats models |
 | `alembic/versions/` | Database migrations |
 | `data/` | Prototype compatibility inputs, approved manifests, ignored raw sources and verification evidence |
 | `tests/` | Unit and integration tests |
@@ -132,36 +132,24 @@ format checks, strict mypy, and maintained unit, integration, tooling and owners
 tests against disposable PostgreSQL/Redis. It does not run separate smoke, coverage
 or lifecycle certification modes.
 
-Alembic retains the original `a7c93e25d104_init_models.py` baseline and adds guarded
-Item/Action retirement revision `c8d42f19e630`. The final schema has eight application
-tables: five normalized Goal Stats and three RoadToTheFinal tables. Item/Action APIs
-are removed in this checkout; the shared Redis provider remains without business caches.
-**Do not run startup preparation or deploy this checkout against persistent PostgreSQL
-until frontend Home consumers are retired and deployment is explicitly coordinated.**
-See the [retirement handoff](docs/testing/item-action-backend-retirement.md).
-`make run` and `make deploy` apply existing
-revisions before startup. Future revision generation requires a separately reviewed,
-explicitly authorized Alembic workflow; no additional Make command is provided.
-See [testing](docs/testing/overview.md) and [development](docs/service/development.md).
-
+Alembic retains the original revisions and adds guarded prototype retirement head
+`d91e6a4b208f`. The final schema has five application tables. The new migration
+refuses populated prototype tables and unexpected ownership/dependencies. Inventory,
+verify backups and coordinate archival before any persistent upgrade; this phase
+only verifies disposable resources. `make run` and `make deploy` apply migrations,
+so do not use them as a workaround for a retirement refusal.
 
 ## Startup and empty databases
 
-Startup prepares the schema with Alembic but never seeds prototype or historical data.
-Existing populated databases retain their records. Fresh databases have empty application
-catalogs while health, readiness and Swagger remain available. Prototype compatibility
-endpoints may return empty collections or missing-team errors. The existing `/demo` and
-frontend demo require explicitly supplied prototype data or migration to normalized
-Goal Stats APIs; startup does not fabricate ratings or historical examples for them.
+Flask construction does not migrate or seed. Local lifecycle commands prepare schema
+explicitly. Fresh catalogs remain empty until an authorized historical import.
+Production operations use normalized integer IDs and explicit prediction assumptions;
+there is no prototype catalog, snapshot API or CSV fallback.
 
-The explicit prototype compatibility importer remains available. Historical imports use
-the guarded Flask CLI described in the [football guide](docs/service/football.md#historical-import-operations).
-Use the explicit `make seed` workflow described below to import approved historical data.
-
-Approved historical contracts live in `data/womens-world-cup/` (nine editions),
-original source bytes in `data/raw/`, and RoadToTheFinal compatibility inputs in
-`data/prototype/`. The importer supports all nine editions; the persistent development
-catalog currently contains only 2023. Startup does not populate additional editions.
+Approved manifests live in `data/womens-world-cup/`; source bytes stay in `data/raw/`.
+The importer supports nine editions. Persistent development contents are unverified.
+See [backend contracts](docs/service/frontend-api.md) and
+[retirement safeguards](docs/service/football.md#persistence-retirement).
 
 ## Explicit historical seeding
 

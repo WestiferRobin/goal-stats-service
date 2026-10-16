@@ -27,7 +27,7 @@ def test_schema_exports_match_without_reading_prototype(tmp_path, monkeypatch, o
     def forbidden():
         pytest.fail("Schema export must not read prototype CSVs")
 
-    monkeypatch.setattr(exporter, "read_datasets", forbidden)
+    assert not hasattr(exporter, "read_datasets")
     exporter.export(tmp_path, mode="schema")
     paths = sorted(tmp_path.glob("*.sql"))
     assert len(paths) == 1
@@ -36,24 +36,9 @@ def test_schema_exports_match_without_reading_prototype(tmp_path, monkeypatch, o
     assert not (tmp_path / "prototype").exists()
 
 
-def test_prototype_export_is_separate_unchanged_and_deterministic(tmp_path, offline):
-    exporter.export(tmp_path, mode="prototype")
-    path = tmp_path / "prototype/003_seed_football.sql"
-    before = path.read_bytes()
-    assert before == (ROOT / "sql/prototype/003_seed_football.sql").read_bytes()
-    exporter.export(tmp_path, mode="prototype")
-    assert path.read_bytes() == before
-    assert not list(tmp_path.glob("*.sql"))
-    sql = before.decode()
-    assert sql.count("INSERT INTO football_teams ") == 32
-    assert sql.count("INSERT INTO football_history ") == 16
-    assert "INSERT INTO matches " not in sql
-    assert "INSERT INTO teams " not in sql
-
-
 def test_legacy_export_all_keeps_both_outputs(tmp_path, offline):
     exporter.export(tmp_path)
-    assert len(list(tmp_path.rglob("*.sql"))) == 2
+    assert len(list(tmp_path.rglob("*.sql"))) == 1
 
 
 def test_sql_approved_facts_match_checked_in_coverage():

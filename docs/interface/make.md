@@ -9,9 +9,10 @@ Run commands from the repository root, sequentially.
 | `make run` | Validate host setup; stop owned Docker Flask; prepare database; run foreground host Flask |
 | `make deploy` | Deploy the complete backend locally in Docker. No cloud deployment. |
 | `make seed DATASET=… DRY=true` | Preview approved historical imports; omit DRY or use false to write. |
-| `make test` | Run quality checks and owned disposable unit/integration tests |
+| `make test` | Run host quality checks and Unit + Integration with disposable providers |
+| `make certify` | Run host quality checks, Unit + Integration including the real historical source, and the 95% coverage gate |
 | `make stop` | Remove local Docker containers/network; preserve PostgreSQL data |
-| `make help` | Display these eight commands |
+| `make help` | Display these nine commands |
 
 `run` and `deploy` differ in where Flask executes. Both use project
 `goalstats-service-local`, database `goal_stats_service_local`, and `.env.local`.
@@ -23,7 +24,15 @@ Ctrl-C or IDE Stop ends host Flask; providers remain running. Stop host Flask be
 If Flask remains running after `stop`, it loses access to its providers.
 These are the only supported Make commands. `make test` is the standard verification
 command and runs quality checks plus unit, integration and maintained tooling tests
-using owned disposable PostgreSQL/Redis. There are no separate test modes.
+using owned disposable PostgreSQL/Redis. `make certify` reuses the same guarded
+host runner, adds coverage, and retains reports under a unique ignored
+`.host-sessions/certify-*` directory. It fails below 95% combined statement-and-branch
+coverage, even when all tests pass. Test mode excludes the single `pinned_source` case;
+certify includes it in the same pytest invocation, using the approved ignored CSV and
+an invocation-owned macOS read-only disk image. The runner provisions and verifies the
+mount, then detaches and removes it during cleanup. Missing source, unsupported mounting,
+checksum/ownership failures or cleanup failures prevent PASS. It does not seed persistent
+data or change other tests' fixtures. See [certification](../testing/certification.md).
 
 Alembic and all existing revisions remain in place. Startup applies existing revisions;
 future migration generation must be planned and explicitly authorized separately.

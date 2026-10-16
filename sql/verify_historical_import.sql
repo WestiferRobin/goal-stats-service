@@ -313,18 +313,6 @@ $approved$::jsonb) AS e(edition text, start date, finish date, matches integer,
     SELECT 'predictions' AS entity, count(*) AS rows,
            md5(coalesce(string_agg(to_jsonb(t)::text, E'\n' ORDER BY to_jsonb(t)::text COLLATE "C"), '')) AS digest
     FROM predictions t
-    UNION ALL
-    SELECT 'football_teams' AS entity, count(*) AS rows,
-           md5(coalesce(string_agg(to_jsonb(t)::text, E'\n' ORDER BY to_jsonb(t)::text COLLATE "C"), '')) AS digest
-    FROM football_teams t
-    UNION ALL
-    SELECT 'football_history' AS entity, count(*) AS rows,
-           md5(coalesce(string_agg(to_jsonb(t)::text, E'\n' ORDER BY to_jsonb(t)::text COLLATE "C"), '')) AS digest
-    FROM football_history t
-    UNION ALL
-    SELECT 'football_snapshots' AS entity, count(*) AS rows,
-           md5(coalesce(string_agg(to_jsonb(t)::text, E'\n' ORDER BY to_jsonb(t)::text COLLATE "C"), '')) AS digest
-    FROM football_snapshots t
 ), preservation_report AS (
     SELECT jsonb_object_agg(entity, jsonb_build_object('rows', rows, 'digest', digest)) AS evidence
     FROM preservation
@@ -332,7 +320,7 @@ $approved$::jsonb) AS e(edition text, start date, finish date, matches integer,
     SELECT 'database identity' AS check_name,
            s.database_name IS NULL OR s.database_name = current_database() AS passed FROM settings s
     UNION ALL SELECT 'Alembic head',
-        (SELECT count(*) = 1 AND min(version_num) = 'c8d42f19e630' FROM alembic_version)
+        (SELECT count(*) = 1 AND min(version_num) = 'd91e6a4b208f' FROM alembic_version)
     UNION ALL SELECT 'competition identity/category', NOT EXISTS (
         SELECT 1 FROM selected_competitions WHERE name <> 'FIFA Women''s World Cup'
           OR name_key <> 'fifa women''s world cup' OR category <> 'women_senior_national')

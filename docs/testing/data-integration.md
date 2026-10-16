@@ -1,4 +1,70 @@
+# Real historical dataset integration — Prompt 2
+
+The canonical `make certify` executes the existing pinned-source integration test in
+its single Unit + Integration pytest invocation. `make test` excludes only that marker.
+Synthetic edge-case fixtures are preserved; historical data is not seeded globally.
+
+## Source and read-only handling
+
+Source revision: `1855e313ae8bcd0330426e62c8e4cf15ce45077c`.
+Approved SHA-256: `de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
+The original ignored CSV remains unchanged. The macOS runner verifies the source and
+nine manifests, copies it into a private UDRO/HFS+ image, and uses `hdiutil` to mount
+read-only. The test fixture independently verifies canonical path, checksum,
+`ST_RDONLY` and the invocation's mount receipt. No Docker bind or chmod shortcut is used.
+Missing/incorrect source, invalid manifests, unowned/writable mounts and creation failure
+stop certification rather than skip the test.
+
+## Disposable database and API evidence
+
+The existing historical integration test verifies actual rows after nine explicit
+per-edition CLI imports: **44 teams, nine editions, 348 matches, 1,081 goals**. It compares
+all match dates, participants, scores and source ordinals with the mounted CSV and
+checks all edition counts, provenance, foreign keys and prepared SQL acceptance rules.
+Schema inspection and Alembic metadata comparison require only teams, competitions,
+matches, scenarios and predictions, plus `alembic_version`; prototype tables are absent.
+
+Flask checks cover catalog teams/competitions/matches, pagination, filters and detail;
+the Spain–England 2023 final (1–0) and head-to-head comparison; unsaved preview; and
+hypothetical simulation with normalized identities and explicit synthetic ratings.
+The approved route inventory is checked and prototype paths return 404.
+
+A saved Spain/England scenario uses explicitly synthetic assumptions, never historical
+ratings. Two generated predictions validate probability/output schemas, immutable input
+snapshots, model version, saved retrieval and append-only paginated history. Subsequent
+edition imports and repeat imports preserve exact rows. A conflicting factual score is
+rejected without partial writes. Application/connection-pool recreation preserves records;
+this is not a hosted deployment or persistent-stack restart test.
+
+## Isolation and cleanup
+
+Only the historical test's owned disposable schema receives the full dataset. The
+original source, manifests, production modules, migrations and persistent resources
+are unchanged. Source lifecycle regressions use a recording provider; real macOS
+mounting is exercised by canonical certification. Existing importer, SQL verifier,
+API, rollback, runner, coverage and Docker-ownership regressions remain in place.
+
+Owned Python groups stop before teardown. Cleanup checks Docker preservation, verifies
+the exact owned image, detaches it and removes only private source artifacts. Failures
+retain the original failure code; detach/ownership failures retain the session directory
+and prevent PASS. JSON/XML coverage and pytest XML reports remain in a unique report
+directory; raw `.coverage` is removed. See [certification](certification.md).
+
+This is disposable real-source verification, not development seeding or independent
+final production certification. The dated report below describes superseded behavior
+and must not be used as current operational instructions.
+
+## Archived integration evidence (2026-10-11)
+
 # Data architecture integration — Prompt 6
+
+Current implementation note: Prompt 1 consolidates the backend to five normalized
+application tables and 15 application operations. The evidence below predates that
+adaptation unless explicitly dated otherwise. See [current contracts](../service/frontend-api.md)
+and [phase boundaries](../service/football.md#phase-boundaries). The canonical runner
+and pinned-source exclusion are unchanged in Prompt 1; mandatory real-source
+certification remains Prompt 2 work. Persistent development contents are unverified.
+
 
 Migration-history note: dated revision-chain evidence below predates consolidation
 into `a7c93e25d104_init_models.py`. The head ID and schema are preserved; see
@@ -66,20 +132,31 @@ venue limitations remain documented in `data/verification/`.
 
 ## Actual-source disposable acceptance
 
-`tests/acceptance/test_pinned_historical_source.py` requires `/input/results.csv` on a
-read-only directory mount. Missing source or ownership verification fails rather than
-skipping or substituting synthetic data. It reuses existing disposable-schema fixtures,
-existing CLI, production parser/importer and read-only verification SQL without patching
-manifests, checksums or historical import logic.
+`tests/integration/football/test_historical_import.py::test_pinned_source_import_repeat_and_application_restart`
+is an opt-in host test. Set `TEST_PINNED_SOURCE` to a canonical absolute `results.csv`
+path on a verified read-only filesystem. The fixture checks the filesystem's
+`statvfs` read-only flag and the approved SHA-256 before imports. Ordinary chmod
+permissions are insufficient. Missing source, writable mounts and invalid receipts
+fail instead of skipping or substituting synthetic data.
 
-The test ran through a temporary copy of `scripts/test.sh` using the same unique project,
-provider ownership receipt, tmpfs providers and scoped cleanup. The only harness changes
-were an absolute repository working directory, a read-only bind of the pinned directory
-to `/input`, and selection of the focused tests including `tests/acceptance`. No maintained
-command dispatcher or Make target was added. To repeat this maintainer acceptance, retain
-all ownership checks in that harness and add the source mount to its `owned_run`; invoke
-`pytest -q -p no:cacheprovider tests/acceptance` through `scripts/testing/test_ownership.py` inside
-that owned runner. Do not point this test at development PostgreSQL.
+On macOS, a maintainer may prepare a read-only disk image containing the approved
+source and attach it read-only. Preserve the original CSV and verify its checksum;
+never change manifests or historical importer code. Detach only the image created
+for this verification afterward.
+
+Provision a fresh disposable session using the same `test.sh` lifecycle: generate
+project/session credentials, use an empty Compose environment file, snapshot resources,
+start only the two providers, then issue the private receipt with `test_resources.py`.
+Use the host `test_ownership.py owned` entry point for Alembic and the explicitly
+selected `-m pinned_source` pytest invocation documented in the testing overview.
+Keep process termination, project cleanup and resource-preservation checks in an exit
+trap. Do not change public runner arguments or point this procedure at development
+PostgreSQL. The session must remain alive until verification and cleanup finish.
+
+The original 2026-10-11 acceptance below used a temporary container harness and a
+read-only `/input` mount. That historical execution is not evidence of host execution.
+The preserved test reuses disposable-schema fixtures, production parsing/imports and
+read-only verification SQL.
 
 Acceptance checks:
 

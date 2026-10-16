@@ -1,26 +1,17 @@
 {
   "blueprints": [
     "health",
-    "football",
+    "team",
+    "competition",
+    "match",
     "scenarios",
     "saved_predictions",
     "docs"
   ],
   "routes": [
     [
-      "/api/v1/backtests",
-      "football.backtests",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {}
-    ],
-    [
       "/api/v1/catalog/competitions",
-      "football.catalog_competitions",
+      "competition.catalog_competitions",
       [
         "GET",
         "HEAD",
@@ -31,7 +22,7 @@
     ],
     [
       "/api/v1/catalog/matches",
-      "football.catalog_matches",
+      "match.catalog_matches",
       [
         "GET",
         "HEAD",
@@ -42,7 +33,7 @@
     ],
     [
       "/api/v1/catalog/matches/<match_id>",
-      "football.catalog_match",
+      "match.catalog_match",
       [
         "GET",
         "HEAD",
@@ -54,8 +45,19 @@
       }
     ],
     [
+      "/api/v1/catalog/matches/insights",
+      "match.insights",
+      [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ],
+      true,
+      {}
+    ],
+    [
       "/api/v1/catalog/teams",
-      "football.catalog_teams",
+      "team.catalog_teams",
       [
         "GET",
         "HEAD",
@@ -66,7 +68,7 @@
     ],
     [
       "/api/v1/catalog/teams/<team_id>",
-      "football.catalog_team",
+      "team.catalog_team",
       [
         "GET",
         "HEAD",
@@ -78,40 +80,8 @@
       }
     ],
     [
-      "/api/v1/history",
-      "football.history",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/insights",
-      "football.insights",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/live/refresh",
-      "football.refresh_live",
-      [
-        "OPTIONS",
-        "POST"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/predictions",
-      "football.predictions",
+      "/api/v1/competitions/simulate",
+      "competition.simulate",
       [
         "OPTIONS",
         "POST"
@@ -131,6 +101,16 @@
       {
         "prediction_id": "UnicodeConverter"
       }
+    ],
+    [
+      "/api/v1/predictions/preview",
+      "saved_predictions.preview",
+      [
+        "OPTIONS",
+        "POST"
+      ],
+      true,
+      {}
     ],
     [
       "/api/v1/scenarios",
@@ -202,61 +182,6 @@
       {
         "scenario_id": "UnicodeConverter"
       }
-    ],
-    [
-      "/api/v1/snapshots",
-      "football.save_snapshot",
-      [
-        "OPTIONS",
-        "POST"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/snapshots",
-      "football.snapshots",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/snapshots/<uuid:snapshot_id>",
-      "football.snapshot",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {
-        "snapshot_id": "UUIDConverter"
-      }
-    ],
-    [
-      "/api/v1/teams",
-      "football.teams",
-      [
-        "GET",
-        "HEAD",
-        "OPTIONS"
-      ],
-      true,
-      {}
-    ],
-    [
-      "/api/v1/tournaments/simulate",
-      "football.tournament",
-      [
-        "OPTIONS",
-        "POST"
-      ],
-      true,
-      {}
     ],
     [
       "/health",

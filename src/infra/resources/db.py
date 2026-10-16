@@ -13,7 +13,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from models.competition import Competition
-from models.hold.football import FootballHistory, FootballSnapshot, FootballTeam
 from models.match import Match
 from models.prediction import Prediction
 from models.scenario import Scenario
@@ -66,9 +65,6 @@ def is_ready(database: Database) -> bool:
             ):
                 return False
             for model in (
-                FootballTeam,
-                FootballHistory,
-                FootballSnapshot,
                 Team,
                 Competition,
                 Match,

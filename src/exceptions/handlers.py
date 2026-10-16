@@ -6,7 +6,7 @@ from flask import Flask, Response, current_app, jsonify
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-from exceptions.base import DomainError
+from exceptions.base import DomainError, PredictionGenerationError
 from schemas.problem import ProblemDetailSchema
 
 _INVALID_VALUES_DETAIL = "The request contains invalid values."
@@ -46,6 +46,11 @@ def register_error_handlers(app: Flask) -> None:
             if name.lower() not in {"content-type", "content-length"}:
                 response.headers.add(name, value)
         return response
+
+    @app.errorhandler(PredictionGenerationError)
+    def prediction_failure(error: PredictionGenerationError) -> Response:
+        current_app.logger.error("Prediction generation failed")
+        return problem(500, error.public_detail)
 
     @app.errorhandler(Exception)
     def unexpected_error(error: Exception) -> Response:

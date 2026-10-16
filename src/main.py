@@ -37,16 +37,22 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from exceptions.handlers import register_error_handlers, request_validation
 from football.cli import register_commands
+from infra.repositories.competition import CompetitionRepository
+from infra.repositories.match import MatchRepository
+from infra.repositories.prediction import PredictionRepository
+from infra.repositories.scenario import ScenarioRepository
+from infra.repositories.team import TeamRepository
 from infra.resources.db import Database, is_ready
 from infra.resources.redis import RedisCache
-from routers.football import create_football_blueprint
+from routers.competition import create_competition_blueprint
 from routers.infra import create_health_blueprint
+from routers.match import create_match_blueprint
 from routers.openapi import create_docs_blueprint
-from routers.predictions import create_predictions_blueprint
-from routers.scenarios import create_scenarios_blueprint
+from routers.prediction import create_predictions_blueprint
+from routers.scenario import create_scenarios_blueprint
+from routers.team import create_team_blueprint
 from schemas.problem import ProblemDetailSchema
 from services.competition import CompetitionService
-from services.football import FootballService
 from services.match import MatchService
 from services.prediction import PredictionService
 from services.scenario import ScenarioService
@@ -78,19 +84,29 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.extensions["goalstats_database"] = database
     app.extensions["goalstats_cache"] = cache
 
+    team_repo = TeamRepository(database)
+    competition_repo = CompetitionRepository(database)
+    match_repo = MatchRepository(database)
+    scenario_repo = ScenarioRepository(database)
+    prediction_repo = PredictionRepository(database)
+    team_service = TeamService(repo=team_repo)
+    competition_service = CompetitionService(repo=competition_repo, team_service=team_service)
+    match_service = MatchService(repo=match_repo, team_service=team_service)
+    scenario_service = ScenarioService(
+        repo=scenario_repo, team_service=team_service, match_service=match_service
+    )
+    prediction_service = PredictionService(
+        repo=prediction_repo, scenario_service=scenario_service, team_service=team_service
+    )
+
     if settings.redis.url is None:
         app.logger.warning("Redis is unconfigured; database fallback is available")
     app.register_api(create_health_blueprint(database, cache, settings.redis.cache_key_prefix))
-    app.register_api(
-        create_football_blueprint(
-            FootballService(database),
-            team_service=TeamService(database),
-            competition_service=CompetitionService(database),
-            match_service=MatchService(database),
-        )
-    )
-    app.register_api(create_scenarios_blueprint(ScenarioService(database)))
-    app.register_api(create_predictions_blueprint(PredictionService(database)))
+    app.register_api(create_team_blueprint(team_service))
+    app.register_api(create_competition_blueprint(competition_service))
+    app.register_api(create_match_blueprint(match_service))
+    app.register_api(create_scenarios_blueprint(scenario_service))
+    app.register_api(create_predictions_blueprint(prediction_service))
     register_commands(app, database)
     register_error_handlers(app)
     if settings.core.openapi_enabled:

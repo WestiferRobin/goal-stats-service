@@ -50,3 +50,21 @@ def test_boolean_contract(value, expected):
 def test_invalid_settings_fail_with_safe_field_name(key, value):
     with pytest.raises(ConfigurationError, match=key):
         load_application({"DATABASE_URL": URL, key: value})
+
+
+@pytest.mark.parametrize(
+    "host,expected",
+    [
+        ("localhost", True),
+        ("127.0.0.2", True),
+        ("::1", True),
+        ("192.0.2.1", False),
+        (None, False),
+        ("not-an-address", False),
+    ],
+)
+def test_loopback_classification_does_not_resolve_hostnames(host, expected):
+    """Classify literal loopbacks and reject arbitrary hosts without DNS lookups."""
+    from settings.base import loopback
+
+    assert loopback(host) is expected
