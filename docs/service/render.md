@@ -147,8 +147,12 @@ No exception text, connection URLs, credentials, hostnames, or database names ar
 | --- | --- |
 | Database connection or DNS | Endpoint availability, DNS, external access rules and connection limits |
 | PostgreSQL authentication | Configured credentials and database role access |
+| Database TLS transport verification | The cloud guard did not confirm TLS in `pg_stat_ssl`; investigate transport configuration without bypassing the guard |
 | TLS certificate verification | Full external hostname and trusted CA; retain `verify-full` |
-| Database identity mismatch | Independently verified `BOOTSTRAP_EXPECT_HOST` and `BOOTSTRAP_EXPECT_DATABASE` against the intended target |
+| Identity: configured hostname/database name | Compare `BOOTSTRAP_EXPECT_HOST` / `BOOTSTRAP_EXPECT_DATABASE` privately with the corresponding URL fields; failure occurs before connecting |
+| Identity: connected driver hostname | Requested libpq hostname differs from the independently expected hostname; inspect connection overrides, not resolved IPs |
+| Identity: connected database name | `current_database()` differs from the independently expected database |
+| Identity: connected user | `current_user` differs from the URL username; inspect role configuration without relaxing the check |
 | Alembic migration | Role permissions, lock contention and existing legacy migration guards |
 | Historical import | Approved source and importer safeguards; do not reset existing data |
 | Catalog verification | Missing, extra or conflicting historical records; resolve separately without automatic repair |
@@ -158,6 +162,14 @@ validation, database safety guards (including a competing importer or unrelated 
 and transaction completion. Driver authentication/TLS/connection failures take precedence
 over the active stage. Other errors report the stage that failed, not an inferred root cause.
 The original generic message cannot identify which category caused a previous deployment.
+Likewise, the older `database identity mismatch` label cannot identify which comparison
+failed; the TLS transport guard also previously fell back to that label. New identity labels distinguish all five comparisons without logging their values.
+Psycopg's `info.host` (`PQhost`) retains the requested hostname when `host` and
+`hostaddr` are supplied; DNS resolution is reported separately in `info.hostaddr`.
+It is a connection-parameter check, not independent server authentication. Cloud
+`verify-full` authenticates that hostname; the SQL checks verify database and user.
+A Render proxy or DNS alias alone is not justification to remove the hostname check.
+See [PostgreSQL connection status](https://www.postgresql.org/docs/current/libpq-status.html).
 Do not disable TLS verification or migration guards to resolve a failed startup.
 
 ## Authenticate goal-stats-app

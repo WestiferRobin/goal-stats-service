@@ -146,7 +146,7 @@ def test_wrong_identity_never_migrates(fresh_database, prepared_source):
     diagnostic = boot.BootstrapDiagnostic()
     with pytest.raises(ConfigurationError) as failure:
         boot.bootstrap(fresh_database, bad, prepared_source, diagnostic)
-    assert diagnostic.category(failure.value) == boot.FailureCategory.IDENTITY
+    assert diagnostic.category(failure.value) == boot.FailureCategory.CONFIGURED_HOST
     assert inspect(fresh_database.engine).get_table_names() == []
 
 

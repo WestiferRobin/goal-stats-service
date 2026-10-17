@@ -40,12 +40,27 @@ class FailureCategory(Enum):
     CONNECTION = "database connection or DNS failure"
     AUTHENTICATION = "PostgreSQL authentication failure"
     TLS = "TLS certificate verification failure"
+    TRANSPORT = "database TLS transport verification failure"
     IDENTITY = "database identity mismatch"
+    CONFIGURED_HOST = "database identity mismatch: configured hostname"
+    CONFIGURED_DATABASE = "database identity mismatch: configured database name"
+    CONNECTED_HOST = "database identity mismatch: connected driver hostname"
+    CONNECTED_DATABASE = "database identity mismatch: connected database name"
+    CONNECTED_USER = "database identity mismatch: connected user"
     GUARD = "database safety guard failure"
     MIGRATION = "Alembic migration failure"
     IMPORT = "historical import failure"
     CATALOG = "catalog verification failure"
     COMMIT = "database transaction completion failure"
+
+
+IDENTITY_FAILURES = {
+    "Database hostname does not match --expect-host.": FailureCategory.CONFIGURED_HOST,
+    "Database name does not match --expect-database.": FailureCategory.CONFIGURED_DATABASE,
+    "Connected hostname does not match --expect-host.": FailureCategory.CONNECTED_HOST,
+    "Connected database does not match --expect-database.": FailureCategory.CONNECTED_DATABASE,
+    "Connected database user differs from configured user.": FailureCategory.CONNECTED_USER,
+}
 
 
 @dataclass
@@ -87,14 +102,12 @@ class BootstrapDiagnostic:
                     return FailureCategory.CONNECTION
                 if (error.sqlstate or "").startswith("08"):
                     return FailureCategory.CONNECTION
-            if isinstance(error, ConfigurationError) and str(error) in {
-                "Database hostname does not match --expect-host.",
-                "Database name does not match --expect-database.",
-                "Connected hostname does not match --expect-host.",
-                "Connected database does not match --expect-database.",
-                "Connected database user differs from configured user.",
-            }:
-                return FailureCategory.IDENTITY
+            if isinstance(error, ConfigurationError) and str(error) in IDENTITY_FAILURES:
+                return IDENTITY_FAILURES[str(error)]
+            if isinstance(error, ConfigurationError) and str(error) == (
+                "Cloud import connection must use verified TLS."
+            ):
+                return FailureCategory.TRANSPORT
             nested = (
                 error.orig
                 if isinstance(error, DBAPIError)

@@ -81,7 +81,7 @@ def test_authentication_sqlstate_and_identity():
     assert diagnostic.category(InvalidPassword("secret")) == boot.FailureCategory.AUTHENTICATION
     assert (
         diagnostic.category(ConfigurationError("Database hostname does not match --expect-host."))
-        == boot.FailureCategory.IDENTITY
+        == boot.FailureCategory.CONFIGURED_HOST
     )
     # Arbitrary application text must not masquerade as a driver failure.
     assert diagnostic.category(RuntimeError("certificate verify failed")) == diagnostic.stage
@@ -120,3 +120,32 @@ def test_cli_reports_only_fixed_stage_labels(monkeypatch, capsys, stage):
         f"Production bootstrap failed; no startup authorized. Category: {stage.value}.\n"
     )
     database.dispose.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "message,expected",
+    [
+        *boot.IDENTITY_FAILURES.items(),
+        (
+            "Cloud import connection must use verified TLS.",
+            boot.FailureCategory.TRANSPORT,
+        ),
+    ],
+)
+def test_identity_comparison_is_reported_without_values(monkeypatch, capsys, message, expected):
+    from settings.base import ConfigurationError
+
+    def fail():
+        try:
+            raise ConfigurationError(message)
+        except ConfigurationError:
+            raise RuntimeError("private-host private-user private-password") from None
+
+    monkeypatch.setattr("sys.argv", ["bootstrap", "--confirm-production"])
+    monkeypatch.setattr(boot, "load_application", fail)
+    with pytest.raises(SystemExit) as error:
+        boot.main()
+    assert error.value.code == 1
+    assert capsys.readouterr().err == (
+        f"Production bootstrap failed; no startup authorized. Category: {expected.value}.\n"
+    )

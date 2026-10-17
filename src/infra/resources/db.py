@@ -82,6 +82,9 @@ def verify_database_identity(session: Session, target: ImportTarget) -> None:
     connection = session.connection()
     target.validate(connection.engine.url)
     driver = cast(PsycopgConnection[Any], connection.connection.driver_connection)
+    # PQhost preserves the requested hostname; resolved IPs are in info.hostaddr.
+    # This checks connection parameters, not DNS/server identity: cloud verify-full
+    # authenticates the hostname. Never substitute the peer IP or reverse DNS here.
     if driver.info.host != target.expect_host:
         raise ConfigurationError("Connected hostname does not match --expect-host.")
     if session.scalar(text("SELECT current_database()")) != target.expect_database:
