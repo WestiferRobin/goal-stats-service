@@ -29,6 +29,7 @@ DIRECT_KEYS = frozenset(
         "OPENAPI_ENABLED",
         "HOST_APP_PORT",
         "FLASK_DEBUG",
+        "SERVICE_API_TOKEN",
     }
 )
 
@@ -100,6 +101,7 @@ def load_application(values: Mapping[str, str] | None = None) -> Settings:
             log_level(source.get("LOG_LEVEL", CORE_POLICY["LOG_LEVEL"])),
             boolean(source.get("OPENAPI_ENABLED", "false")),
             port(source.get("HOST_APP_PORT", "5100"), "HOST_APP_PORT"),
+            source.get("SERVICE_API_TOKEN", ""),
         ),
         DatabaseSettings(database_url(source.get("DATABASE_URL", ""))),
         RedisSettings(

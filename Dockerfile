@@ -11,14 +11,17 @@ COPY data/ ./data/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
 COPY sql/ ./sql/
+COPY scripts/deployment/start.sh ./scripts/deployment/start.sh
 USER 10001:10001
 EXPOSE 8000
 HEALTHCHECK --interval=5s --timeout=3s --start-period=10s --retries=12 \
-  CMD python -c "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/ready',timeout=2); assert r.status == 200 and r.read() == b'Healthy'"
-CMD ["gunicorn", "--bind=0.0.0.0:8000", "--workers=2", "--timeout=30", "--graceful-timeout=10", "--access-logfile=-", "--error-logfile=-", "main:create_app()"]
+  CMD python -c "import os, urllib.request; r=urllib.request.urlopen('http://127.0.0.1:'+(os.environ.get('PORT') or '8000')+'/ready',timeout=2); assert r.status == 200"
+CMD ["/bin/sh", "/app/scripts/deployment/start.sh"]
 
 FROM runtime AS tooling
 COPY tests/ ./tests/
 COPY scripts/ ./scripts/
 COPY .coveragerc pytest.ini ruff.toml mypy.ini Makefile .env.example ./
 CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider"]
+
+FROM runtime AS production

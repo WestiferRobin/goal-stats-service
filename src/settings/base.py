@@ -12,6 +12,7 @@ class Environment(StrEnum):
     LOCAL = "local"
     DEV = "dev"
     TEST = "test"
+    PRODUCTION = "production"
 
 
 def port(value: str, key: str) -> int:

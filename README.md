@@ -9,6 +9,8 @@ Goal Stats has two repositories:
 The simple request flow is: browser → `goal-stats-app` → `goal-stats-service` →
 database and football logic. This repository is `goal-stats-service`.
 
+For production Docker deployment, see the [Render deployment guide](docs/service/render.md).
+
 ## Start here: backend development
 
 **`make run` = host Flask + Docker PostgreSQL/Redis.**
