@@ -1,13 +1,141 @@
-# Development internals
+# Backend development
 
-The root README owns the supported contributor loop. `make run` handles build,
-provider startup, migration, idempotent CSV import, and API startup. `make stop`
-preserves PostgreSQL data.
+`make run` runs host Flask with Docker PostgreSQL/Redis.
+`make deploy` runs Flask and both providers in Docker, locally only.
+Both use one `.env.local`, one database, the same migrations and football data.
 
-Alembic revisions remain in `alembic/versions/`, and the importer remains in the
-application image. Maintainers can use underscore-prefixed internal targets in the
-root `Makefile` for migration authoring/checking and release validation. They are
-absent from `make help` and are not onboarding requirements.
+## Preparation
 
-Do not introduce a parallel host-Python or DEV-mode happy path. Retained internal
-tools must stay behind the public five-command interface.
+Use Python 3.12, GNU Make, and running Docker/Compose v2 on macOS, Linux, or WSL.
+Native Windows host Python is not supported; use WSL. Run `make setup` to create/reuse
+`.venv`, install pinned requirements when needed, run `pip check`, and prepare images.
+Setup never starts services or overwrites `.env.local`. A wrong-version venv is refused;
+move it aside yourself before retrying. Setup does not install Python itself.
+
+## Coding and debugging
+
+Run `make run`. It validates host prerequisites before stopping Docker Flask, checks
+`APP_PORT`, builds the preparation image, starts healthy providers, applies migrations,
+and executes `.venv/bin/python src/main.py` in the foreground. Ctrl-C ends only Flask.
+Restart manually after edits; host reload and the browser debugger are disabled.
+
+VS Code's app launch configuration already selects `.venv/bin/python` and `src/main.py`.
+For PyCharm or another debugger, use that interpreter/script and the repository root as
+working directory. Breakpoints work in the single host process. Do not configure a second
+env file. To prepare the database for initial IDE use or after migrations change, run
+`make run`, stop Flask, then IDE Run. For a prepared database, use `make infra` then IDE Run.
+IDE pytest discovery and debugging select provider-free unit tests. Use `make test` for
+integration tests inside the verified disposable Docker runner.
+
+## Switching and stopping
+
+- Docker to host: `make run` stops only this project's Docker app and reuses providers.
+- Host to Docker: Ctrl-C/IDE Stop, then `make deploy`.
+- Infrastructure only: stop host Flask, then `make infra`; Docker Flask is stopped automatically.
+- Finished: stop host Flask, then `make stop`. PostgreSQL's named volume remains.
+
+Occupied ports produce an error; no arbitrary process is killed. Commands must run
+sequentially. `make stop` does not manage host processes; any remaining host Flask loses
+its database/cache connections. Redis is intentionally ephemeral; PostgreSQL persists.
+
+## Internal ownership
+
+`scripts/development/local.sh` owns the public lifecycle and fixed project `goalstats-service-local`.
+Its shared preparation function uses a one-off Docker app command for Alembic only.
+The Flask factory itself never migrates or imports. Host configuration is explicit
+in `load_local`; ordinary factory calls and tests never load `.env.local` automatically.
+
+`scripts/testing/test.sh` owns the single disposable testing workflow invoked by `make test`.
+There is no separate DEV stack or host test-provider session. Historical import remains
+explicit; see [football data operations](football.md#historical-import-operations).
+Startup does not import prototype or historical datasets.
+
+## Troubleshooting
+
+Prerequisite and configuration errors come from `local.sh` and `python_environment.py`.
+Direct startup checks PostgreSQL connectivity and Redis availability in `main.py`;
+integration tests verify schema readiness and SQLAlchemy metadata against disposable
+PostgreSQL. Errors omit
+credentials. If authentication fails, restore the original `.env.local` password: changing
+the file does not rotate the password stored in the volume. Do not reset the volume.
+Port checks refuse an occupied listener and never kill it. Stop your host Flask using
+Ctrl-C or IDE Stop; inspect any other port owner before changing `APP_PORT`.
+
+## Schema changes
+
+Alembic remains authoritative. The initial migration is
+`alembic/versions/a7c93e25d104_init_models.py`, with no parent. It creates all ten
+original application tables, constraints and indexes without seeding data. The forward
+`c8d42f19e630` revision removes empty Item/Action tables under exclusive locks,
+refuses any existing legacy records, and leaves eight application tables. Both normal
+startup commands apply migrations through the shared preparation function.
+
+The former five revisions were consolidated while retaining the previous head ID
+`a7c93e25d104`. The new repository head is `c8d42f19e630`; persistent development
+PostgreSQL intentionally remains at the parent during frontend coordination.
+Do not run `make run`, `make deploy`, or persistent Alembic upgrades from this checkout
+before coordinated authorization: startup preparation applies pending migrations.
+Direct factory construction is lazy; readiness correctly rejects an old revision.
+Older intermediate revisions are no longer supported by this checkout: complete
+the original migration chain using the previous checkout before switching. Do not
+stamp an incomplete schema as current. Future migrations must extend the current head; preserve the initial baseline. Downgrading to `base` drops all application tables and is tested only in
+disposable databases.
+`make infra` starts providers without applying migrations or importing data.
+
+For a future schema change, first obtain explicit authorization for the intended target
+and revision. Use an isolated database at the current head, configure Alembic explicitly,
+and review an autogenerated revision before applying it. Do not generate placeholder
+revisions against the persistent development database. No replacement migration command
+or wrapper is provided by this workflow.
+
+## Verification
+
+Run `make test` for Ruff lint/format checks, strict mypy, unit and integration tests,
+and maintained tooling/resource-ownership tests. PostgreSQL and Redis are disposable;
+tests never fall back to development providers. Conflicting inherited target settings
+are rejected. See [testing and ownership](../testing/overview.md).
+
+
+## Startup and empty databases
+
+Startup prepares the schema with Alembic but never seeds prototype or historical data.
+Existing populated databases retain their records. Fresh databases have empty application
+catalogs while health, readiness and Swagger remain available. Prototype compatibility
+endpoints may return empty collections or missing-team errors. The existing `/demo` and
+frontend demo require explicitly supplied prototype data or migration to normalized
+Goal Stats APIs; startup does not fabricate ratings or historical examples for them.
+
+The explicit prototype compatibility importer remains available. Historical imports use
+the guarded Flask CLI described in the [football guide](football.md#historical-import-operations).
+Use the explicit `make seed` workflow described below to import approved historical data.
+
+## Script responsibilities
+
+| Script | Responsibility |
+| --- | --- |
+| `scripts/development/local.sh` | Dispatch the supported setup, infra, run, deploy, stop and help lifecycle operations. |
+| `scripts/development/python_environment.py` | Prepare/verify Python 3.12, load local configuration and check the application port. |
+| `scripts/development/environment_config.py` | Load canonical settings for the dependency-light environment helper. |
+| `scripts/database/export_football_sql.py` | Generate offline schema or prototype compatibility SQL artifacts; never execute them against a database. |
+| `scripts/database/verify_historical_contracts.py` | Read and verify pinned historical source bytes and contracts; never import records. |
+
+Actual database imports belong to the existing Flask CLI described in the
+[football guide](football.md#historical-import-operations). Testing helpers are
+described in the [testing guide](../testing/overview.md).
+
+Python may create ignored `__pycache__` files when importing helpers. They are harmless
+and are not runtime inputs maintained by this repository. For an optional local session
+without bytecode writes, use `export PYTHONDONTWRITEBYTECODE=1`. No lifecycle command
+cleans caches or requires this setting.
+
+## Explicit historical seeding
+
+`make seed DATASET=womens-world-cup DRY=true` previews all nine editions.
+Use `DRY=false` to write, or select an individual ID such as `womens-world-cup-2023`.
+Omitted `DRY` means `false`; empty/other values and legacy `DRY_RUN` are rejected.
+Contracts remain in `data/womens-world-cup/`, with pinned source in `data/raw/`.
+The command requires prepared infrastructure and schema; it never starts services,
+migrates or selects prototype data. Each edition commits separately, so earlier
+commits survive later failure and unchanged imports can be safely retried. Dry-run
+team estimates are edition-local, not additive. Startup imports nothing.
+See [seed prerequisites, safeguards and reporting](../interface/make.md#explicit-historical-seeding) for the full contract.

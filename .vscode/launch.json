@@ -13,27 +13,19 @@
       "justMyCode": true
     },
     {
-      "name": "pytest: owned TEST session",
+      "name": "pytest: unit tests",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "python": "${workspaceFolder}/.venv/bin/python",
       "cwd": "${workspaceFolder}",
       "args": [
-        "${input:testNode}",
+        "tests/unit",
         "-s"
       ],
       "console": "integratedTerminal",
       "subProcess": false,
       "justMyCode": true
-    }
-  ],
-  "inputs": [
-    {
-      "id": "testNode",
-      "type": "promptString",
-      "description": "Integration test file or pytest node",
-      "default": "tests/integration/infra/repositories/test_persistence.py"
     }
   ]
 }

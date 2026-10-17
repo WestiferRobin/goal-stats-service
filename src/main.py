@@ -1,6 +1,7 @@
 """Application factory; direct execution alone loads LOCAL machine configuration."""
 
 import logging
+import os
 import socket
 import sys
 from collections.abc import Mapping
@@ -36,22 +37,29 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from exceptions.handlers import register_error_handlers, request_validation
 from football.cli import register_commands
-from infra.caches.action import ActionCache
-from infra.caches.item import ItemCache
+from infra.repositories.competition import CompetitionRepository
+from infra.repositories.match import MatchRepository
+from infra.repositories.prediction import PredictionRepository
+from infra.repositories.scenario import ScenarioRepository
+from infra.repositories.team import TeamRepository
 from infra.resources.db import Database, is_ready
 from infra.resources.redis import RedisCache
-from routers.action import create_actions_blueprint
-from routers.football import create_football_blueprint
+from routers.competition import create_competition_blueprint
 from routers.infra import create_health_blueprint
-from routers.item import create_items_blueprint
+from routers.match import create_match_blueprint
 from routers.openapi import create_docs_blueprint
+from routers.prediction import create_predictions_blueprint
+from routers.scenario import create_scenarios_blueprint
+from routers.team import create_team_blueprint
 from schemas.problem import ProblemDetailSchema
-from services.action import ActionService
-from services.football import FootballService
-from services.item import ItemService
+from services.competition import CompetitionService
+from services.match import MatchService
+from services.prediction import PredictionService
+from services.scenario import ScenarioService
+from services.team import TeamService
 from settings.base import ConfigurationError
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
-from settings.environment import Settings, load_application, load_local
+from settings.environment import Settings, load_application, load_local, local_runtime
 
 
 def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
@@ -72,24 +80,33 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.logger.addHandler(default_handler)
     database = Database(settings.database)
     cache = RedisCache(settings.redis, app.logger)
-    item_cache = ItemCache(cache, settings.redis.cache_key_prefix, settings.redis.cache_ttl_seconds)
-    action_cache = ActionCache(
-        cache, settings.redis.cache_key_prefix, settings.redis.cache_ttl_seconds
-    )
     app.extensions["goalstats_settings"] = settings
     app.extensions["goalstats_database"] = database
     app.extensions["goalstats_cache"] = cache
-    app.extensions["goalstats_item_cache"] = item_cache
-    app.extensions["goalstats_action_cache"] = action_cache
 
-    item_service = ItemService(database, item_cache)
-    action_service = ActionService(database, action_cache)
+    team_repo = TeamRepository(database)
+    competition_repo = CompetitionRepository(database)
+    match_repo = MatchRepository(database)
+    scenario_repo = ScenarioRepository(database)
+    prediction_repo = PredictionRepository(database)
+    team_service = TeamService(repo=team_repo)
+    competition_service = CompetitionService(repo=competition_repo, team_service=team_service)
+    match_service = MatchService(repo=match_repo, team_service=team_service)
+    scenario_service = ScenarioService(
+        repo=scenario_repo, team_service=team_service, match_service=match_service
+    )
+    prediction_service = PredictionService(
+        repo=prediction_repo, scenario_service=scenario_service, team_service=team_service
+    )
+
     if settings.redis.url is None:
         app.logger.warning("Redis is unconfigured; database fallback is available")
     app.register_api(create_health_blueprint(database, cache, settings.redis.cache_key_prefix))
-    app.register_api(create_items_blueprint(item_service))
-    app.register_api(create_actions_blueprint(action_service))
-    app.register_api(create_football_blueprint(FootballService(database)))
+    app.register_api(create_team_blueprint(team_service))
+    app.register_api(create_competition_blueprint(competition_service))
+    app.register_api(create_match_blueprint(match_service))
+    app.register_api(create_scenarios_blueprint(scenario_service))
+    app.register_api(create_predictions_blueprint(prediction_service))
     register_commands(app, database)
     register_error_handlers(app)
     if settings.core.openapi_enabled:
@@ -99,12 +116,14 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
 
 def _check_app_port(port: int) -> None:
     with socket.socket() as probe:
+        # Permit an immediate restart after closed connections, but never a live listener.
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             probe.bind(("127.0.0.1", port))
         except OSError:
             raise ConfigurationError(
                 f"LOCAL application port {port} is unavailable. Stop the other application "
-                "or choose HOST_APP_PORT."
+                "or change APP_PORT."
             ) from None
 
 
@@ -119,22 +138,21 @@ def _diagnose_providers(app: Flask) -> None:
     except SQLAlchemyError:
         database.dispose()
         raise ConfigurationError(
-            "LOCAL PostgreSQL is unavailable. Run make providers ENV=local "
-            "and verify the existing configuration."
+            "LOCAL PostgreSQL is unavailable. Run make infra and verify the existing configuration."
         ) from None
     if not is_ready(database):
         app.logger.warning(
-            "LOCAL database is not ready. If migrations are pending, run make migrate ENV=local."
+            "LOCAL database is not ready. If migrations are pending, run make run or make deploy."
         )
     if not cache.ready(settings.redis.cache_key_prefix):
         app.logger.warning(
-            "LOCAL Redis is unavailable; database fallback remains active. "
-            "Run make providers ENV=local."
+            "LOCAL Redis is unavailable; database fallback remains active. Run make infra."
         )
 
 
 def development_main() -> None:
     settings = load_local()
+    os.environ["API_FOOTBALL_KEY"] = local_runtime()["API_FOOTBALL_KEY"]
     _check_app_port(settings.core.host_app_port)
     app = create_app(settings)
     _diagnose_providers(app)

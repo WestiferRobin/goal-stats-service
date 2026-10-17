@@ -6,9 +6,7 @@ from flask import Flask, Response, current_app, jsonify
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-from exceptions.action import ActionNotFound
-from exceptions.base import DomainError
-from exceptions.item import ItemNotFound
+from exceptions.base import DomainError, PredictionGenerationError
 from schemas.problem import ProblemDetailSchema
 
 _INVALID_VALUES_DETAIL = "The request contains invalid values."
@@ -28,9 +26,7 @@ def problem(status: int, detail: str) -> Response:
 def register_error_handlers(app: Flask) -> None:
     @app.errorhandler(DomainError)
     def domain_error(error: DomainError) -> Response:
-        return problem(
-            404 if isinstance(error, (ItemNotFound, ActionNotFound)) else 400, error.public_detail
-        )
+        return problem(400, error.public_detail)
 
     @app.errorhandler(HTTPException)
     def http_error(error: HTTPException) -> Response:
@@ -51,6 +47,11 @@ def register_error_handlers(app: Flask) -> None:
                 response.headers.add(name, value)
         return response
 
+    @app.errorhandler(PredictionGenerationError)
+    def prediction_failure(error: PredictionGenerationError) -> Response:
+        current_app.logger.error("Prediction generation failed")
+        return problem(500, error.public_detail)
+
     @app.errorhandler(Exception)
     def unexpected_error(error: Exception) -> Response:
         current_app.logger.error("Unhandled application error (%s)", type(error).__name__)
@@ -58,10 +59,7 @@ def register_error_handlers(app: Flask) -> None:
 
 
 def request_validation(error: ValidationError) -> Response:
-    detail = "The request could not be understood."
-    if any(issue["loc"] in {("item_id",), ("action_id",)} for issue in error.errors()):
-        detail = _INVALID_VALUES_DETAIL
-    return problem(400, detail)
+    return problem(400, "The request could not be understood.")
 
 
 def object_body() -> Response | None:

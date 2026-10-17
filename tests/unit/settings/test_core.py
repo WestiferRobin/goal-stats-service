@@ -9,7 +9,7 @@ def test_typed_core_is_immutable_and_validated(mode):
     from dataclasses import FrozenInstanceError
 
     core = CoreSettings(app_env=mode)
-    assert core.host_app_port == 5300
+    assert core.host_app_port == 5100
     with pytest.raises(FrozenInstanceError):
         core.host_app_port = 1
 
@@ -18,3 +18,10 @@ def test_typed_core_is_immutable_and_validated(mode):
 def test_typed_core_rejects_bad_port(port):
     with pytest.raises(ConfigurationError):
         CoreSettings(host_app_port=port)
+
+
+@pytest.mark.parametrize("value", ["true", 1, None])
+def test_typed_core_rejects_nonboolean_openapi_values(value):
+    """Typed configuration must not silently coerce strings or integers into feature flags."""
+    with pytest.raises(ConfigurationError, match="OPENAPI_ENABLED must be a boolean"):
+        CoreSettings(openapi_enabled=value)

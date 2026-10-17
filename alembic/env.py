@@ -3,9 +3,11 @@
 from alembic import context
 from sqlalchemy.engine import Connection
 
-import models.action  # noqa: F401 — populate migration metadata
-import models.football  # noqa: F401
-import models.item  # noqa: F401
+import models.competition  # noqa: F401
+import models.match  # noqa: F401
+import models.prediction  # noqa: F401
+import models.scenario  # noqa: F401
+import models.team  # noqa: F401
 from infra.resources.db import Database
 from models.base import Base
 from settings.environment import load_application

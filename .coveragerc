@@ -1,0 +1,11 @@
+[run]
+source = src
+branch = True
+relative_files = True
+
+[report]
+fail_under = 95
+precision = 6
+show_missing = True
+exclude_lines =
+    ^if TYPE_CHECKING:

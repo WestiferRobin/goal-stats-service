@@ -2,7 +2,6 @@
 
 import ipaddress
 from enum import StrEnum
-from typing import Literal
 
 
 class ConfigurationError(ValueError):
@@ -13,9 +12,6 @@ class Environment(StrEnum):
     LOCAL = "local"
     DEV = "dev"
     TEST = "test"
-
-
-ExecutionContext = Literal["host", "container"]
 
 
 def port(value: str, key: str) -> int:

@@ -10,6 +10,7 @@ from sqlalchemy import text
 from test_ownership import owned_test_config
 
 from infra.resources.db import Database
+from models.base import Base
 from settings.database import database_url
 from settings.environment import load_application
 
@@ -64,14 +65,14 @@ def postgres_app(app_factory, postgres_config) -> Iterator[Flask]:
     db = app.extensions["goalstats_database"]
     # Explicitly disposable database only; no shared developer rows.
     with db.engine.begin() as connection:
-        connection.execute(text("DELETE FROM actions"))
-        connection.execute(text("DELETE FROM items"))
+        for table in reversed(Base.metadata.sorted_tables):
+            connection.execute(table.delete())
     try:
         yield app
     finally:
         with db.engine.begin() as connection:
-            connection.execute(text("DELETE FROM actions"))
-            connection.execute(text("DELETE FROM items"))
+            for table in reversed(Base.metadata.sorted_tables):
+                connection.execute(table.delete())
 
 
 @pytest.fixture

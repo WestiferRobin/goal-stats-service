@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, MetaData
+from sqlalchemy import CheckConstraint, DateTime, MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -27,4 +27,10 @@ class Timestamped:
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+
+
+def _nonblank(*names: str) -> tuple[CheckConstraint, ...]:
+    return tuple(
+        CheckConstraint(f"{name} ~ '[^[:space:]]'", name=f"{name}_nonblank") for name in names
     )

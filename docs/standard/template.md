@@ -1,7 +1,7 @@
 # Repository identity and template history
 
 This repository now hosts the GoalStats monolithic backend, including the
-RoadToTheFinal football domain. Item/Action routes remain for compatibility.
+RoadToTheFinal football domain. The inherited Item/Action business domains are retired.
 New contributors should follow the [README](../../README.md), not scaffold another
 service. The repository, database and Docker names below are retained to preserve
 existing tooling, credentials and volumes.
@@ -16,27 +16,25 @@ Gunicorn from the original template. The identity table is a maintenance referen
 | --- | --- |
 | Repository | `goal-stats-service` |
 | Source/import root | `src/` (flat modules; no service package directory) |
-| Coverage source | `src` |
 | Factory | `main:create_app()` |
 | Image/runtime slug | `goal-stats-service` |
 | Image tags | `goal-stats-service:runtime`, `goal-stats-service:tooling` |
-| Developer Compose projects | `goal-stats-service-local`, `goal-stats-service-dev` |
-| Disposable projects | `goal-stats-service-test-<hex>`, `goal-stats-service-cert-<hex>` |
-| Developer databases | `goal_stats_service_local`, `goal_stats_service_dev` |
+| Public local Compose project | `goalstats-service-local` |
+| Disposable projects | `goal-stats-service-test-<24 hex digits>` |
+| Public development database | `goal_stats_service_local` |
 | TEST database | `goalstats_test_runtime` |
 | Cache namespace | `goal-stats-service:<env>:v1` |
 | API display title | `GoalStats Monolith API` |
 | Logger identity | `goal_stats_service` (service label, not an import/package) |
 | Internal Compose services | `app`, `runner`, `postgres`, `redis` |
-| Disposable tool container | `goal-stats-service-tool-<hex>` |
+| Disposable tool container | `<test-project>-quality`, `<test-project>-runner` |
 | CI concurrency | `goal-stats-service-${{ github.workflow }}-${{ github.ref }}` |
 
 Later scaffolding must update identity producers, consumers, safety guards, fixtures,
 Docker/Compose references, and observations together. There is no Python package-directory identity to transform. Flat module names,
-source paths, the Item/Action reference domain and generic `goalstats_*` extension
-keys remain unchanged.
+source paths and generic `goalstats_*` resource extension keys remain stable.
 Do not use broad textual substitution. The migration revision is not an identity
-placeholder: preserve `b7f42e9c1a60` unless a separately reviewed migration is needed.
+placeholder: preserve baseline `a7c93e25d104` and retirement child `c8d42f19e630`.
 
 Dependencies remain Python 3.12 and one pinned `requirements.txt`. No generic
 provider framework, async architecture, authentication platform, queues, or gRPC
@@ -45,29 +43,31 @@ is included. PostgreSQL and Redis are runtime providers; API-Football is optiona
 ## Flat Python execution contract
 
 `src/main.py` exports `create_app` and explicitly connects application-owned resources,
-cache adapters and services to typed Blueprint factories. Routes capture services directly;
+shared Redis provider and services to typed Blueprint factories. Routes capture services directly;
 `app.extensions` retains resource references for diagnostics and cleanup, not service lookup.
 Modules import directly from `enums`, `exceptions`, `settings`,
 `models`, `schemas`, `infra`, `services`, and `routers`. There is no
 intermediate service package and no `src` package to import.
 
-Pytest declares `pythonpath = src scripts`; Alembic uses its configuration-relative
+Pytest declares `pythonpath = src scripts/development scripts/database scripts/testing`;
+Alembic uses its configuration-relative
 `prepend_sys_path`; mypy declares `mypy_path = src`. Docker explicitly sets
-`PYTHONPATH=/app/src`, shared by Gunicorn, LOCAL Flask CLI, migration/test runners
-and certification subprocesses. CI calls the same Make/Docker workflows. Host
+`PYTHONPATH=/app/src`, for containerized application execution. Test and certification commands use the
+repository `.venv` on the host, explicit import paths, and disposable Docker providers.
+CI calls the same Make entry points. Host
 factory commands must explicitly expose the source directory, for example
 `PYTHONPATH=src flask --app 'main:create_app()' run`. No developer shell path
 configuration is assumed by the public Make workflows.
 
 The remaining `goal_stats_service` occurrences are intentional service identities:
-LOCAL/DEV database names (and their producers/ownership checks) and the isolated
+the local database name (and explicit prototype import compatibility checks) and the isolated
 application logger label. They are not Python package references. Generic TEST
 identities and unrelated-resource sentinels remain intentionally generic.
 
 ## Host development and propagation
 
-Host IDE support is additive to Docker. Flat `src/`, `main:create_app()`, Python 3.12,
-one `requirements.txt`, Item/Action behavior, HTTP/OpenAPI, database schema/migration
+Host Flask is the public `make run` workflow; `make deploy` runs Docker Flask locally. Flat `src/`, `main:create_app()`, Python 3.12,
+one `requirements.txt`, retained domain behavior, HTTP/OpenAPI, database schema/migration
 history, Redis semantics and health/readiness contracts stay unchanged. Direct
 `src/main.py` adds only a LOCAL development entrypoint. `src/` is not a package;
 script execution naturally exposes it, pytest uses its configured paths, Alembic
@@ -77,8 +77,8 @@ Track only portable `.vscode/settings.json`, `.vscode/launch.json`, and optional
 `.vscode/extensions.json`. Ignore `.idea/`, `.venv/`, `.env.local`, and
 `.host-sessions/`. No extra dotenv example or dependency manifest is introduced.
 
-Scaffolding must preserve the shared code-owned configuration schema, private setup,
-manifest-based TEST ownership and portable IDE launch. Reject all real env files and
+Scaffolding must preserve the public configuration schema, setup-created Python 3.12
+venv, Docker test receipt ownership and POSIX IDE launch. Reject all real env files and
 internal state from payloads; generated services use `.env.local`, while tests create
 ephemeral configuration internally. Identity literals are transformed only in reviewed paths.
 
@@ -90,13 +90,22 @@ must validate this shared loader and preserve its source bytes without identity 
 
 API body DTOs use `*Request`, resource/list DTOs use `*Response`, and path/shared
 contracts use `*Schema` (including `ProblemDetailSchema`). Domain exceptions live
-in `exceptions/base.py`, `item.py`, and `action.py`; Flask handling lives in
-`exceptions/handlers.py`. Football uses its own domain module and flat `schemas/football.py` contracts.
+in `exceptions/base.py` (DomainError) and `services/prediction.py` (ScenarioNotReady); Flask handling lives in
+`exceptions/handlers.py`. Normalized Goal Stats contracts use singular entity modules under `schemas/`; shared
+calculation contracts live in `schemas/engine.py`, and prototype-specific requests
+remain in `schemas/football.py`.
 
-Domain API contracts live in `schemas/<domain>/request.py` (`*Request`),
-`response.py` (`*Response`), and `base.py` (`*Schema`). The latter owns path/query
-schemas and genuine shared domain foundations; it does not require a generic base
-class. Other domain schema files contain `*Schema` contracts only when genuinely
-needed. Shared primitives stay in `schemas/common.py`, and singleton cross-cutting
-contracts such as `schemas/problem.py` need no package hierarchy. Imports name the
-defining module explicitly; empty package markers do not re-export schemas.
+Shared primitives stay in `schemas/common.py`; singleton cross-cutting contracts
+such as `schemas/problem.py` need no package hierarchy. Imports name the defining
+module explicitly; empty package markers do not re-export schemas.
+
+## Public lifecycle contract
+
+The eight public commands are setup, infra, run, deploy, seed, test, stop, and help.
+`scripts/development/local.sh` owns the public lifecycle. Both application locations share
+`goalstats-service-local_postgres-data`, `.env.local`, migrations, imports and cache
+namespace. Tests use independently generated disposable project identities.
+Setup starts nothing; infra starts only providers; run/deploy share Docker preparation.
+Ctrl-C/IDE Stop ends host Flask; stop removes Docker resources without deleting data.
+Host development supports macOS/Linux/WSL and manual restart. Disposable integration
+tests run inside the verified Docker runner; IDE pytest runs provider-free unit tests.

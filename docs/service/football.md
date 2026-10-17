@@ -1,116 +1,61 @@
-# GoalStats monolith and RoadToTheFinal
+# Goal Stats and the RoadToTheFinal reference engine
 
-One Flask/Gunicorn application hosts the football model, JSON API, CSV import,
-backtests, tournament simulator and optional live-provider adapter. PostgreSQL
-owns teams, imported history and saved match snapshots. Redis remains optional.
-No other GoalStats service or sibling repository is needed at runtime.
+Goal Stats uses one normalized Women's World Cup database. RoadToTheFinal is the
+attributed reference implementation of the unchanged mathematics, not a second
+team catalog, persistence service or production dataset.
 
-The model came from the historical RoadToTheFinal `app.py`, `live_feed.py`, and
-three CSV datasets at revision `8f17bc42e30f436f5cd860f2791695421160ccd2`.
-The model was extracted without Flask, sessions, template rendering or import-time
-network/file writes. Existing Item/Action routes remain available for compatibility.
-The directory and Compose project keep their existing names so local volumes and
-workspace tooling continue to work; this is now the backend application, not a
-requirement to scaffold more microservices.
+See [API contracts](frontend-api.md) and [architecture](architecture.md).
 
-## Start and import
+## Historical import operations
 
-```sh
-make setup
-make run
-```
+Run `make seed DATASET=womens-world-cup DRY=true` to inspect proposed imports;
+remove `DRY=true` only for an explicitly authorized target. This phase did not seed
+persistent resources. The Make workflow requires prepared infrastructure and the
+pinned source, verifies the runtime fingerprint, and imports each edition separately.
 
-Startup applies migrations and imports the bundled CSVs automatically. Repeating
-`make run` is safe and preserves existing imported rows.
+The underlying Flask `import-football` command requires an approved `--dataset`,
+explicit `--directory`, `--target`, `--expect-host` and `--expect-database`.
+Cloud targets additionally require `--confirm-production` and verified TLS.
+Checksums, approved selections, conflicts, source provenance and idempotency remain
+unchanged. Missing dataset selection fails; no prototype fallback or standalone
+prototype importer exists. Imports never modify scenarios or predictions.
 
-The three source CSVs live in the project-root `data/` folder. Both host and
-container importers use that folder by default, independently of the working
-directory. The SQL exporter reads the same files.
+## Preserved and deferred capabilities
 
-The importer validates all three files before writing and commits the batch
-atomically. File order is part of imported record identity. Maintainers can run the
-Flask `import-football` command inside the application container for a nonstandard
-data directory. [SQL alternatives](../../sql/README.md) are advanced reference only.
+The pure formatter is `football/report.py`. Preview, saved generation and simulation
+use explicit inputs; identity validation uses TeamService and normalized records.
+Historical comparisons use MatchService and MatchRepository.
 
-## Frontend contract
+`football/historical.py`, `live.py` and `provider.py` preserve reference parsing and
+provider helpers, with their tests. No active HTTP route calls them. Historical
+backtesting needs time-correct ratings and observed match state; the old advancement
+winner metric is not a three-way accuracy metric. Live adaptation needs verified
+competition/participant mapping, timestamps and an unknown-statistics policy.
+Reference parser defaults must not be presented as observed historical facts.
 
-Swagger is at `/swagger`; football routes use `/api/v1`. JSON field names are
-snake_case. Validation failures return 400 Problem Details; unknown teams or
-snapshots return 404. POST bodies must be JSON objects.
+## Persistence retirement
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/api/v1/teams` | Team ratings and ranking metadata |
-| POST | `/api/v1/predictions` | Stateless prediction from supplied match state |
-| POST | `/api/v1/snapshots` | Persist state and prediction; returns 201 + Location |
-| GET | `/api/v1/snapshots/{id}` | Retrieve a saved prediction |
-| GET | `/api/v1/snapshots?team1=Spain&team2=England` | Saved timeline, newest first |
-| GET | `/api/v1/history` | Imported completed matches and historical snapshots |
-| GET | `/api/v1/insights?team1=Spain&team2=England` | Head-to-head and team history from CSV |
-| GET | `/api/v1/backtests` | Pregame/available snapshot comparison against labeled winners |
-| POST | `/api/v1/tournaments/simulate` | Monte Carlo bracket in supplied team order |
-| POST | `/api/v1/live/refresh` | Explicit API-Football refresh, or labeled cached fallback |
+Head `d91e6a4b208f` follows `c8d42f19e630`. It locks the three prototype tables,
+requires ordinary tables owned by the current migration user in the current schema,
+refuses populated tables and drops without CASCADE. Unexpected dependencies abort
+transactionally. Normalized records are untouched.
 
-History and timeline accept `limit` (1–200, default 50) and `offset` (default 0).
-Saved snapshots are shared match records, not private user sessions.
+Before any persistent upgrade, inventory dependencies and records, verify external
+backups and agree archival/rollback. Populated tables deliberately block migration;
+this migration never deletes their rows or fabricates missing original ratings.
+Downgrade recreates empty schema, not lost data. Fresh installs and disposable
+upgrades are tested. No persistent migration is authorized by this implementation.
 
-```js
-const response = await fetch('/api/v1/predictions', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    team1: 'Spain', team2: 'England', minute: 65,
-    team1_stats: { goals: 1, shots: 8, shots_on_target: 4, possession: 60 },
-    team2_stats: { goals: 0, shots: 5, shots_on_target: 2, possession: 40 }
-  })
-});
-if (!response.ok) throw new Error(`Prediction failed: ${response.status}`);
-const prediction = await response.json();
-```
+## Phase boundaries
 
-React can use a same-origin `/api` proxy. Wix can call the same API from its server
-code. The backend does not choose, deploy or alter either frontend. Direct browser
-calls across origins require deployment-specific CORS/proxy configuration; no
-wildcard CORS policy is enabled here.
+Prompt 1 adapted backend behavior and corresponding tests. Prompt 2 implemented
+mandatory real-source certification and macOS read-only mounting; Prompt 3 performs
+independent final certification. `make test` runs ordinary Unit + Integration tests
+with the pinned-source test excluded. `make certify` includes actual pinned-source
+verification and requires at least 95% combined statement and branch coverage.
 
-`probabilities` and `advancement` are fractions totaling 1. `momentum_percent` and
-confidence are percentages. `expected_goals_remaining` means additional goals,
-not the final expected score. Scores and top scorelines retain the original
-Poisson model. Statistics default to zero and possession to 50/50; supplied
-possession must total 100. `extra_minute`, `status`, cards, goalkeeper saves,
-blocked shots, corners, big chances and bounded manual `modifiers` are supported.
-
-Tournament body: `{"teams":["Spain","England","France","Germany"],"simulations":1000}`.
-Use 4, 8, 16 or 32 distinct teams, and 1,000–2,000 simulations. Results use percent.
-The original semifinal counter was corrected to count each team once per stage.
-
-For live refresh, send `{"team1":"Spain","team2":"England"}`. Supply
-`API_FOOTBALL_KEY` in `.env.local`, never frontend code. Provider calls occur only on explicit refresh.
-Fresh results are stored in PostgreSQL; failures return the latest previously real
-update with `source: "cached"` and its original `observed_at`, or 503 if none exists.
-Cached reads do not create new timeline entries. No demo stats are substituted.
-Provider team matching requires exact normalized names; aliases need an explicit
-mapping if the provider's names differ. Production provider access has not been
-verified with a real key by this change.
-
-## Data and model limits
-
-Bundled data has 32 teams, 13 completed matches, and 3 unlabeled snapshots. Completed
-matches have final outcomes but no in-match snapshots; the three snapshots have no
-known final outcome. Backtests therefore report 13 pregame evaluations, zero
-labeled snapshot evaluations, and three skipped unlabeled rows. Final scores never
-enter the historical prediction inputs. Historical rows lack dates, so insights
-return CSV order and do not claim to represent recent form. The original external
-H2H/recent-form JSON file cache is replaced here with imported historical insights.
-
-Ratings and formulas are heuristic source data, not recalibrated or independently
-verified forecasts. The source model retains a small remaining-goal floor at and
-after minute 90; status strings do not turn probabilities into settled outcomes.
-The extracted engine and historical/live mappers retain the source's dynamic Python
-types; the new request, persistence and service boundaries are typed and validated.
-
-## Verification
-
-`make test` covers format/types, probability invariants, validation, data leakage, stage counting,
-repeatable imports, shared live fallback, persistence and migration/model agreement.
-Integration tests run only against automatically owned disposable TEST providers.
+Tests run locally through `.venv`, with Docker providing disposable PostgreSQL and
+Redis. Certification checksum-verifies the approved source and mounts it on a
+read-only filesystem. If mandatory historical-source verification cannot execute,
+certification fails; no prototype CSV fallback exists. A passing ordinary suite
+is not proof of development seeding or final production certification.

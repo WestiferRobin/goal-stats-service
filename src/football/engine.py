@@ -60,7 +60,7 @@ class Team:
 
     def base_score(self):
         """
-        Creates the pregame team-strength score from teams.csv ratings.
+        Creates the pregame team-strength score from explicit input ratings.
         """
         weighted_rating = (
             self.offense * 0.3
