@@ -61,6 +61,14 @@ the API then uses its existing degraded readiness policy.
 
 URL-encode provider credentials. PostgreSQL accepts `postgresql://` and
 `postgresql+psycopg://`, not `postgres://`, with only supported TLS query parameters.
+The Docker image sets `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt` and
+`SSL_CERT_DIR=/etc/ssl/certs` so psycopg-binary's bundled OpenSSL uses Debian's
+existing CA trust store for `sslrootcert=system`. Its compiled-in paths can point
+outside Debian's certificate directories. No Render environment change is needed;
+keep `sslmode=verify-full&sslrootcert=system` and do not override these image defaults
+with nonexistent paths. HTTPS source downloads use Python's separate OpenSSL library,
+so a successful download alone does not prove libpq can find its trusted roots.
+
 For a private CA, mount a secret certificate and replace `sslrootcert=system` with its
 absolute readable path, such as `/etc/secrets/postgres-ca.pem`. Redis accepts `redis://`
 and `rediss://` without query parameters; use TLS for external connections. Allow Render
