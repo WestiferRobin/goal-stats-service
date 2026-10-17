@@ -129,6 +129,29 @@ Without startup arguments the image only serves; `--migrate` remains available f
 explicit migration-only startup. Local Make/Compose commands never use bootstrap.
 Free PostgreSQL expires after 30 days; use a durable database plan for retained data.
 
+## Bootstrap failure diagnostics
+
+A bootstrap failure exits before Gunicorn and prints only a fixed category, for example:
+`Production bootstrap failed; no startup authorized. Category: TLS certificate verification failure.`
+No exception text, connection URLs, credentials, hostnames, or database names are printed.
+
+| Category | Check privately in Render settings or the database dashboard |
+| --- | --- |
+| Database connection or DNS | Endpoint availability, DNS, external access rules and connection limits |
+| PostgreSQL authentication | Configured credentials and database role access |
+| TLS certificate verification | Full external hostname and trusted CA; retain `verify-full` |
+| Database identity mismatch | Independently verified `BOOTSTRAP_EXPECT_HOST` and `BOOTSTRAP_EXPECT_DATABASE` against the intended target |
+| Alembic migration | Role permissions, lock contention and existing legacy migration guards |
+| Historical import | Approved source and importer safeguards; do not reset existing data |
+| Catalog verification | Missing, extra or conflicting historical records; resolve separately without automatic repair |
+
+Additional categories distinguish invalid production/target/TLS configuration, source
+validation, database safety guards (including a competing importer or unrelated tables),
+and transaction completion. Driver authentication/TLS/connection failures take precedence
+over the active stage. Other errors report the stage that failed, not an inferred root cause.
+The original generic message cannot identify which category caused a previous deployment.
+Do not disable TLS verification or migration guards to resolve a failed startup.
+
 ## Authenticate goal-stats-app
 
 Production requires `Authorization: Bearer <SERVICE_API_TOKEN>` on every method except

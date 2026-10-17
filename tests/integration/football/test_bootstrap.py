@@ -89,8 +89,10 @@ def test_existing_invalid_catalog_is_preserved(
         pytest.fail("Partial/conflicting database must never invoke the importer")
 
     monkeypatch.setattr(boot, "import_historical_dataset", forbidden)
-    with pytest.raises(ConfigurationError):
-        boot.bootstrap(database, target(database), prepared_source)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(ConfigurationError) as failure:
+        boot.bootstrap(database, target(database), prepared_source, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.CATALOG
     assert snapshot(database) == before
 
 
@@ -106,8 +108,10 @@ def test_import_failure_rolls_back_migrations_and_all_editions(
         return import_historical_dataset(*args, **kwargs)
 
     monkeypatch.setattr(boot, "import_historical_dataset", fail_later)
-    with pytest.raises(RuntimeError, match="injected"):
-        boot.bootstrap(fresh_database, target(fresh_database), prepared_source)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(RuntimeError, match="injected") as failure:
+        boot.bootstrap(fresh_database, target(fresh_database), prepared_source, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.IMPORT
     assert calls == list(APPROVED_DATASETS[:3])
     assert inspect(fresh_database.engine).get_table_names() == []
 
@@ -117,8 +121,10 @@ def test_final_verification_failure_rolls_back(fresh_database, prepared_source, 
         raise ConfigurationError("injected verification failure")
 
     monkeypatch.setattr(boot, "verify_catalog", fail)
-    with pytest.raises(ConfigurationError):
-        boot.bootstrap(fresh_database, target(fresh_database), prepared_source)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(ConfigurationError) as failure:
+        boot.bootstrap(fresh_database, target(fresh_database), prepared_source, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.CATALOG
     assert inspect(fresh_database.engine).get_table_names() == []
 
 
@@ -128,15 +134,19 @@ def test_missing_or_corrupt_source_never_migrates(fresh_database, tmp_path, corr
     if corrupt:
         directory.mkdir()
         (directory / "results.csv").write_text("not the pinned source")
-    with pytest.raises(HistoricalImportError):
-        boot.bootstrap(fresh_database, target(fresh_database), directory)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(HistoricalImportError) as failure:
+        boot.bootstrap(fresh_database, target(fresh_database), directory, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.SOURCE
     assert inspect(fresh_database.engine).get_table_names() == []
 
 
 def test_wrong_identity_never_migrates(fresh_database, prepared_source):
     bad = ImportTarget("test", "wrong-host", fresh_database.engine.url.database)
-    with pytest.raises(ConfigurationError):
-        boot.bootstrap(fresh_database, bad, prepared_source)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(ConfigurationError) as failure:
+        boot.bootstrap(fresh_database, bad, prepared_source, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.IDENTITY
     assert inspect(fresh_database.engine).get_table_names() == []
 
 
@@ -151,8 +161,10 @@ def test_guarded_migration_failure_preserves_legacy_data(fresh_database, prepare
         command.upgrade(config, "c8d42f19e630")
         connection.execute(text("INSERT INTO football_teams(name,ratings) VALUES ('Keep', '{}')"))
     before = snapshot(fresh_database)
-    with pytest.raises(SQLAlchemyError):
-        boot.bootstrap(fresh_database, target(fresh_database), prepared_source)
+    diagnostic = boot.BootstrapDiagnostic()
+    with pytest.raises(SQLAlchemyError) as failure:
+        boot.bootstrap(fresh_database, target(fresh_database), prepared_source, diagnostic)
+    assert diagnostic.category(failure.value) == boot.FailureCategory.MIGRATION
     assert snapshot(fresh_database) == before
 
 

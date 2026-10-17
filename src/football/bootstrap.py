@@ -3,11 +3,16 @@
 import argparse
 import os
 from copy import copy
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
+from psycopg import Error as PostgresError
+from psycopg import OperationalError
 from sqlalchemy import inspect, select, text
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session, sessionmaker
 
 from football.datasets import HistoricalBatch, read_historical_dataset
@@ -27,6 +32,78 @@ from settings.environment import load_application
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/bootstrap/results.csv"
 CATALOG = (Team, Competition, Match)
+
+
+class FailureCategory(Enum):
+    CONFIGURATION = "production configuration or target/TLS policy failure"
+    SOURCE = "historical source validation failure"
+    CONNECTION = "database connection or DNS failure"
+    AUTHENTICATION = "PostgreSQL authentication failure"
+    TLS = "TLS certificate verification failure"
+    IDENTITY = "database identity mismatch"
+    GUARD = "database safety guard failure"
+    MIGRATION = "Alembic migration failure"
+    IMPORT = "historical import failure"
+    CATALOG = "catalog verification failure"
+    COMMIT = "database transaction completion failure"
+
+
+@dataclass
+class BootstrapDiagnostic:
+    stage: FailureCategory = FailureCategory.CONFIGURATION
+
+    def category(self, error: BaseException) -> FailureCategory:
+        """Inspect driver failures privately; return only fixed, credential-free labels."""
+        seen: set[int] = set()
+        while id(error) not in seen:
+            seen.add(id(error))
+            if isinstance(error, PostgresError):
+                if (error.sqlstate or "").startswith("28"):
+                    return FailureCategory.AUTHENTICATION
+                if isinstance(error, OperationalError) and error.sqlstate is None:
+                    # libpq connection failures commonly have no SQLSTATE. Never emit this text.
+                    message = str(error).lower()
+                    if any(
+                        term in message
+                        for term in (
+                            "certificate verify failed",
+                            "certificate verification failed",
+                            "root certificate",
+                            "server certificate",
+                            "ssl certificate",
+                        )
+                    ):
+                        return FailureCategory.TLS
+                    if any(
+                        term in message
+                        for term in (
+                            "password authentication failed",
+                            "no password supplied",
+                            "no pg_hba.conf entry",
+                            "authentication failed",
+                        )
+                    ):
+                        return FailureCategory.AUTHENTICATION
+                    return FailureCategory.CONNECTION
+                if (error.sqlstate or "").startswith("08"):
+                    return FailureCategory.CONNECTION
+            if isinstance(error, ConfigurationError) and str(error) in {
+                "Database hostname does not match --expect-host.",
+                "Database name does not match --expect-database.",
+                "Connected hostname does not match --expect-host.",
+                "Connected database does not match --expect-database.",
+                "Connected database user differs from configured user.",
+            }:
+                return FailureCategory.IDENTITY
+            nested = (
+                error.orig
+                if isinstance(error, DBAPIError)
+                else (error.__cause__ or error.__context__)
+            )
+            if nested is None:
+                break
+            error = nested
+        return self.stage
 
 
 def verify_catalog(session: Session, batches: list[HistoricalBatch]) -> None:
@@ -69,10 +146,18 @@ def verify_catalog(session: Session, batches: list[HistoricalBatch]) -> None:
                 raise ConfigurationError("Historical match differs from the approved source.")
 
 
-def bootstrap(database: Database, target: ImportTarget, directory: Path) -> str:
+def bootstrap(
+    database: Database,
+    target: ImportTarget,
+    directory: Path,
+    diagnostic: BootstrapDiagnostic | None = None,
+) -> str:
     """One outer transaction; existing importer commits release only savepoints."""
+    diagnostic = diagnostic or BootstrapDiagnostic()
     target.validate(database.engine.url)
+    diagnostic.stage = FailureCategory.SOURCE
     batches = [read_historical_dataset(directory, load_manifest(d)) for d in APPROVED_DATASETS]
+    diagnostic.stage = FailureCategory.CONNECTION
     with database.engine.begin() as connection:
         bound = copy(database)
         bound.sessions = sessionmaker(
@@ -82,7 +167,9 @@ def bootstrap(database: Database, target: ImportTarget, directory: Path) -> str:
             close_resets_only=False,
         )
         with bound.transaction() as session:
+            diagnostic.stage = FailureCategory.IDENTITY
             verify_database_identity(session, target)
+            diagnostic.stage = FailureCategory.GUARD
             # Same lock as the importer; serialize cooperating import/bootstrap processes.
             if not session.scalar(text("SELECT pg_try_advisory_xact_lock(718235940215)")):
                 raise ConfigurationError("Another historical import/bootstrap is running.")
@@ -96,9 +183,11 @@ def bootstrap(database: Database, target: ImportTarget, directory: Path) -> str:
         }
         if set(inspect(connection).get_table_names()) - allowed:
             raise ConfigurationError("Bootstrap refuses a schema containing unrelated tables.")
+        diagnostic.stage = FailureCategory.MIGRATION
         config = Config(str(ROOT / "alembic.ini"))
         config.attributes["connection"] = connection
         command.upgrade(config, "head")
+        diagnostic.stage = FailureCategory.CATALOG
         # Hold catalog writes and scenario creation until classification/import/verification end.
         connection.execute(
             text(
@@ -113,10 +202,13 @@ def bootstrap(database: Database, target: ImportTarget, directory: Path) -> str:
                 for model in (*CATALOG, Scenario, Prediction)
             )
         if empty:
+            diagnostic.stage = FailureCategory.IMPORT
             for dataset in APPROVED_DATASETS:
                 import_historical_dataset(bound, directory, target, dataset_id=dataset)
+        diagnostic.stage = FailureCategory.CATALOG
         with bound.transaction() as session:
             verify_catalog(session, batches)
+        diagnostic.stage = FailureCategory.COMMIT
     return "imported" if empty else "verified existing"
 
 
@@ -125,6 +217,7 @@ def main() -> None:
     parser.add_argument("--confirm-production", action="store_true", required=True)
     args = parser.parse_args()
     database = None
+    diagnostic = BootstrapDiagnostic()
     try:
         settings = load_application()
         if settings.core.app_env != Environment.PRODUCTION:
@@ -136,13 +229,13 @@ def main() -> None:
             args.confirm_production,
         )
         database = Database(settings.database)
-        result = bootstrap(database, target, SOURCE.parent)
-    except Exception:
+        result = bootstrap(database, target, SOURCE.parent, diagnostic)
+    except Exception as error:
         # Never print driver errors, URLs, credentials, or partially committed success reports.
         parser.exit(
             1,
             "Production bootstrap failed; no startup authorized. "
-            "Check source, target/TLS, migration guards and catalog consistency.\n",
+            f"Category: {diagnostic.category(error).value}.\n",
         )
     finally:
         if database is not None:
