@@ -1,12 +1,13 @@
 #!/bin/sh
 set -eu
 
-# Explicit single-process migration option for Render Free (no pre-deploy hook).
-# No listener or workers start if migration fails. Normal startup never migrates.
+# Explicit single-process migration/bootstrap options for Render Free.
+# No listener starts on failure. Normal startup never migrates or imports.
 case "$#:$*" in
   0:) ;;
   1:--migrate) alembic upgrade head ;;
-  *) echo 'Usage: start.sh [--migrate]' >&2; exit 2 ;;
+  2:--bootstrap\ --confirm-production) python -m football.bootstrap --confirm-production ;;
+  *) echo 'Usage: start.sh [--migrate | --bootstrap --confirm-production]' >&2; exit 2 ;;
 esac
 
 exec gunicorn --bind "0.0.0.0:${PORT:-8000}" --workers=2 \

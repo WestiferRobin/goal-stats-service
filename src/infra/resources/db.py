@@ -77,8 +77,8 @@ def is_ready(database: Database) -> bool:
         return False
 
 
-def verify_import_database(session: Session, target: ImportTarget) -> None:
-    """Bounded reads on the same connection that will perform the import."""
+def verify_database_identity(session: Session, target: ImportTarget) -> None:
+    """Verify target/user/TLS before either migrations or imports."""
     connection = session.connection()
     target.validate(connection.engine.url)
     driver = cast(PsycopgConnection[Any], connection.connection.driver_connection)
@@ -92,6 +92,12 @@ def verify_import_database(session: Session, target: ImportTarget) -> None:
         text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")
     ):
         raise ConfigurationError("Cloud import connection must use verified TLS.")
+
+
+def verify_import_database(session: Session, target: ImportTarget) -> None:
+    """Bounded reads on the same connection that will perform the import."""
+    verify_database_identity(session, target)
+    connection = session.connection()
     expected = set(
         ScriptDirectory(str(Path(__file__).resolve().parents[3] / "alembic")).get_heads()
     )

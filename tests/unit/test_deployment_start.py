@@ -15,6 +15,9 @@ START = Path(__file__).resolve().parents[2] / "scripts/deployment/start.sh"
         ([], "0", None, 0, ["gunicorn"]),
         (["--migrate"], "0", "10000", 0, ["alembic", "gunicorn"]),
         (["--migrate"], "7", "10000", 7, ["alembic"]),
+        (["--bootstrap", "--confirm-production"], "0", "10000", 0, ["python", "gunicorn"]),
+        (["--bootstrap", "--confirm-production"], "7", "10000", 7, ["python"]),
+        (["--bootstrap"], "0", None, 2, []),
         (["unknown"], "0", None, 2, []),
     ],
 )
@@ -22,11 +25,11 @@ def test_deployment_start(
     tmp_path, arguments, migration_status, port, expected_status, expected_commands
 ):
     record = tmp_path / "record"
-    for command in ("alembic", "gunicorn"):
+    for command in ("alembic", "python", "gunicorn"):
         executable = tmp_path / command
         executable.write_text(
             '#!/bin/sh\nprintf "%s\\n" "$(basename "$0") $*" >> "$RECORD"\n'
-            + ('exit "$MIGRATION_STATUS"\n' if command == "alembic" else "exit 0\n")
+            + ('exit "$MIGRATION_STATUS"\n' if command != "gunicorn" else "exit 0\n")
         )
         executable.chmod(0o700)
     env = {
@@ -44,6 +47,8 @@ def test_deployment_start(
     assert [line.split()[0] for line in calls] == expected_commands
     if "alembic" in expected_commands:
         assert calls[0] == "alembic upgrade head"
+    if "python" in expected_commands:
+        assert calls[0] == "python -m football.bootstrap --confirm-production"
     if "gunicorn" in expected_commands:
         assert f"--bind 0.0.0.0:{port or '8000'}" in calls[-1]
         assert "main:create_app()" in calls[-1]

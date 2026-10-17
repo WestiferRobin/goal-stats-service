@@ -3,6 +3,10 @@
 Local Make commands and Compose remain unchanged. Production uses injected environment
 variables, external PostgreSQL/Redis, and Gunicorn; it never reads `.env.local`.
 The default Docker image serves the API. Named `runtime` and `tooling` targets remain available.
+The production build downloads only the approved immutable `results.csv`, verifies its
+SHA-256 against the manifest, and packages it at `/app/data/bootstrap/results.csv`.
+Unrelated raw data and local credentials remain excluded. A download/checksum failure
+fails the build. Runtime and tooling targets retain their existing source packaging.
 
 ## Render settings
 
@@ -14,13 +18,16 @@ The default Docker image serves the API. Named `runtime` and `tooling` targets r
 | Root directory | Leave blank (repository root) |
 | Dockerfile / context | `./Dockerfile` / `.` |
 | Build command | None; Render builds the Dockerfile |
+| Docker Command | `/bin/sh /app/scripts/deployment/start.sh --bootstrap --confirm-production` |
+| Pre-Deploy Command | Leave blank, including on Free |
 | Health check path | `/ready` |
 | Region | Near external PostgreSQL and Redis |
 | Disk | None |
 | Auto-deploy | Off initially; manually deploy the reviewed commit |
 | Compute | Free for initial preview; paid compute for sustained availability |
 
-Choose one migration procedure below. Free has 512 MB RAM and idle spin-down/cold starts;
+The bootstrap procedure below works on Free without shell access or one-off jobs.
+Free has 512 MB RAM and idle spin-down/cold starts;
 production workload capacity has not been certified. References:
 [Docker](https://render.com/docs/docker), [deploys](https://render.com/docs/deploys),
 [Free limitations](https://render.com/docs/free).
@@ -33,6 +40,8 @@ Set these in Render Environment settings. Examples contain no real credentials.
 | --- | --- |
 | `APP_ENV` | `production` |
 | `DATABASE_URL` | `postgresql+psycopg://goalstats_app:REPLACE_ME@db.example.com:5432/goalstats?sslmode=verify-full&sslrootcert=system` |
+| `BOOTSTRAP_EXPECT_HOST` | Exact full external database hostname from the Render database page; must equal the URL host |
+| `BOOTSTRAP_EXPECT_DATABASE` | Exact database name from the Render database page; must equal the URL database |
 | `REDIS_URL` | `rediss://default:REPLACE_ME@cache.example.com:6379/0` |
 | `SERVICE_API_TOKEN` | Random secret, at least 32 printable ASCII characters, no whitespace |
 | `CACHE_KEY_PREFIX` | `goal-stats-service:production:v1` (also the production default) |
@@ -57,6 +66,14 @@ absolute readable path, such as `/etc/secrets/postgres-ca.pem`. Redis accepts `r
 and `rediss://` without query parameters; use TLS for external connections. Allow Render
 through provider firewalls and check provider connection limits.
 
+**Use Render PostgreSQL's external URL for bootstrap**, including its full hostname.
+Render's internal endpoint does not support `verify-full`; do not downgrade to
+`sslmode=require` or bypass the cloud-import guards. Allow the web service's outbound
+addresses in the database's external access rules. See
+[Render PostgreSQL connections](https://render.com/docs/postgresql-creating-connecting).
+The expected host/database must be independently copied from the intended database,
+not guessed or replaced with local values. No local `.env.local` or Mac import is needed.
+
 ## Database and migrations
 
 Provision a durable PostgreSQL database (17 matches local) and a role allowed to create
@@ -70,37 +87,47 @@ ownership, or dependencies. Resolve refusals separately; do not delete records o
 over failures. Database timeouts are bounded, so lock contention may abort migrations.
 Do not run concurrent migration jobs/deploys.
 
-### Paid: separate pre-deploy migration
+### Automatic production bootstrap (Free or paid)
 
-- Pre-Deploy Command: `alembic upgrade head`
-- Docker Command: leave blank; normal image startup never migrates.
-
-A failed pre-deploy command prevents promotion. `/ready` also checks the exact Alembic
-head and application tables, so a missing/stale schema cannot pass readiness.
-
-### Free: explicit migrate-before-serve command
-
-Free has no pre-deploy command. Leave that field blank and set **Docker Command** to:
+Leave Pre-Deploy Command blank. Set **Docker Command** exactly to:
 
 ```sh
-/bin/sh /app/scripts/deployment/start.sh --migrate
+/bin/sh /app/scripts/deployment/start.sh --bootstrap --confirm-production
 ```
 
-This runs `alembic upgrade head` once in the startup process, then replaces that process
-with Gunicorn. It does not migrate in workers. Failure exits before the HTTP listener
-starts. It runs again on restarts/cold starts; an already-current database is a no-op.
-Keep one service instance and serialize migration operations. Old instances may still
-serve during deployment; schema changes must remain compatible with them.
+The single startup process (never Gunicorn workers):
 
-Alternatively, run `alembic upgrade head` from a trusted operator environment with the
-same reviewed code and injected production variables, then leave Docker Command blank.
-Never use local Make commands for production migrations or put credential URLs in shell
-history/command arguments. Keep production variables out of your local-development shell.
+1. Requires production configuration, explicit confirmation, exact target identity, and
+   verified TLS. Validates all nine source selections before making database changes.
+2. Takes the historical importer lock and runs Alembic `upgrade head` with existing guards.
+3. Imports only when all five application tables are empty, using the existing cloud-safe
+   importer for 1991, 1995, 1999, 2003, 2007, 2011, 2015, 2019, and 2023.
+4. Requires exactly 44 historical teams, nine competitions, and 348 matches. Verifies
+   every match's facts, participant links, edition and provenance against the pinned source.
+   Edition match counts are 26, 26, 32, 32, 32, 32, 52, 52, and 64.
+5. Commits and then replaces the startup process with Gunicorn.
 
-Startup never seeds. Readiness can succeed with an empty catalog. Historical data needs
-the approved source and existing cloud importer: `--target cloud`, exact expected host
-and database, `--confirm-production`, and verified TLS. Raw sources are intentionally
-excluded from the image. See [import operations](football.md#historical-import-operations).
+Migrations and all imports share one outer PostgreSQL transaction; importer transactions
+use savepoints. Import/verification failures roll back the whole bootstrap, including
+earlier editions and newly applied migrations. No success is logged before commit.
+Raw exceptions/credentials are suppressed. A lost commit acknowledgment stops startup;
+the next attempt verifies whatever actually committed.
+
+On repeat deployments, a complete catalog is verified and no importer is invoked.
+Existing scenarios, predictions and separately attributed team ratings are retained.
+Partial, conflicting, extra, or altered historical records are refused without repairs
+or deletion. An unrelated table in the target schema also blocks bootstrap. Resolve
+such failures explicitly; never reset a populated database to force startup.
+
+Keep one service instance and serialize deployments. A competing historical import
+causes safe refusal; retry after it finishes. Catalog writes are locked while bootstrapping.
+Old instances may serve reads during deployment, so schema changes must remain compatible.
+Gunicorn never starts on failure. `/ready` retains its database/schema and Redis policy;
+the detailed historical verification runs at each bootstrap, not on every health probe.
+
+Without startup arguments the image only serves; `--migrate` remains available for
+explicit migration-only startup. Local Make/Compose commands never use bootstrap.
+Free PostgreSQL expires after 30 days; use a durable database plan for retained data.
 
 ## Authenticate goal-stats-app
 
@@ -138,7 +165,8 @@ After the approved changes are pushed and Render builds the selected commit:
 3. `curl -i https://YOUR-SERVICE.onrender.com/ready` must return `200 Healthy`, or
    `200 Degraded` for Redis unavailability. Database/schema failure returns 503.
    Docker and Render accept both successful readiness states.
-4. `GET /api/v1/catalog/teams` must return 200 (empty is valid before import).
+4. Logs must report `44 teams, 9 competitions, 348 matches verified`. Catalog teams and
+   competitions endpoints must return all 44 teams and all nine editions; empty is a failure.
 5. POST JSON `{}` to `/api/v1/scenarios` without authentication: expect 401.
    Through the authenticated frontend proxy, expect 400 validation failure. This checks
    authentication without creating records.

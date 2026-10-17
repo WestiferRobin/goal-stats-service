@@ -24,4 +24,9 @@ COPY scripts/ ./scripts/
 COPY .coveragerc pytest.ini ruff.toml mypy.ini Makefile .env.example ./
 CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider"]
 
+FROM runtime AS historical_source
+# Fetch only the immutable approved CSV; never package the developer's data/raw directory.
+RUN python -c "import hashlib,json; from pathlib import Path; from urllib.request import urlopen; m=json.loads(Path('data/womens-world-cup/womens-world-cup-2023.json').read_text()); url='https://raw.githubusercontent.com/martj42/womens-international-results/'+m['upstream_revision']+'/results.csv'; data=urlopen(url,timeout=60).read(); assert hashlib.sha256(data).hexdigest()==m['sha256'], 'Pinned historical source checksum mismatch'; Path('/tmp/results.csv').write_bytes(data)"
+
 FROM runtime AS production
+COPY --from=historical_source /tmp/results.csv /app/data/bootstrap/results.csv

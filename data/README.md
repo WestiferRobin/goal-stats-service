@@ -1,8 +1,10 @@
 # Approved Women's World Cup data
 
-Only approved historical manifests and verification evidence are packaged. Raw source
-bytes remain under `data/raw/` and are excluded from runtime images. Prototype CSVs
-and their importer have been retired; reference mathematics uses explicit inputs.
+Local runtime/tooling images package approved manifests and verification evidence;
+developer `data/raw/` remains excluded. The production image separately downloads and
+checksum-verifies the pinned `results.csv` into `/app/data/bootstrap/` for explicit
+production bootstrap. See [Render deployment](../docs/service/render.md). Prototype
+CSVs and their importer remain retired; reference mathematics uses explicit inputs.
 
 ## Selected historical source
 
@@ -18,7 +20,8 @@ The selection is exactly `tournament = FIFA World Cup`, with inclusive dates
 bounded, relevant Phase 1 dataset with 64 matches, 32 senior women's national teams,
 and one competition. These counts describe the **subset**, not the full upstream
 CSV. The pinned full file contains 11,650 result rows. It has been verified in memory;
-it is available locally under `data/raw/`, but is not tracked or packaged in images.
+the local `data/raw/` copy is not tracked or copied into images. Production builds
+download the same pinned bytes separately for the explicit bootstrap mode.
 
 The explicit mapping is `FIFA World Cup` → `FIFA Women's World Cup`, edition `2023`,
 category `women_senior_national`. No edition is inferred from arbitrary dates.
