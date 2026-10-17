@@ -89,7 +89,10 @@ def verify_database_identity(session: Session, target: ImportTarget) -> None:
         raise ConfigurationError("Connected hostname does not match --expect-host.")
     if session.scalar(text("SELECT current_database()")) != target.expect_database:
         raise ConfigurationError("Connected database does not match --expect-database.")
-    if session.scalar(text("SELECT current_user")) != connection.engine.url.username:
+    # Verify the session login identity, not the effective privilege role. SET ROLE
+    # may legitimately change current_user without changing session_user. A changed
+    # session authorization must still match the independently configured username.
+    if session.scalar(text("SELECT session_user")) != connection.engine.url.username:
         raise ConfigurationError("Connected database user differs from configured user.")
     if target.target == "cloud" and not session.scalar(
         text("SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()")

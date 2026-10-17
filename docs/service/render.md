@@ -152,7 +152,7 @@ No exception text, connection URLs, credentials, hostnames, or database names ar
 | Identity: configured hostname/database name | Compare `BOOTSTRAP_EXPECT_HOST` / `BOOTSTRAP_EXPECT_DATABASE` privately with the corresponding URL fields; failure occurs before connecting |
 | Identity: connected driver hostname | Requested libpq hostname differs from the independently expected hostname; inspect connection overrides, not resolved IPs |
 | Identity: connected database name | `current_database()` differs from the independently expected database |
-| Identity: connected user | `current_user` differs from the URL username; inspect role configuration without relaxing the check |
+| Identity: connected user | `session_user` differs from the URL username; verify the login/session authorization without relaxing the check |
 | Alembic migration | Role permissions, lock contention and existing legacy migration guards |
 | Historical import | Approved source and importer safeguards; do not reset existing data |
 | Catalog verification | Missing, extra or conflicting historical records; resolve separately without automatic repair |
@@ -170,6 +170,14 @@ It is a connection-parameter check, not independent server authentication. Cloud
 `verify-full` authenticates that hostname; the SQL checks verify database and user.
 A Render proxy or DNS alias alone is not justification to remove the hostname check.
 See [PostgreSQL connection status](https://www.postgresql.org/docs/current/libpq-status.html).
+
+The user guard compares `session_user` to the URL username. `current_user` is the
+effective privilege role and may differ after `SET ROLE`; that alone is not a login
+identity mismatch. A different session user remains rejected, even when its effective
+role matches the configured username. This does not grant privileges or change roles;
+PostgreSQL permissions and migration/import safeguards still apply.
+See [PostgreSQL SET ROLE](https://www.postgresql.org/docs/current/sql-set-role.html).
+
 Do not disable TLS verification or migration guards to resolve a failed startup.
 
 ## Authenticate goal-stats-app
