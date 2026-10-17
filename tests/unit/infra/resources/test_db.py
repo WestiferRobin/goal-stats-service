@@ -46,6 +46,8 @@ def test_import_identity_mismatch_fails_before_table_access(mismatch, message, r
         verify_import_database(session, target)
     assert "test@" not in str(error.value)
     assert session.scalar.call_count == reads
+    if reads >= 2:
+        assert str(session.scalar.call_args_list[1].args[0]) == "SELECT session_user"
     session.execute.assert_not_called()
     session.commit.assert_not_called()
     session.rollback.assert_not_called()
