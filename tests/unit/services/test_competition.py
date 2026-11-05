@@ -44,10 +44,24 @@ def test_simulation_preserves_order_and_calculates_after_transaction(service_con
         team_service=SimpleNamespace(database=repo.database, capture_names_in_transaction=names),
     )
 
-    def simulate(teams, count):
+    def simulate(teams, count, *, seed):
         assert not service_context.state.active
         assert [t.name for t in teams] == ["4", "3", "2", "1"]
-        return [], "4", count, None
+        return (
+            [
+                dict(
+                    team_id=4,
+                    team="4",
+                    fifa_rank=None,
+                    semifinal_probability=100,
+                    final_probability=100,
+                    champion_probability=100,
+                )
+            ],
+            "4",
+            count,
+            None,
+        )
 
     monkeypatch.setattr(competition, "simulate_tournament", simulate)
     result = service.simulate(TournamentRequest(teams=[team(i) for i in [4, 3, 2, 1]]))

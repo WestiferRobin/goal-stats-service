@@ -20,6 +20,7 @@ class SimulationTeam(Contract):
 
 class TournamentRequest(Contract):
     teams: list[SimulationTeam] = Field(min_length=4, max_length=32)
+    seed: int | None = Field(default=None, strict=True, ge=0, le=4294967295)
     simulations: int = Field(default=1000, strict=True, ge=1000, le=2000)
 
     @model_validator(mode="after")

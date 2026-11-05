@@ -36,7 +36,9 @@ class Team:
         fifa_rank=None,
         fifa_points=None,
         ranking_date="",
+        team_id=None,
     ):
+        self.team_id = team_id
         self.name = name
         self.offense = float(offense)
         self.defense = float(defense)
@@ -164,7 +166,9 @@ class Team:
 
 
 class Match:
-    def __init__(self, team1, team2, match_minute=0):
+    def __init__(self, team1, team2, match_minute=0, *, regulation_horizon=False):
+        # Explicit prediction opt-in; tournament and existing callers retain legacy behavior.
+        self.regulation_horizon = regulation_horizon
         self.team1 = team1
         self.team2 = team2
         self.match_minute = max(0, min(int(match_minute), 120))
@@ -177,7 +181,35 @@ class Match:
     def poisson_probability(goals, expected_goals):
         return math.exp(-expected_goals) * expected_goals**goals / math.factorial(goals)
 
+    @staticmethod
+    def _prediction_poisson_distribution(expected_goals):
+        """Retain a Poisson marginal with omitted mass bounded by 2.5e-13.
+
+        After retaining k, the first omitted term is p[k+1]. Subsequent ratios
+        are at most lambda/(k+2), so their sum is bounded by a geometric series.
+        Two such marginal tails omit at most 5e-13 joint mass, leaving room for
+        floating-point roundoff within the prediction's 1e-12 error budget.
+        Accepted prediction inputs imply 0 <= lambda <= 2.6 + 11*0.18 = 4.58.
+        """
+        if not math.isfinite(expected_goals) or expected_goals < 0:
+            raise ValueError("Poisson mean must be finite and nonnegative")
+        probabilities = [math.exp(-expected_goals)]
+        if probabilities[0] == 0:
+            raise ValueError("Poisson mean exceeds the supported numerical range")
+        while True:
+            k = len(probabilities) - 1
+            next_probability = probabilities[-1] * expected_goals / (k + 1)
+            ratio = expected_goals / (k + 2)
+            # Retain enough cells to present five scorelines for a positive mean.
+            enough_scorelines = expected_goals == 0 or len(probabilities) >= 5
+            if enough_scorelines and ratio < 1 and next_probability / (1 - ratio) <= 2.5e-13:
+                return probabilities
+            probabilities.append(next_probability)
+
     def remaining_time_ratio(self):
+        if self.regulation_horizon:
+            # This is a modeled horizon, not evidence of real-world completion.
+            return max((90 - self.match_minute) / 90, 0.0)
         if self.match_minute >= 90:
             return 0.03
         return max((90 - self.match_minute) / 90, 0.03)
@@ -230,24 +262,32 @@ class Match:
         team2_expected_goals -= self.team2.red_cards * 0.22 * remaining_ratio
         team1_expected_goals += self.team2.red_cards * 0.18 * remaining_ratio
         team2_expected_goals += self.team1.red_cards * 0.18 * remaining_ratio
-        team1_expected_goals = max(team1_expected_goals, 0.02)
-        team2_expected_goals = max(team2_expected_goals, 0.02)
+        minimum_goals = 0.0 if self.regulation_horizon else 0.02
+        team1_expected_goals = max(team1_expected_goals, minimum_goals)
+        team2_expected_goals = max(team2_expected_goals, minimum_goals)
         return (team1_expected_goals, team2_expected_goals)
 
     def calculate_probabilities(self, max_additional_goals=10):
+        """Aggregate independent Poisson goals; the legacy range applies only by default."""
         team1_expected_goals, team2_expected_goals = self.expected_goals()
+        if self.regulation_horizon:
+            team1_distribution = self._prediction_poisson_distribution(team1_expected_goals)
+            team2_distribution = self._prediction_poisson_distribution(team2_expected_goals)
+        else:
+            team1_distribution = [
+                self.poisson_probability(goals, team1_expected_goals)
+                for goals in range(max_additional_goals + 1)
+            ]
+            team2_distribution = [
+                self.poisson_probability(goals, team2_expected_goals)
+                for goals in range(max_additional_goals + 1)
+            ]
         team1_win_probability = 0.0
         draw_probability = 0.0
         team2_win_probability = 0.0
         scorelines = []
-        for team1_extra_goals in range(max_additional_goals + 1):
-            team1_goal_probability = self.poisson_probability(
-                team1_extra_goals, team1_expected_goals
-            )
-            for team2_extra_goals in range(max_additional_goals + 1):
-                team2_goal_probability = self.poisson_probability(
-                    team2_extra_goals, team2_expected_goals
-                )
+        for team1_extra_goals, team1_goal_probability in enumerate(team1_distribution):
+            for team2_extra_goals, team2_goal_probability in enumerate(team2_distribution):
                 score_probability = team1_goal_probability * team2_goal_probability
                 team1_final_score = self.team1.goals + team1_extra_goals
                 team2_final_score = self.team2.goals + team2_extra_goals
@@ -422,37 +462,50 @@ def copy_team(team):
         team.fifa_rank,
         team.fifa_points,
         team.ranking_date,
+        team_id=team.team_id,
     )
 
 
-def _sample_poisson(expected_goals):
+def _sample_poisson(expected_goals, rng=None):
     """Samples one Poisson goal total without requiring NumPy."""
+    rng = rng if rng is not None else random.Random()
     limit = math.exp(-max(expected_goals, 0.0))
     product = 1.0
     goals = 0
     while product > limit:
         goals += 1
-        product *= random.random()
+        product *= rng.random()
     return max(goals - 1, 0)
 
 
-def _simulate_knockout_match(team1, team2):
+def _simulate_knockout_match(team1, team2, rng=None):
+    rng = rng if rng is not None else random.Random()
     match = Match(copy_team(team1), copy_team(team2), match_minute=0)
     team1_xg, team2_xg = match.expected_goals()
-    team1_goals = _sample_poisson(team1_xg)
-    team2_goals = _sample_poisson(team2_xg)
+    team1_goals = _sample_poisson(team1_xg, rng)
+    team2_goals = _sample_poisson(team2_xg, rng)
     if team1_goals > team2_goals:
         return team1
     if team2_goals > team1_goals:
         return team2
-    p1, draw, p2, _, _ = match.calculate_probabilities()
-    advance1, _ = match.advancement_probabilities((p1, draw, p2))
-    return team1 if random.random() < advance1 else team2
+    # Regulation has already ended in a draw; use only the conditional draw share.
+    clutch_total = team1.clutch + team2.clutch
+    team1_draw_share = team1.clutch / clutch_total if clutch_total > 0 else 0.5
+    return team1 if rng.random() < team1_draw_share else team2
 
 
-def simulate_tournament(teams, simulation_count=10000):
+def simulate_tournament(teams, simulation_count=10000, *, seed=None):
     """Runs thousands of Monte Carlo knockout brackets."""
     simulation_count = max(1000, min(int(simulation_count), 50000))
+    rng = random.Random(seed)
+    teams = [copy_team(team) for team in teams]
+    # Legacy engine callers lack catalog IDs; use distinct, request-local slot IDs.
+    for index, team in enumerate(teams):
+        if team.team_id is None:
+            team.team_id = -(index + 1)
+    if len({team.team_id for team in teams}) != len(teams):
+        raise ValueError("Tournament participant IDs must be unique")
+    names = {team.team_id: team.name for team in teams}
     champion_counts = Counter()
     final_counts = Counter()
     semifinal_counts = Counter()
@@ -461,7 +514,7 @@ def simulate_tournament(teams, simulation_count=10000):
         current_round = [copy_team(team) for team in teams]
         if len(current_round) == 4:
             for team in current_round:
-                semifinal_counts[team.name] += 1
+                semifinal_counts[team.team_id] += 1
         while len(current_round) > 1:
             next_round = []
             round_size = len(current_round)
@@ -471,29 +524,30 @@ def simulate_tournament(teams, simulation_count=10000):
                     next_round.append(team1)
                     continue
                 team2 = current_round[index + 1]
-                next_round.append(_simulate_knockout_match(team1, team2))
+                next_round.append(_simulate_knockout_match(team1, team2, rng))
             if len(next_round) == 4:
                 for team in next_round:
-                    semifinal_counts[team.name] += 1
+                    semifinal_counts[team.team_id] += 1
             if len(next_round) == 2:
                 for team in next_round:
-                    final_counts[team.name] += 1
-                final_matchups[tuple(sorted([next_round[0].name, next_round[1].name]))] += 1
+                    final_counts[team.team_id] += 1
+                final_matchups[tuple(sorted([next_round[0].team_id, next_round[1].team_id]))] += 1
             current_round = next_round
         if current_round:
-            champion_counts[current_round[0].name] += 1
+            champion_counts[current_round[0].team_id] += 1
     results = []
     for team in teams:
         results.append(
             {
                 "team": team.name,
+                "team_id": team.team_id,
                 "fifa_rank": team.fifa_rank,
                 "semifinal_probability": round(
-                    100 * semifinal_counts[team.name] / simulation_count, 2
+                    100 * semifinal_counts[team.team_id] / simulation_count, 2
                 ),
-                "final_probability": round(100 * final_counts[team.name] / simulation_count, 2),
+                "final_probability": round(100 * final_counts[team.team_id] / simulation_count, 2),
                 "champion_probability": round(
-                    100 * champion_counts[team.name] / simulation_count, 2
+                    100 * champion_counts[team.team_id] / simulation_count, 2
                 ),
             }
         )
@@ -502,8 +556,10 @@ def simulate_tournament(teams, simulation_count=10000):
     if final_matchups:
         matchup, count = final_matchups.most_common(1)[0]
         most_common_final = {
-            "team1": matchup[0],
-            "team2": matchup[1],
+            "team1": names[matchup[0]],
+            "team1_id": matchup[0],
+            "team2": names[matchup[1]],
+            "team2_id": matchup[1],
             "probability": round(100 * count / simulation_count, 2),
         }
     champion = results[0]["team"] if results else None

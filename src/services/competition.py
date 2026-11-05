@@ -1,6 +1,7 @@
 # mypy: disable-error-code="no-untyped-call"
 """Historical competition responses; imports remain separately owned."""
 
+import secrets
 from typing import Any
 
 from football.engine import Team, simulate_tournament
@@ -32,12 +33,13 @@ class CompetitionService:
             names = self.team_service.capture_names_in_transaction(
                 session=session, team_ids=[t.team_id for t in body.teams]
             )
-        teams = [
-            Team(name=names[t.team_id], **t.model_dump(exclude={"team_id"})) for t in body.teams
-        ]
-        results, champion, count, final = simulate_tournament(teams, body.simulations)
+        teams = [Team(name=names[t.team_id], **t.model_dump()) for t in body.teams]
+        seed = body.seed if body.seed is not None else secrets.randbits(32)
+        results, champion, count, final = simulate_tournament(teams, body.simulations, seed=seed)
         return TournamentResponse.model_validate(
             dict(
+                seed=seed,
+                predicted_champion_id=results[0]["team_id"],
                 results=results,
                 predicted_champion=champion,
                 simulations=count,

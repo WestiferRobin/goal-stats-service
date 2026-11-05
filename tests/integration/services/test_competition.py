@@ -20,10 +20,24 @@ def test_simulation_releases_database_before_engine(small_catalog, import_databa
             Team(team_id=4, name="Sweden", name_key="sweden", category="women_senior_national")
         )
 
-    def compute(teams, count):
+    def compute(teams, count, *, seed):
         assert import_database.engine.pool.checkedout() == 0
         assert [t.name for t in teams] == ["Sweden", "Spain", "Japan", "England"]
-        return [], "Sweden", count, None
+        return (
+            [
+                dict(
+                    team_id=4,
+                    team="Sweden",
+                    fifa_rank=None,
+                    semifinal_probability=100,
+                    final_probability=100,
+                    champion_probability=100,
+                )
+            ],
+            "Sweden",
+            count,
+            None,
+        )
 
     monkeypatch.setattr("services.competition.simulate_tournament", compute)
     body = TournamentRequest(

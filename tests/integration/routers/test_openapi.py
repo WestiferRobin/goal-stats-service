@@ -99,6 +99,7 @@ def test_exact_route_and_openapi_resource_contract(app):
         "/api/v1/scenarios/{scenario_id}": {"get", "patch"},
         "/api/v1/catalog/teams": {"get"},
         "/api/v1/catalog/teams/{team_id}": {"get"},
+        "/api/v1/catalog/teams/{team_id}/summary": {"get"},
         "/api/v1/catalog/competitions": {"get"},
         "/api/v1/catalog/matches": {"get"},
         "/api/v1/catalog/matches/{match_id}": {"get"},
@@ -114,6 +115,89 @@ def test_exact_route_and_openapi_resource_contract(app):
         rule.rule.startswith(("/items", "/actions")) for rule in app.url_map.iter_rules()
     )
     assert not any(name.startswith(("Item", "Action")) for name in spec["components"]["schemas"])
+
+
+def test_team_summary_openapi_contract(app):
+    spec = app.test_client().get("/swagger/v1/swagger.json").json
+    path = spec["paths"]["/api/v1/catalog/teams/{team_id}/summary"]
+    assert set(path) == {"get"}
+    operation = path["get"]
+    assert "requestBody" not in operation
+    params = {parameter["name"]: parameter for parameter in operation["parameters"]}
+    assert set(params) == {"team_id", "competition_id", "date_from", "date_to"}
+    assert params["team_id"]["in"] == "path"
+    assert params["team_id"]["required"] is True
+    for name in ("team_id", "competition_id"):
+        schema = params[name]["schema"]
+        if name == "competition_id":
+            assert {"type": "null"} in schema["anyOf"]
+            schema = next(part for part in schema["anyOf"] if part.get("type") == "integer")
+        assert schema["type"] == "integer"
+        assert schema["minimum"] == 1
+        assert schema["maximum"] == 2147483647
+    for name in ("competition_id", "date_from", "date_to"):
+        assert params[name]["in"] == "query"
+        assert params[name]["required"] is False
+        assert params[name]["schema"]["default"] is None
+    for name in ("date_from", "date_to"):
+        assert {"type": "string", "format": "date"} in params[name]["schema"]["anyOf"]
+        assert "Inclusive" in params[name]["description"]
+
+    schemas = spec["components"]["schemas"]
+    query = schemas["TeamSummaryQuery"]
+    assert set(query["properties"]) == {"competition_id", "date_from", "date_to"}
+    assert query["additionalProperties"] is False
+    response = schemas["TeamSummaryResponse"]
+    fields = {
+        "team_id",
+        "name",
+        "matches_played",
+        "wins",
+        "draws",
+        "losses",
+        "goals_for",
+        "goals_against",
+        "goal_difference",
+        "tournament_appearances",
+        "filters",
+        "score_basis",
+        "result_definition",
+        "coverage_status",
+    }
+    assert set(response["properties"]) == set(response["required"]) == fields
+    assert response["additionalProperties"] is False
+    properties = response["properties"]
+    assert properties["filters"]["$ref"] == "#/components/schemas/TeamSummaryQuery"
+    for name in (
+        "matches_played",
+        "wins",
+        "draws",
+        "losses",
+        "goals_for",
+        "goals_against",
+        "tournament_appearances",
+    ):
+        assert properties[name]["type"] == "integer"
+        assert properties[name]["minimum"] == 0
+        assert "maximum" not in properties[name]
+    assert properties["goal_difference"]["type"] == "integer"
+    assert "minimum" not in properties["goal_difference"]
+    assert properties["name"]["minLength"] == 1
+    assert properties["result_definition"]["const"] == "recorded_final_score"
+    assert set(properties["coverage_status"]["enum"]) == {
+        "available_records_only",
+        "no_matching_records",
+    }
+    assert {"type": "null"} in properties["score_basis"]["anyOf"]
+    assert any(
+        part.get("const") == "including_extra_time_no_shootout"
+        for part in properties["score_basis"]["anyOf"]
+    )
+    assert operation["responses"]["200"]["content"]["application/json"]["schema"] == {
+        "$ref": "#/components/schemas/TeamSummaryResponse",
+    }
+    for status in ("400", "404", "500"):
+        assert operation["responses"][status] == operation["responses"]["default"]
 
 
 def test_infra_documents_plain_text_readiness_states(app):

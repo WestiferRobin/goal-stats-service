@@ -3,13 +3,14 @@
 Base path: `/api/v1`. Generated OpenAPI: `/swagger/v1/swagger.json`; UI: `/swagger`.
 This document describes backend contracts only. Frontend integration has not been certified.
 
-The active API has **15 application operations**, two infrastructure operations and
+The active API has **16 application operations**, two infrastructure operations and
 three optional Swagger route rules. There is no parallel prototype API.
 
 | Method | Path beneath `/api/v1` | Behavior |
 |---|---|---|
 | GET | `/catalog/teams` | Normalized teams, ordered by name then ID |
 | GET | `/catalog/teams/{team_id}` | Team metadata; unknown ratings remain null |
+| GET | `/catalog/teams/{team_id}/summary` | Historical totals across all matching World Cup records |
 | GET | `/catalog/competitions` | Historical competition editions |
 | GET | `/catalog/matches` | Historical matches; team/competition/date filters |
 | GET | `/catalog/matches/{match_id}` | Historical result and score basis |
@@ -45,11 +46,49 @@ See generated schemas for numeric bounds and complete examples.
 
 Preview accepts the same explicit state/rating fields, without scenario title or
 match association. It additionally accepts `extra_minute` (0–30, default 0) and
-`status` (maximum 10 characters, default empty). Preview returns the existing engine
+`status` (maximum 10 characters, default empty). Preview returns the v2 engine
 report directly, including probabilities, scorelines, xG, momentum, confidence and
 reasoning. It never creates scenarios or predictions. Calculations run after the
 identity-validation transaction ends. Probabilities are fractions, while momentum
 and confidence are percentages.
+
+## Prediction model and horizon
+
+New previews and generated predictions use `road-to-the-final-heuristic-v2`.
+Ratings and match statistics are user-provided hypothetical assumptions; historical
+browsing does not automatically supply ratings. Predictions are calculated estimates,
+not recorded historical match facts. The report's `reasoning` describes these limits.
+
+| Supplied minute | V2 behavior |
+|---|---|
+| 0–89 | Predict additional goals through the nominal minute-90 horizon |
+| 90 | Zero remaining modeled time; summarize the supplied current score |
+| 91–120 | Outside the supported horizon; summarize the supplied current score |
+
+At and beyond minute 90, remaining xG is exactly zero, W/D/L is deterministic from
+the supplied score, and the only scoreline has probability one. The supplied minute
+is retained. This does not confirm the real final whistle or reconstruct the score
+at minute 90. Stoppage time, extra time, and shootouts are not forecast.
+
+Preview `status` and `extra_minute` retain their accepted ranges. Status is uppercased
+and echoed; neither field determines completion, a match phase, or a future horizon.
+These preview metadata fields are not persisted in saved scenarios. Saving retains
+the fixed saved-input defaults below, not a lossless copy of nondefault preview metadata.
+
+V2 removes artificial time/xG floors and uses adaptive independent Poisson tails
+with omitted joint mass bounded by `1e-12`. Default/legacy engine callers and
+tournament simulation retain their existing behavior. This is a numerical correction,
+not calibration or measured accuracy.
+
+Confidence remains a percentage heuristic derived from the margin between the two
+leading W/D/L probabilities. Advancement remains a fraction using hypothetical
+clutch-weighted tiebreak shares for draws (equal shares when both clutch values are
+zero). It is not an observed shootout result or a forecast of extra-time play.
+
+Preview and generation preserve `effective_shots = max(shots, shots_on_target)`.
+Only copied calculation inputs are normalized; the saved scenario remains unchanged.
+Saved prediction input snapshots record those effective shots. No stricter validation
+is introduced.
 
 ## Saved workflow
 
@@ -66,10 +105,25 @@ not change old predictions. Existing `scenario-v1` snapshots remain compatible:
 extra minute is zero, status empty and modifiers represented by totals. This phase
 does not add new persistent state fields or claim lossless legacy snapshot conversion.
 
+New saved records have `model_version == output.model == "road-to-the-final-heuristic-v2"`.
+Existing v1 records retain their original model identifier, inputs, and numerical
+outputs. Reads and history do not execute either model. V1 and v2 can coexist in
+the same history; no records are rewritten and no migration is required.
+
 History is newest first by generation time then prediction ID, with limit 50 by
 default, maximum 200, and nonnegative offset. Scenario lists can filter by `team_id`.
 A dedicated pair-wide prediction history contract remains an optional extension;
 this phase retains the approved per-scenario history and does not invent an alias.
+
+### Frontend handoff — Nikita
+
+The existing parsers accept both model identifiers with the same fields and units.
+Frontend presentation has not been updated by this backend change. Label the fixed
+90-minute horizon; distinguish minute 90–120 supplied-score summaries from forecasts
+and avoid presenting their confidence as measured certainty about an actual result.
+Explain heuristic confidence and hypothetical advancement. Align the Matches
+shots-on-target submit check with backend normalization. Distinguish legacy v1
+snapshots from corrected v2 outputs without rewriting their historical descriptions.
 
 ## Historical insights
 
@@ -80,6 +134,65 @@ Each list independently applies limit/offset and is ordered by match date then I
 oldest first. Head-to-head matches either home/away orientation and retains original
 orientation, competition, dates and score basis. No meetings returns an empty list.
 These are historical result records, not invented observations or recent-form ratings.
+
+## Historical team summary
+
+`GET /api/v1/catalog/teams/{team_id}/summary` reads existing database records without
+changing them. These historical definitions remain **provisional until Mehla confirms
+them**. Existing catalog and match-history response shapes are unchanged.
+
+The required path `team_id` and optional query `competition_id` are positive integer
+IDs, bounded to 2,147,483,647. Optional `date_from` and `date_to` must be valid calendar
+dates in exact `YYYY-MM-DD` form. Both boundaries are inclusive; reversed ranges are
+rejected. Unknown query fields, including `limit`, `offset`, and query-string
+`team_id`, are rejected. Summary totals are never paginated.
+
+Matches must involve the selected team and belong to competitions with
+`name_key = "fifa women's world cup"` and `category = "women_senior_national"`.
+Competition and date filters combine with this scope. A valid but nonexistent or
+out-of-scope competition ID produces no matching records, not an unknown-team error.
+
+Every response includes all of these fields:
+
+| Field | Meaning/type |
+|---|---|
+| `team_id`, `name` | Requested team's integer identity and nonempty display name |
+| `matches_played` | Nonnegative integer count of all matching stored matches |
+| `wins`, `draws`, `losses` | Nonnegative integer result counts from the team's perspective |
+| `goals_for`, `goals_against` | Nonnegative integer sums, correctly oriented for home/away matches |
+| `goal_difference` | Signed integer: `goals_for - goals_against` |
+| `tournament_appearances` | Nonnegative integer count of distinct World Cup editions represented after filtering |
+| `filters` | Applied `competition_id`, `date_from`, and `date_to`; all three keys remain present, with null for omitted values |
+| `score_basis` | `including_extra_time_no_shootout`, or null when no records match |
+| `result_definition` | `recorded_final_score` |
+| `coverage_status` | `available_records_only` or `no_matching_records` |
+
+Wins/losses compare recorded final scores; equal scores count as draws, including
+matches whose shootout winner is unavailable. Recorded scores already include
+extra-time goals where applicable; shootout goals are excluded. Totals include all
+matching rows, regardless of the match-history page being displayed. Rankings and
+ratings are not inferred or fabricated.
+
+The response enforces `wins + draws + losses == matches_played`,
+`goal_difference == goals_for - goals_against`, and
+`tournament_appearances <= matches_played`.
+
+`available_records_only` describes matching imported records; it does not certify
+complete historical coverage or independent verification of every match.
+`no_matching_records` means the requested team exists but the stored selection is
+empty. All statistics are then zero and `score_basis` is null. This does not prove
+that the team never participated or that all historical records have been imported.
+
+| Status | Meaning |
+|---|---|
+| 200 | Valid summary, including labeled empty results |
+| 400 | Invalid IDs, dates, reversed ranges, or unsupported query parameters |
+| 404 | Requested team does not exist |
+| 500 | Unexpected database failure or any matching record with an unsupported score basis |
+
+Unsupported or mixed score bases fail safely instead of silently dropping records
+or returning misleading totals. Errors use the existing Problem Details responses;
+database details and unsupported stored values are not exposed.
 
 ## Hypothetical simulation
 
