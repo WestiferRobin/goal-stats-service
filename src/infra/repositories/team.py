@@ -31,3 +31,68 @@ class TeamRepository:
 
     def list(self, session: Session) -> list[Team]:
         return list(session.scalars(select(Team).order_by(Team.name, Team.team_id)))
+
+    def historical_statistics(
+        self,
+        session: Session,
+        team_id: int,
+    ) -> dict[str, int]:  # return dictionary value ex: wins: 10
+
+        # Find every match where this team played whether as home or away
+        # from the matches table
+        statement = select(Match).where(
+            or_(
+                Match.home_team_id == team_id,
+                Match.away_team_id == team_id,
+            )
+        )
+
+        # Store the matches in a list
+        matches = list(session.scalars(statement))
+
+        # Start all statistics at zero
+        wins = 0
+        draws = 0
+        losses = 0
+        goals_scored = 0
+        goals_conceded = 0
+
+        # A set prevents counting the same tournament more than once
+        tournament_ids = set()
+
+        # Loop to examine each match
+        for match in matches:
+
+            # Store which tournament this match belongs to
+            tournament_ids.add(match.competition_id)
+
+            # Figure out whether our team was home or away
+            if match.home_team_id == team_id:
+                team_score = match.home_score
+                opponent_score = match.away_score
+            else:
+                team_score = match.away_score
+                opponent_score = match.home_score
+
+            # Add the goals
+            goals_scored += team_score
+            goals_conceded += opponent_score
+
+            # Decide whether the team won, drew, or lost
+            if team_score > opponent_score:
+                wins += 1
+            elif team_score == opponent_score:
+                draws += 1
+            else:
+                losses += 1
+
+        # Return the final statistics
+        return {
+            "team_id": team_id,
+            "wins": wins,
+            "draws": draws,
+            "losses": losses,
+            "goals_scored": goals_scored,
+            "goals_conceded": goals_conceded,
+            "tournament_appearances": len(tournament_ids),
+        }
