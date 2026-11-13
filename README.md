@@ -134,9 +134,12 @@ format checks, strict mypy, and maintained unit, integration, tooling and owners
 tests against disposable PostgreSQL/Redis. It does not run separate smoke, coverage
 or lifecycle certification modes.
 
-Alembic retains the original revisions and adds guarded prototype retirement head
-`d91e6a4b208f`. The final schema has five application tables. The new migration
-refuses populated prototype tables and unexpected ownership/dependencies. Inventory,
+Alembic retains the original revisions, guarded prototype retirement
+`d91e6a4b208f`, and ownership preparation head `e42b7c19a603`. The final schema has
+six application tables. Users may be empty; scenario ownership is nullable and
+current APIs remain shared. Ownership downgrade refuses populated users or owners.
+The prototype retirement still refuses populated tables and unexpected
+ownership/dependencies. See the [ownership design](docs/service/task1-database-ownership-design.md). Inventory,
 verify backups and coordinate archival before any persistent upgrade; this phase
 only verifies disposable resources. `make run` and `make deploy` apply migrations,
 so do not use them as a workaround for a retirement refusal.

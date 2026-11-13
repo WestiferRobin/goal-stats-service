@@ -278,3 +278,30 @@ def test_summary_over_200_records_one_select_no_writes(summary_database):
         assert all(token not in sql for token in ("LIMIT", "OFFSET", "GROUP BY"))
     finally:
         event.remove(summary_database.engine, "before_cursor_execute", track)
+
+
+@pytest.mark.postgres
+@pytest.mark.parametrize(
+    "column,value,sqlstate",
+    [
+        ("name_key", "zulu", "23505"),
+        ("name", "   ", "23514"),
+        ("category", "", "23514"),
+        ("offense", 101, "23514"),
+        ("fifa_rank", 0, "23514"),
+    ],
+)
+def test_team_constraints_reject_invalid_write_without_changes(database, column, value, sqlstate):
+    from sqlalchemy.exc import IntegrityError
+
+    from tests.fixtures.historical_database import snapshot
+
+    before = snapshot(database)
+    with pytest.raises(IntegrityError) as error:
+        with database.transaction() as session:
+            session.execute(
+                text(f"UPDATE teams SET {column}=:value WHERE team_id=10"),
+                {"value": value},
+            )
+    assert error.value.orig.sqlstate == sqlstate
+    assert snapshot(database) == before

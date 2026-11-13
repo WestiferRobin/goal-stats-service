@@ -71,8 +71,12 @@ refuses any existing legacy records, and leaves eight application tables. Both n
 startup commands apply migrations through the shared preparation function.
 
 The former five revisions were consolidated while retaining the previous head ID
-`a7c93e25d104`. The new repository head is `c8d42f19e630`; persistent development
-PostgreSQL intentionally remains at the parent during frontend coordination.
+`a7c93e25d104`. Revision `d91e6a4b208f` retires empty prototype tables;
+current head `e42b7c19a603` adds users and nullable scenario ownership, leaving six
+application tables. Zero users and unowned scenarios remain valid. No persistent
+database state is inferred from this checkout. Ownership downgrade refuses any
+user rows or non-NULL owner fields; it never clears records to permit rollback.
+See the [ownership plan](task1-database-ownership-design.md) for deployment sequencing.
 Do not run `make run`, `make deploy`, or persistent Alembic upgrades from this checkout
 before coordinated authorization: startup preparation applies pending migrations.
 Direct factory construction is lazy; readiness correctly rejects an old revision.

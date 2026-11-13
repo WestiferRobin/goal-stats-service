@@ -42,12 +42,19 @@ class ScenarioService:
         return self.repo.database
 
     @staticmethod
-    def _response(row: ScenarioProjection) -> dict[str, Any]:
+    def _public_values(row: ScenarioProjection) -> dict[str, Any]:
+        """Keep internal ownership out of API responses and saved engine inputs."""
         values = {
-            column.name: getattr(row.scenario, column.name) for column in Scenario.__table__.columns
+            column.name: getattr(row.scenario, column.name)
+            for column in Scenario.__table__.columns
+            if column.name != "owner_user_id"
         }
         values.update(team1_name=row.team1_name, team2_name=row.team2_name)
-        return ScenarioResponse.model_validate(values).model_dump(mode="json")
+        return values
+
+    @classmethod
+    def _response(cls, row: ScenarioProjection) -> dict[str, Any]:
+        return ScenarioResponse.model_validate(cls._public_values(row)).model_dump(mode="json")
 
     def _get(self, session: Session, scenario_id: int) -> dict[str, Any]:
         row = self.repo.get_projection(session, scenario_id)
@@ -109,11 +116,7 @@ class ScenarioService:
         row = self.repo.get_projection(session, scenario_id)
         if row is None:
             raise NotFound()
-        values = {
-            column.name: getattr(row.scenario, column.name) for column in Scenario.__table__.columns
-        }
-        values.update(team1_name=row.team1_name, team2_name=row.team2_name)
-        return MappingProxyType(values)
+        return MappingProxyType(self._public_values(row))
 
     def require_exists_in_transaction(self, *, session: Session, scenario_id: int) -> None:
         """Check existence in the caller's transaction without returning ORM state."""

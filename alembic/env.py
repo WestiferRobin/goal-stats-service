@@ -8,6 +8,7 @@ import models.match  # noqa: F401
 import models.prediction  # noqa: F401
 import models.scenario  # noqa: F401
 import models.team  # noqa: F401
+import models.user  # noqa: F401
 from infra.resources.db import Database
 from models.base import Base
 from settings.environment import load_application

@@ -35,7 +35,7 @@ Reference parser defaults must not be presented as observed historical facts.
 
 ## Persistence retirement
 
-Head `d91e6a4b208f` follows `c8d42f19e630`. It locks the three prototype tables,
+Retirement revision `d91e6a4b208f` follows `c8d42f19e630`. It locks the three prototype tables,
 requires ordinary tables owned by the current migration user in the current schema,
 refuses populated tables and drops without CASCADE. Unexpected dependencies abort
 transactionally. Normalized records are untouched.
@@ -45,6 +45,11 @@ backups and agree archival/rollback. Populated tables deliberately block migrati
 this migration never deletes their rows or fabricates missing original ratings.
 Downgrade recreates empty schema, not lost data. Fresh installs and disposable
 upgrades are tested. No persistent migration is authorized by this implementation.
+
+Current head `e42b7c19a603` adds users and nullable scenario ownership after this
+retirement. Its downgrade refuses populated users or ownership; the empty-schema
+recreation described above applies only to the retirement revisions. See the
+[ownership design](task1-database-ownership-design.md).
 
 ## Phase boundaries
 

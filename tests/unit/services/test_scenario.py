@@ -140,7 +140,8 @@ def test_scenario_rejects_mismatched_database_dependencies(mismatched):
         scenario.ScenarioService(repo=repo, team_service=team_service, match_service=match_service)
 
 
-def test_snapshot_and_existence_borrow_session_without_validation(scenario_projection):
+@pytest.mark.parametrize("owner", [None, 42])
+def test_snapshot_and_existence_borrow_session_without_validation(scenario_projection, owner):
     from datetime import datetime
 
     session, database = object(), object()
@@ -154,12 +155,15 @@ def test_snapshot_and_existence_borrow_session_without_validation(scenario_proje
         team_service=SimpleNamespace(database=database),
         match_service=SimpleNamespace(database=database),
     )
+    scenario_projection.scenario.owner_user_id = owner
+    assert "owner_user_id" not in service._response(scenario_projection)
     original = vars(service).copy()
     scenario_projection.scenario.team1_offense = None
     captured = service.capture_state_in_transaction(session=session, scenario_id=7)
     expected = {
         column.name: getattr(scenario_projection.scenario, column.name)
         for column in scenario_projection.scenario.__table__.columns
+        if column.name != "owner_user_id"
     }
     expected.update(team1_name="First", team2_name="Second")
     assert dict(captured) == expected

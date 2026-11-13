@@ -74,9 +74,10 @@ The five normalized models have individual modules under `src/models/`: `team.py
 `competition.py`, `match.py`, `scenario.py`, and `prediction.py`. The shared base,
 metadata naming convention, and nonblank constraint helper remain in `base.py`.
 
-Exactly five application mappings are registered: teams, competitions, matches,
-scenarios and predictions. Alembic adds only normal migration metadata. Reusable
-calculation and source-parsing code remains in `src/football/`.
+Six application mappings are registered: teams, competitions, matches,
+scenarios, predictions and the provider-neutral users identity table. Zero users
+is valid; no account workflows are enabled. Alembic adds normal migration metadata.
+Reusable calculation and source-parsing code remains in `src/football/`.
 
 ## Database and transactions
 
@@ -96,6 +97,13 @@ it does not recover data. See [retirement](../testing/item-action-backend-retire
 The [historical catalog](historical-catalog.md) supports nine approved Women's World
 Cup editions. Its explicit importer retains checksums, provenance, conflict rejection,
 idempotency and per-edition transactions. Startup never seeds data.
+
+Revision `e42b7c19a603` adds users (`user_id`, `created_at`) and nullable scenario
+`owner_user_id` with a restrictive FK and composite owner/time/ID index. Predictions
+inherit ownership through scenarios; saved JSON and public API shapes are unchanged.
+Existing shared APIs remain shared. Downgrade locks scenarios/users and refuses
+any user rows or non-NULL owners. See the [ownership design](task1-database-ownership-design.md)
+for preservation, deployment and Task 13/14 boundaries.
 
 ## Normalized entity cache decisions
 

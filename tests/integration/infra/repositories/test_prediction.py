@@ -54,6 +54,111 @@ def test_database_constraints(scenario_client, saved_scenario, import_database, 
 
 
 @pytest.mark.postgres
+def test_previous_schema_seeded_history_survives_ownership_upgrade(
+    import_database, scenario_body, monkeypatch
+):
+    import json
+    from datetime import date
+
+    from sqlalchemy import MetaData, Table
+
+    from services.prediction import PredictionService
+    from tests.fixtures.historical_database import snapshot
+    from tests.unit.services.test_prediction import frozen_v1_row
+
+    config = Config(str(Path(__file__).resolve().parents[4] / "alembic.ini"))
+    with import_database.engine.begin() as connection:
+        config.attributes["connection"] = connection
+        command.downgrade(config, "d91e6a4b208f")
+        metadata = MetaData()
+        metadata.reflect(connection)
+        tables = metadata.tables
+        connection.execute(
+            tables["teams"].insert(),
+            [
+                {"team_id": 1, "name": "First", "name_key": "first", "category": "test"},
+                {"team_id": 2, "name": "Second", "name_key": "second", "category": "test"},
+            ],
+        )
+        connection.execute(
+            tables["competitions"].insert(),
+            {
+                "competition_id": 1,
+                "name": "Cup",
+                "name_key": "cup",
+                "edition_label": "2023",
+                "category": "test",
+            },
+        )
+        connection.execute(
+            tables["matches"].insert(),
+            {
+                "match_id": 1,
+                "competition_id": 1,
+                "home_team_id": 1,
+                "away_team_id": 2,
+                "match_date": date(2023, 8, 20),
+                "home_score": 1,
+                "away_score": 0,
+                "score_basis": "including_extra_time_no_shootout",
+                "source": "fixture",
+                "source_record_key": "a" * 64,
+                "source_file_sha256": "b" * 64,
+                "source_row": 1,
+                "source_version": "fixture",
+                "source_url": "fixture://test",
+                "source_home_team": "First",
+                "source_away_team": "Second",
+                "source_tournament": "Cup",
+            },
+        )
+        connection.execute(
+            tables["scenarios"].insert(),
+            {
+                **scenario_body,
+                "scenario_id": 1,
+                "match_id": 1,
+                "created_at": datetime(2026, 1, 1, tzinfo=UTC),
+            },
+        )
+        _, frozen = frozen_v1_row(1)
+        values = {
+            c.name: getattr(frozen, c.name)
+            for c in Prediction.__table__.columns
+            if c.name != "prediction_id"
+        }
+        connection.execute(tables["predictions"].insert(), values)
+    before = snapshot(import_database)
+    with import_database.engine.begin() as connection:
+        config.attributes["connection"] = connection
+        command.upgrade(config, "head")
+        command.upgrade(config, "head")
+        assert connection.scalar(text("SELECT count(*) FROM users")) == 0
+        assert (
+            connection.scalar(text("SELECT owner_user_id FROM scenarios WHERE scenario_id=1"))
+            is None
+        )
+        old_scenario = connection.scalar(
+            text("SELECT to_jsonb(s) - 'owner_user_id' FROM scenarios s WHERE scenario_id=1")
+        )
+        assert old_scenario == json.loads(before["scenarios"][0])
+        assert Table("users", MetaData(), autoload_with=connection).c.user_id.primary_key
+    after = snapshot(import_database)
+    for table in ("teams", "competitions", "matches", "predictions"):
+        assert after[table] == before[table]
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("Reading preserved history must not recalculate")
+
+    monkeypatch.setattr("services.prediction.predict_inputs", forbidden)
+    with import_database.transaction() as session:
+        saved = session.get(Prediction, 1)
+        assert (
+            PredictionService._response(saved)["model_version"] == "road-to-the-final-heuristic-v1"
+        )
+
+
+@pytest.mark.postgres
 def test_repeated_upgrade_preserves_data_and_relationship(
     scenario_client, saved_scenario, import_database
 ):
@@ -185,7 +290,9 @@ def test_shared_session_caller_rollback_undoes_all_writes(database, scenario_bod
 
 
 @pytest.mark.postgres
-@pytest.mark.parametrize("starting_revision", ["a7c93e25d104", "c8d42f19e630", "d91e6a4b208f"])
+@pytest.mark.parametrize(
+    "starting_revision", ["a7c93e25d104", "c8d42f19e630", "d91e6a4b208f", "e42b7c19a603"]
+)
 def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
     scenario_client, saved_scenario, import_database, starting_revision
 ):
@@ -198,8 +305,9 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
     config = Config(str(Path(__file__).resolve().parents[4] / "alembic.ini"))
     scripts = ScriptDirectory.from_config(config)
     assert scripts.get_bases() == ["a7c93e25d104"]
-    assert scripts.get_heads() == ["d91e6a4b208f"]
+    assert scripts.get_heads() == ["e42b7c19a603"]
     assert [r.revision for r in scripts.walk_revisions()] == [
+        "e42b7c19a603",
         "d91e6a4b208f",
         "c8d42f19e630",
         "a7c93e25d104",
@@ -212,7 +320,7 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
         assert MigrationContext.configure(connection).get_current_revision() == starting_revision
         command.upgrade(config, "head")
         command.upgrade(config, "head")
-        assert MigrationContext.configure(connection).get_current_revision() == "d91e6a4b208f"
+        assert MigrationContext.configure(connection).get_current_revision() == "e42b7c19a603"
         assert set(inspect(connection).get_table_names()) == {
             "alembic_version",
             "teams",
@@ -220,6 +328,7 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
             "matches",
             "scenarios",
             "predictions",
+            "users",
         }
         assert (
             compare_metadata(

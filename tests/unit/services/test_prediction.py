@@ -180,6 +180,7 @@ def setup(context, projection):
             **{
                 column.name: getattr(projection.scenario, column.name)
                 for column in projection.scenario.__table__.columns
+                if column.name != "owner_user_id"
             },
             "team1_name": projection.team1_name,
             "team2_name": projection.team2_name,

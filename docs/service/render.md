@@ -95,6 +95,16 @@ ownership, or dependencies. Resolve refusals separately; do not delete records o
 over failures. Database timeouts are bounded, so lock contention may abort migrations.
 Do not run concurrent migration jobs/deploys.
 
+Ownership preparation at `e42b7c19a603` requires coordinated deployment: old
+readiness rejects the new head, and new ORM reads require the new schema. Use a
+rehearsed maintenance window and verified backup; drain traffic before migration
+and start the matching application after success. The default command only serves;
+`--migrate` and `--bootstrap --confirm-production` migrate before Gunicorn starts.
+The additive DDL/index can block reads or writes, and the 3-second statement
+timeout can abort it. No zero-downtime guarantee is made. Downgrade refuses populated
+users or ownership. See the [ownership plan](task1-database-ownership-design.md).
+This schema change leaves service-token checks and shared-record visibility unchanged.
+
 ### Automatic production bootstrap (Free or paid)
 
 Leave Pre-Deploy Command blank. Set **Docker Command** exactly to:
