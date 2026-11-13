@@ -45,8 +45,13 @@ import json
 from pathlib import Path
 
 root = Path(".")
-source = root / "data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv"
-assert hashlib.sha256(source.read_bytes()).hexdigest() == "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0"
+source = (
+    root / "data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv"
+)
+assert (
+    hashlib.sha256(source.read_bytes()).hexdigest()
+    == "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0"
+)
 with source.open(encoding="utf-8", newline="") as handle:
     raw = list(csv.DictReader(handle))
 assert len(raw) == 11650
@@ -56,21 +61,26 @@ for path in sorted((root / "data/womens-world-cup").glob("*.json")):
     selection = manifest["selection"]
     edition = manifest["competition"]["edition_label"]
     for line, row in enumerate(raw, 2):
-        if (row["tournament"] == selection["tournament"]
-                and selection["date_from"] <= row["date"] <= selection["date_to"]):
+        if (
+            row["tournament"] == selection["tournament"]
+            and selection["date_from"] <= row["date"] <= selection["date_to"]
+        ):
             selected.append((edition, line, row))
 assert len(selected) == 348
 assert len({team for _, _, r in selected for team in (r["home_team"], r["away_team"])}) == 44
 assert sum(int(r["home_score"]) + int(r["away_score"]) for _, _, r in selected) == 1081
-assert len({(r["date"], tuple(sorted((r["home_team"], r["away_team"])))) for _, _, r in selected}) == 348
+assert (
+    len({(r["date"], tuple(sorted((r["home_team"], r["away_team"])))) for _, _, r in selected})
+    == 348
+)
 queries = [
-    ("United States", "United States", None, None, [54,41,9,4,142,39,103,9]),
-    ("Germany", "Germany", None, None, [47,31,6,10,129,42,87,9]),
-    ("Spain", "Spain", None, None, [14,7,2,5,24,15,9,3]),
-    ("Japan 2011", "Japan", "2011", None, [6,4,1,1,12,6,6,1]),
-    ("Panama", "Panama", None, None, [3,0,0,3,3,11,-8,1]),
-    ("USA 1999 final", "United States", "1999", "1999-07-10", [1,0,1,0,0,0,0,1]),
-    ("Germany 2003 final", "Germany", "2003", "2003-10-12", [1,1,0,0,2,1,1,1]),
+    ("United States", "United States", None, None, [54, 41, 9, 4, 142, 39, 103, 9]),
+    ("Germany", "Germany", None, None, [47, 31, 6, 10, 129, 42, 87, 9]),
+    ("Spain", "Spain", None, None, [14, 7, 2, 5, 24, 15, 9, 3]),
+    ("Japan 2011", "Japan", "2011", None, [6, 4, 1, 1, 12, 6, 6, 1]),
+    ("Panama", "Panama", None, None, [3, 0, 0, 3, 3, 11, -8, 1]),
+    ("USA 1999 final", "United States", "1999", "1999-07-10", [1, 0, 1, 0, 0, 0, 0, 1]),
+    ("Germany 2003 final", "Germany", "2003", "2003-10-12", [1, 1, 0, 0, 2, 1, 1, 1]),
 ]
 evidence = []
 for label, team, year, day, expected in queries:
@@ -83,13 +93,31 @@ for label, team, year, day, expected in queries:
         home, away = int(row["home_score"]), int(row["away_score"])
         gf, ga = (home, away) if team == row["home_team"] else (away, home)
         result = "W" if gf > ga else "D" if gf == ga else "L"
-        group.append(dict(selection=label, edition=edition, csv_line=str(line),
-            **{k: row[k] for k in ("date", "home_team", "away_team", "home_score", "away_score")},
-            team=team, goals_for=str(gf), goals_against=str(ga), result=result))
+        group.append(
+            dict(
+                selection=label,
+                edition=edition,
+                csv_line=str(line),
+                **{
+                    k: row[k]
+                    for k in ("date", "home_team", "away_team", "home_score", "away_score")
+                },
+                team=team,
+                goals_for=str(gf),
+                goals_against=str(ga),
+                result=result,
+            )
+        )
     gf = sum(int(r["goals_for"]) for r in group)
     ga = sum(int(r["goals_against"]) for r in group)
-    totals = [len(group), *[sum(r["result"] == v for r in group) for v in "WDL"],
-              gf, ga, gf - ga, len({r["edition"] for r in group})]
+    totals = [
+        len(group),
+        *[sum(r["result"] == v for r in group) for v in "WDL"],
+        gf,
+        ga,
+        gf - ga,
+        len({r["edition"] for r in group}),
+    ]
     assert totals == expected, (label, totals)
     evidence.extend(group)
     print(label, totals)
