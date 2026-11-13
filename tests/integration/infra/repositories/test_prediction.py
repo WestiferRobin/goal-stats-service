@@ -182,3 +182,51 @@ def test_shared_session_caller_rollback_undoes_all_writes(database, scenario_bod
     with database.transaction() as session:
         assert ScenarioRepository(database).get_by_id(session, identity) is None
         assert PredictionRepository(database).get_by_id(session, prediction_id) is None
+
+
+@pytest.mark.postgres
+@pytest.mark.parametrize("starting_revision", ["a7c93e25d104", "c8d42f19e630", "d91e6a4b208f"])
+def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
+    scenario_client, saved_scenario, import_database, starting_revision
+):
+    from alembic.script import ScriptDirectory
+
+    from tests.fixtures.historical_database import snapshot
+
+    saved = generate(scenario_client, saved_scenario).json
+    before = snapshot(import_database)
+    config = Config(str(Path(__file__).resolve().parents[4] / "alembic.ini"))
+    scripts = ScriptDirectory.from_config(config)
+    assert scripts.get_bases() == ["a7c93e25d104"]
+    assert scripts.get_heads() == ["d91e6a4b208f"]
+    assert [r.revision for r in scripts.walk_revisions()] == [
+        "d91e6a4b208f",
+        "c8d42f19e630",
+        "a7c93e25d104",
+    ]
+    with import_database.engine.begin() as connection:
+        config.attributes["connection"] = connection
+        # The fixture is an isolated schema inside ownership-verified test PostgreSQL.
+        # Downgrade only recreates empty legacy tables; normalized records remain intact.
+        command.downgrade(config, starting_revision)
+        assert MigrationContext.configure(connection).get_current_revision() == starting_revision
+        command.upgrade(config, "head")
+        command.upgrade(config, "head")
+        assert MigrationContext.configure(connection).get_current_revision() == "d91e6a4b208f"
+        assert set(inspect(connection).get_table_names()) == {
+            "alembic_version",
+            "teams",
+            "competitions",
+            "matches",
+            "scenarios",
+            "predictions",
+        }
+        assert (
+            compare_metadata(
+                MigrationContext.configure(connection, opts={"compare_server_default": True}),
+                Base.metadata,
+            )
+            == []
+        )
+    assert snapshot(import_database) == before
+    assert scenario_client.get(f"/api/v1/predictions/{saved['prediction_id']}").json == saved

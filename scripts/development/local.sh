@@ -243,7 +243,11 @@ case "$action" in
     if [[ "$action" == run ]]; then
       echo 'Starting host Flask; Ctrl-C stops Flask and leaves infrastructure running.'
       urls
-      exec .venv/bin/python src/main.py
+      if [[ "$OSTYPE" == msys* || "$OSTYPE" == cygwin* ]]; then
+        exec .venv/Scripts/python.exe src/main.py
+      else
+        exec .venv/bin/python src/main.py
+      fi
     fi
     step 'Starting Docker Flask'
     "${compose[@]}" up -d --wait --wait-timeout 90 app

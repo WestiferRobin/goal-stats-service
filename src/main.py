@@ -5,6 +5,7 @@ import os
 import socket
 import sys
 from collections.abc import Mapping
+from hmac import compare_digest
 from importlib.util import find_spec
 from typing import cast
 
@@ -28,14 +29,14 @@ if __name__ == "__main__":
         )
 
 
-from flask import Flask
+from flask import Flask, Response, request
 from flask.logging import default_handler
 from flask_openapi3.models.info import Info
 from flask_openapi3.openapi import OpenAPI
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from exceptions.handlers import register_error_handlers, request_validation
+from exceptions.handlers import problem, register_error_handlers, request_validation
 from football.cli import register_commands
 from infra.repositories.competition import CompetitionRepository
 from infra.repositories.match import MatchRepository
@@ -57,7 +58,7 @@ from services.match import MatchService
 from services.prediction import PredictionService
 from services.scenario import ScenarioService
 from services.team import TeamService
-from settings.base import ConfigurationError
+from settings.base import ConfigurationError, Environment
 from settings.core import API_TITLE, API_VERSION, LOGGER_NAME
 from settings.environment import Settings, load_application, load_local, local_runtime
 
@@ -76,6 +77,20 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.config.update(
         APP_ENV=settings.core.app_env, TESTING=settings.core.app_env == "test", DEBUG=False
     )
+    if settings.core.app_env == Environment.PRODUCTION:
+
+        @app.before_request
+        def authenticate_mutation() -> Response | None:
+            if request.method in {"GET", "HEAD", "OPTIONS"}:
+                return None
+            expected = ("Bearer " + settings.core.service_api_token).encode("ascii")
+            supplied = request.headers.get("Authorization", "").encode("utf-8")
+            if not compare_digest(supplied, expected):
+                response = problem(401, "Valid service authentication is required.")
+                response.headers["WWW-Authenticate"] = "Bearer"
+                return response
+            return None
+
     app.logger = logging.Logger(LOGGER_NAME, level=settings.core.log_level)
     app.logger.addHandler(default_handler)
     database = Database(settings.database)

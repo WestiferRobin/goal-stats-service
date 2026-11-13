@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -216,12 +217,25 @@ def test_removed_modes_refused_before_docker(test_runner, mode):
     assert calls == []
 
 
-def test_exactly_nine_make_targets():
-    content = (ROOT / "Makefile").read_text()
+@pytest.mark.parametrize(
+    "assignment",
+    [
+        "",
+        "BASH ?= C:/bin/bash.exe",
+        "BASH := C:/bin/bash.exe",
+        "BASH = C:/bin/bash.exe",
+        "BASH += C:/bin/bash.exe",
+    ],
+)
+def test_exactly_nine_make_targets(assignment):
+    content = (ROOT / "Makefile").read_text() + "\n" + assignment
     targets = set()
     for line in content.splitlines():
-        if line and not line.startswith(("#", "\t", ".")) and ":" in line and ":=" not in line:
-            targets.update(line.split(":", 1)[0].split())
+        # Match explicit target names before a rule colon, not colons in drive paths
+        # or Make assignments. Keep the exact public-target contract below.
+        match = re.match(r"^([A-Za-z_][A-Za-z0-9_-]*(?: +[A-Za-z_][A-Za-z0-9_-]*)*)\s*:(?!=)", line)
+        if match:
+            targets.update(match.group(1).split())
     assert targets == {"setup", "infra", "run", "deploy", "seed", "test", "certify", "stop", "help"}
 
 
