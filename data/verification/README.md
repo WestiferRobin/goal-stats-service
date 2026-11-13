@@ -1,5 +1,12 @@
 # Historical verification evidence
 
+The canonical Phase 2 review is [Task 2 acceptance](../../docs/service/task2-phase2-acceptance.md)
+(2026-11-13): nine-edition source verification, bounded authoritative comparisons,
+proposed statistics definitions and pending human decisions. Supporting evidence:
+[fixture comparisons and discrepancy ledger](task2-historical-comparisons.md) and
+[independent calculations](task2-calculations.md). These supplement, and do not
+replace, the original regression artifact below.
+
 [womens-world-cup-coverage.json](womens-world-cup-coverage.json) records verification
 of the pinned Mart Jürisoo CSV on 2026-10-11. All nine selections pass: **348 matches,
 44 distinct participants, 1,081 goals**. The full source has 11,650 rows. Its revision
@@ -23,9 +30,13 @@ The current importer validates all nine approved editions: 1991, 1995, 1999, 200
 and validates participants, goals, ordering and identity policy. The existing 2023
 manifest and source-record-key algorithm remain unchanged.
 
-Runtime support does not mean the data has been imported. The persistent development
-catalog currently contains only 2023: 32 teams, one competition and 64 matches.
-Additional editions require explicit authorized imports; startup imports nothing.
+The pinned source covers nine editions; runtime support does not mean they have
+been imported. The [2026-10-08 local acceptance](../../docs/service/task2-acceptance.md)
+observed a 2023-only catalog: 32 teams, one competition and 64 matches. That is a
+historical observation, not a statement of current database contents. Current
+database state was not inspected during this review; environments may contain
+different imported editions. Additional editions require explicit authorized
+imports; startup imports nothing.
 
 ## Reproduce the read-only source verification
 

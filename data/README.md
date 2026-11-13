@@ -167,8 +167,12 @@ for exact commands, TLS requirements and acceptance steps.
 
 All use the same pinned full CSV. Historical `--directory` must be explicitly
 provided and contain `results.csv`; prototype files are never a fallback. Each
-edition has one atomic transaction. Enabling these IDs does not import them:
-the persistent development catalog still contains only the existing 2023 edition.
+edition has one atomic transaction. The pinned source covers all nine editions,
+but enabling these IDs does not import them. The
+[2026-10-08 local acceptance](../docs/service/task2-acceptance.md) observed only the
+2023 edition (32 teams, one competition, 64 matches). Current database contents
+were not inspected during this review and may differ by environment and import
+history; neither a 2023-only nor a nine-edition current database is asserted.
 Historical imports do not populate prediction ratings or modify prototype tables.
 
 ## Explicit historical seeding

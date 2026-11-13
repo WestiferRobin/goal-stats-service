@@ -1,5 +1,11 @@
 # Task #2 historical-data acceptance
 
+**Historical report: 2023-only local import acceptance, dated 2026-10-08.**
+The completion statement below applies to that earlier scope. Current Phase 2
+P1/P2 acceptance for all nine editions is tracked in the
+[canonical Task 2 Phase 2 acceptance report](task2-phase2-acceptance.md).
+The dated runtime, API and test observations below are preserved, not current-state claims.
+
 Migration-history note: dated revision-chain evidence below predates consolidation
 into `a7c93e25d104_init_models.py`. The head ID and schema are preserved; see
 [the current migration workflow](development.md#schema-changes).
