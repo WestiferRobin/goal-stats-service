@@ -42,7 +42,7 @@ Flask in the foreground using `.venv`. Ctrl-C stops Flask and leaves providers r
 Restart after source edits; automatic host reload is disabled for predictable debugging.
 
 Open <http://127.0.0.1:5100/swagger>. Verify `/health` and `/ready` return `Healthy`,
-and inspect `/api/v1/teams` (empty on a fresh database). Then start
+and inspect `/api/v1/catalog/teams` (empty until the explicit historical import below). Then start
 `goal-stats-app` following its README.
 
 ## Docker infrastructure only
@@ -79,7 +79,7 @@ Neither transition changes credentials or deletes data. Run lifecycle commands s
 | `make stop` | Stop Docker resources and preserve PostgreSQL data. |
 | `make help` | Explain these nine commands. |
 
-`make test` needs Docker and Make, not the host venv or `.env.local`. Tests use
+`make test` needs Docker, Make and the prepared Python 3.12 `.venv`, not `.env.local`. Tests use
 independently owned disposable providers. They never use the development database.
 
 Stop host Flask with Ctrl-C or IDE Stop, then run `make stop` when finished.
@@ -148,12 +148,42 @@ explicitly. Fresh catalogs remain empty until an authorized historical import.
 Production operations use normalized integer IDs and explicit prediction assumptions;
 there is no prototype catalog, snapshot API or CSV fallback.
 
-Approved manifests live in `data/womens-world-cup/`; source bytes stay in `data/raw/`.
+Approved manifests live in `data/womens-world-cup/`; the exact pinned source CSV is
+included in Git under `data/raw/`. A fresh clone needs no dataset download.
 The importer supports nine editions. Persistent development contents are unverified.
 See [backend contracts](docs/service/frontend-api.md) and
 [retirement safeguards](docs/service/football.md#persistence-retirement).
 
 ## Explicit historical seeding
+
+From a fresh clone with Docker running and Python 3.12 available:
+
+```sh
+make setup
+make deploy
+make seed DATASET=womens-world-cup DRY=true
+# Continue only after the dry-run succeeds:
+make seed DATASET=womens-world-cup DRY=false
+curl --fail http://127.0.0.1:5100/health
+curl --fail http://127.0.0.1:5100/ready
+curl --fail http://127.0.0.1:5100/api/v1/catalog/teams
+curl --fail http://127.0.0.1:5100/api/v1/catalog/competitions
+curl --fail 'http://127.0.0.1:5100/api/v1/catalog/matches?limit=1'
+```
+
+`make deploy` starts local Docker PostgreSQL/Redis, applies migrations, then starts
+Flask; it does not deploy to Render or import records. `make run` is the alternative
+foreground host-Flask workflow. On an empty database, importing all editions creates
+44 teams, nine competitions and 348 matches containing 1,081 goals. Repeating an
+unchanged import skips existing records; conflicts stop the import without overwriting
+them. Do not reset a database to bypass migration or import refusals.
+
+The committed source is
+`data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv`.
+It is Mart Jürisoo's Women's International Football Results at that exact revision,
+with SHA-256 `de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
+See [source attribution and validation](data/README.md). Only this pinned raw CSV is
+distributed; other raw files and private environment files remain ignored.
 
 `make seed DATASET=womens-world-cup DRY=true` previews all nine editions.
 Use `DRY=false` to write, or select an individual ID such as `womens-world-cup-2023`.

@@ -28,7 +28,7 @@ using owned disposable PostgreSQL/Redis. `make certify` reuses the same guarded
 host runner, adds coverage, and retains reports under a unique ignored
 `.host-sessions/certify-*` directory. It fails below 95% combined statement-and-branch
 coverage, even when all tests pass. Test mode excludes the single `pinned_source` case;
-certify includes it in the same pytest invocation, using the approved ignored CSV and
+certify includes it in the same pytest invocation, using the approved committed CSV and
 an invocation-owned macOS read-only disk image. The runner provisions and verifies the
 mount, then detaches and removes it during cleanup. Missing source, unsupported mounting,
 checksum/ownership failures or cleanup failures prevent PASS. It does not seed persistent
@@ -67,8 +67,11 @@ The nine contracts remain in `data/womens-world-cup/`; there is no group manifes
 `false` only when omitted, and rejects an empty value. Legacy `DRY_RUN` is rejected.
 
 Prepare the runtime image, providers and current Alembic schema separately using the
-existing setup/startup workflow. Supply the pinned `results.csv` under
+existing setup/startup workflow (`make setup`, then `make deploy` or `make run`).
+A fresh clone includes the pinned `results.csv` under
 `data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/`.
+No additional dataset download is required. Its source attribution, revision and
+SHA-256 are documented in [data/README.md](../../data/README.md).
 Seed checks prepared-image compatibility and mounts only that input directory read-only.
 It never builds/pulls images, starts dependencies, applies migrations or resets data.
 It uses canonical local configuration and verifies the connected PostgreSQL identity
