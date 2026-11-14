@@ -9,7 +9,7 @@ repository, importer or summary implementation is called by this calculation.
 selection contributions, including deliberately repeated fixtures in overlapping
 examples. Each row records the edition, physical CSV line (header is line 1), date,
 original participants and scores, queried team, oriented GF/GA and W/D/L.
-Do not sum across selections. The source file is pinned and ignored; this evidence
+Do not sum across selections. The source file is pinned and now committed (it was ignored at the dated execution); this evidence
 file is not an import dataset or replacement regression baseline.
 
 | Selection | M | W | D | L | GF | GA | GD | Editions |

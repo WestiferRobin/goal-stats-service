@@ -3,8 +3,12 @@
 Review date: **2026-11-13**. Base: `member/wes`,
 `27df1e5ab55fa3223a3b9509e6578a94bf0152ad`.
 This is new evidence, not a rewrite of `womens-world-cup-coverage.json`.
-Human acceptance remains pending. “Verified” below means checked during this
-technical review with Codex assistance, not signed off by Wesley or Mehla.
+At this review’s execution, human acceptance was pending. “Verified” below means
+checked during that technical review with Codex assistance, not a personal sign-off.
+The project owner has since accepted the implemented statistical definitions and
+documented limitations for the current scope; see [current acceptance](../../docs/service/historical-catalog.md#task-2-acceptance).
+The dated D02/D10 records and their unresolved evidence requirements below are
+preserved. This does not claim Mehla’s or instructor/course approval.
 
 ## Method and limits
 

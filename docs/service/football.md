@@ -49,7 +49,7 @@ upgrades are tested. No persistent migration is authorized by this implementatio
 Current head `e42b7c19a603` adds users and nullable scenario ownership after this
 retirement. Its downgrade refuses populated users or ownership; the empty-schema
 recreation described above applies only to the retirement revisions. See the
-[ownership design](task1-database-ownership-design.md).
+[ownership design](architecture.md#ownership-and-migration-acceptance).
 
 ## Phase boundaries
 

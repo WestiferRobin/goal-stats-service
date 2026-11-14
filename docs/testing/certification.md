@@ -1,9 +1,9 @@
 # Backend certification
 
-Prompt 2 includes the actual approved Women's World Cup source in canonical host
-certification. Prompt 1's five application tables and 15 application operations remain
-unchanged. This phase does not seed development data or provide Prompt 3's independent
-final certification.
+Canonical host certification includes the actual approved Women's World Cup source.
+The current backend has six application tables, head `e42b7c19a603`, and 16
+application operations. Certification uses disposable infrastructure; it does not
+seed development data or establish production deployment acceptance.
 
 Run `make certify` from the repository root with Docker Desktop/Compose and the
 repository Python 3.12 `.venv`. Run `make setup` to prepare a missing environment.
@@ -22,8 +22,8 @@ There is no Python runner image build, runner container or Flask container.
 The complete `tests/unit` and `tests/integration` selection runs together exactly once
 under coverage. GNU Make-dependent cases run on hosts with GNU Make available.
 The `pinned_source` case is mandatory in this invocation; no marker filter excludes it.
-`make test` alone excludes it explicitly. The runner validates the ignored pinned CSV,
-creates and verifies an invocation-owned macOS read-only image, and exposes it only to
+`make test` alone excludes it explicitly. The runner validates the committed pinned
+CSV included in fresh clones, creates and verifies an invocation-owned macOS read-only image, and exposes it only to
 this execution. Missing source, invalid manifests/checksum or mount failures fail closed.
 See [testing](overview.md#pinned-historical-source-certification) for source location,
 checksum, ownership checks and lifecycle.

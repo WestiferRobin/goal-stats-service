@@ -138,8 +138,11 @@ These are historical result records, not invented observations or recent-form ra
 ## Historical team summary
 
 `GET /api/v1/catalog/teams/{team_id}/summary` reads existing database records without
-changing them. These historical definitions remain **provisional until Mehla confirms
-them**. Existing catalog and match-history response shapes are unchanged.
+changing them. These definitions are **accepted project behavior for the current
+implementation scope**, as accepted by the project owner. This does not claim
+Mehla’s personal sign-off or instructor/course approval. Existing catalog and
+match-history response shapes are unchanged. Source-validation limits and unresolved
+D02/D10 evidence remain in the [discrepancy ledger](../../data/verification/task2-historical-comparisons.md).
 
 The required path `team_id` and optional query `competition_id` are positive integer
 IDs, bounded to 2,147,483,647. Optional `date_from` and `date_to` must be valid calendar
@@ -205,8 +208,29 @@ Adjacent entries meet in the first knockout round. No group stages, qualificatio
 official brackets or historic ratings are inferred. The response preserves champion,
 semifinal/final distributions and most-common-final output, marks
 `kind: hypothetical_knockout`, and declares `probability_unit: percent`.
-No simulation records are persisted. Results are stochastic; tests control and
-restore random state without adding a production seed API.
+No simulation records are persisted. Requests accept an optional integer `seed`
+from 0 through 4,294,967,295. Omitted or null seeds generate a seed; the response
+returns the actual `seed` used. The engine constructs a request-local random
+number generator; it neither consumes nor restores global random state.
+Reproduction requires the same ordered participants, assumptions, simulation count
+and seed under the same implementation. Names are display values, not identity.
+`results[].team_id`, `predicted_champion_id`, and
+`most_common_final.team1_id` / `team2_id` identify participants even when names
+are duplicated; `most_common_final` is nullable.
+
+A sampled tied score is resolved with the conditional share
+`team1.clutch / (team1.clutch + team2.clutch)`, or 0.5 when both are zero.
+The overall advancement probability is win probability plus draw probability
+times that share; it is not reused as the conditional draw probability.
+
+**Task 11: DONE — Monte Carlo backend implementation and documentation complete.**
+Existing engine tests cover bracket progression, seeded reproducibility, participant
+identity and four independent Poisson comparisons (20,000 samples per case,
+six-standard-error tolerance). Router tests repeat a seeded request and verify no
+persisted changes; isolated simulation tests check concurrent requests, unchanged
+global random state, seed boundaries and duplicate display names. These checks establish the implemented mathematical contract,
+not predictive calibration. Tournament UI execution and live UI acceptance remain
+separate frontend scope.
 
 ## Errors and retired contracts
 

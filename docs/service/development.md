@@ -76,7 +76,7 @@ current head `e42b7c19a603` adds users and nullable scenario ownership, leaving 
 application tables. Zero users and unowned scenarios remain valid. No persistent
 database state is inferred from this checkout. Ownership downgrade refuses any
 user rows or non-NULL owner fields; it never clears records to permit rollback.
-See the [ownership plan](task1-database-ownership-design.md) for deployment sequencing.
+See the [ownership plan](architecture.md#ownership-and-migration-acceptance) for deployment sequencing.
 Do not run `make run`, `make deploy`, or persistent Alembic upgrades from this checkout
 before coordinated authorization: startup preparation applies pending migrations.
 Direct factory construction is lazy; readiness correctly rejects an old revision.

@@ -30,8 +30,8 @@ engine output, and appends a saved result in a separate transaction. Retrieval u
 saved inputs and output without recalculation.
 
 The five domain routers are registered independently. There is no FootballService
-or prototype router. The 15 application operations include the original normalized
-catalog/scenario/prediction APIs plus preview, historical insights and hypothetical
+or prototype router. The 16 application operations include the original normalized
+catalog/scenario/prediction APIs plus full-history team summaries, preview, historical insights and hypothetical
 knockout simulation. See [the exact API contracts](frontend-api.md).
 
 MatchService and CompetitionService receive TeamService directly. PredictionService
@@ -102,7 +102,7 @@ Revision `e42b7c19a603` adds users (`user_id`, `created_at`) and nullable scenar
 `owner_user_id` with a restrictive FK and composite owner/time/ID index. Predictions
 inherit ownership through scenarios; saved JSON and public API shapes are unchanged.
 Existing shared APIs remain shared. Downgrade locks scenarios/users and refuses
-any user rows or non-NULL owners. See the [ownership design](task1-database-ownership-design.md)
+any user rows or non-NULL owners. See the [ownership design](architecture.md#ownership-and-migration-acceptance)
 for preservation, deployment and Task 13/14 boundaries.
 
 ## Normalized entity cache decisions
@@ -216,3 +216,90 @@ Cross-domain primitives remain in `schemas/common.py`; singleton contracts such 
 `schemas/problem.py` remain flat. Consumers can retain the stable domain-package imports;
 schema package internals import defining modules directly.
 `ProblemDetailSchema` defines the unchanged safe error JSON contract.
+
+## Ownership and migration acceptance
+
+**Task 1: DONE — Database architecture and ownership preparation complete for the
+current scope.** The active chain is
+`a7c93e25d104 → c8d42f19e630 → d91e6a4b208f → e42b7c19a603`.
+The six application tables are `teams`, `competitions`, `matches`, `scenarios`,
+`predictions`, and `users`; `alembic_version` is migration metadata.
+
+| Table | Relationships, constraints and indexes |
+| --- | --- |
+| teams | Stable integer ID; unique name/category; bounded nullable ratings and attribution |
+| competitions | Stable integer ID; unique name/edition/category; nonblank labels |
+| matches | Restrictive competition/two-team FKs; distinct teams; nonnegative scores; unique source/record key; FK/date indexes and provenance |
+| scenarios | Restrictive team/optional-match FKs; explicit rating snapshots, bounded state and possession sum; reference and creation-time/ID indexes |
+| predictions | Restrictive scenario FK; bounded probabilities, object-shaped saved JSON; scenario/time/ID and global time/ID indexes |
+| users | Stable `user_id` identity primary key and database-default `created_at`; zero rows valid |
+
+`scenarios.owner_user_id` is nullable with no default/backfill and references
+`users.user_id` using `ON DELETE RESTRICT`. Its composite index is
+`(owner_user_id, created_at, scenario_id)`. Predictions inherit ownership through
+their scenario; no duplicated owner field is stored in prediction JSON. Existing
+IDs, timestamps, original columns and saved snapshots remain intact. Public response
+and calculation-input projections exclude the internal owner column.
+
+The ownership migration contains no application-data writes. Downgrade locks
+scenarios/users, requires zero users and all owners NULL, and drops ownership
+objects without CASCADE. Populated identities, ownership or unexpected dependencies
+block reversal atomically. Do not clear data to bypass guards; downgrade to `base`
+is not a record-preserving rollback. Earlier retirement revisions also reject
+populated legacy tables rather than deleting their data.
+
+The [SQL export](../../sql/README.md) follows the same Alembic chain. Existing
+`tests/unit/test_sql_exports.py` checks deterministic offline parity;
+`tests/integration/infra/resources/test_db.py` checks actual schema parity,
+original-column preservation, failed DDL, lock timeouts, downgrade dependencies
+and populated-user refusal. Full-row digests change shape when a nullable column
+is added: compare original columns first, verify NULL owners, then establish a
+new full-row baseline. No preservation claim follows from a lone post-upgrade hash.
+
+For a separately authorized deployment: verify target/schema identity, backup and
+restore capability; rehearse on disposable infrastructure; measure lock duration;
+drain traffic/writers and use one migration actor; migrate before starting the
+matching application; verify exact head, six-table readiness, original records and
+shared workflows before restoring traffic. Ordinary index creation and ALTER TABLE
+can block writers. Keep bounded lock/statement timeouts and abort on failure.
+Old-code/new-schema and new-code/old-schema combinations are operationally
+unsupported because readiness and metadata expectations differ. This is not a
+zero-downtime or production deployment certification.
+
+No login, user assignment, per-user filtering or authorization is active. Saved
+records remain shared, not private. Tasks 13/14 must define authentication,
+legacy-record policy and cross-user isolation before private accounts are released.
+
+## Task 9 acceptance
+
+**DONE — Required backend architecture implementation verified.** This conclusion
+covers the current [Engineering Backlog](https://docs.google.com/document/d/1nsJYQbk84yOqcpXeAhxrXTRAZtPNignpOJSuN26Wlg0/edit)
+and [Weekly Team Tasks](https://docs.google.com/document/d/1D_mUhoDmvOqDpT08I0w_yk_jOd5jw2wTEj-nAtbDf0I/edit)
+scope, not production deployment certification or course approval.
+
+| Requirement | Implemented evidence |
+| --- | --- |
+| Flask factory and route registration | `src/main.py` constructs and injects app-owned services; registered Flask methods and generated OpenAPI both contain 16 application operations |
+| Service/repository separation and transactions | `src/services/` owns validation/transactions; `src/infra/repositories/` owns SQL; row locking protects scenario edits |
+| Validation and errors | Strict Pydantic contracts, safe Problem Details, framework/domain handlers and rollback |
+| Full-history summaries | Team repository aggregates all matching records, independent of history pagination; accepted definitions and empty states in the API contract |
+| Prediction integration | Preview is unsaved; generation appends captured inputs/output; saved reads never recalculate |
+| Monte Carlo integration | Competition service captures normalized identities, closes its read transaction, then runs request-local seeded simulation |
+| Scenario persistence | Create/list/detail/PATCH and per-scenario saved prediction history use PostgreSQL |
+| Health/readiness | Provider-independent liveness; exact migration head and mapped-column probes; bounded Redis readiness |
+| Production boundary | `main.py` checks a configured bearer service token on non-GET/HEAD/OPTIONS requests in production; this is service authentication, not per-user authorization |
+| Deferred identity | Tasks 13/14 remain separate; schema ownership preparation does not make shared records private |
+
+No additional runtime architecture change is required for this audited scope.
+
+Documentation acceptance verification on 2026-11-13, based on runtime commit
+`d8d7452138431570cece9c1d8cdafa338d41cb0b`: Flask registration and generated OpenAPI
+independently counted 16 application operations; the historical verifier passed
+all nine editions and the committed checksum. Canonical `make test` reported
+**1,636 passed, one deselected in 295.38s**, Ruff lint PASS, 211 files formatted,
+strict mypy PASS (81 source files), and tests/resource cleanup PASS. The deselected
+pinned-source integration test belongs to `make certify`, which was not rerun in
+this documentation audit. A temporary read-only Markdown checker resolved all 91
+relative links; `git diff --check` passed. No runtime, schema, source-data or
+frontend changes were made. This is local verification, not a claim of GitHub CI
+or production deployment success.
