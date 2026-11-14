@@ -224,6 +224,14 @@ def seed_calls(calls):
     return [c for c in calls if "import-football" in c]
 
 
+def test_local_app_never_pulls_but_providers_keep_default_policy():
+    content = (ROOT / "docker/compose.local.yml").read_text()
+    providers, app = content.split("\n  app:\n", 1)
+    assert "    pull_policy: never\n" in app
+    assert "pull_policy:" not in providers
+    assert content.count("pull_policy:") == 1
+
+
 @pytest.mark.parametrize("dataset", APPROVED_DATASETS)
 def test_seed_individual(workflow, dataset):
     run, _ = workflow
@@ -249,7 +257,12 @@ def test_seed_group_order_allowlist_and_safety(workflow, dry):
         assert c[c.index("--volume") + 1].endswith(":/input:ro")
         assert c[c.index("--expect-host") + 1] == "postgres"
         assert c[c.index("--expect-database") + 1] == "goal_stats_service_local"
-        assert all(flag in c for flag in ("--rm", "--no-deps", "--pull", "never"))
+        assert all(flag in c for flag in ("--rm", "--no-deps", "-T"))
+    runners = [c for c in calls if c[:2] == ["docker", "compose"] and "run" in c]
+    assert len(runners) == len(imports) + 1  # Fingerprint preflight precedes imports.
+    assert all(not any(arg.startswith("--pull") for arg in c) for c in runners)
+    assert ["docker", "image", "inspect", "goal-stats-service:runtime"] in calls
+    assert calls.index(runners[0]) < calls.index(imports[0])
     assert not any(
         word in c
         for c in calls
@@ -315,6 +328,11 @@ def test_seed_preparation_failure_never_imports(workflow, extra):
     run, _ = workflow
     result, calls = run("seed", DATASET="womens-world-cup", **extra)
     assert result.returncode != 0 and not seed_calls(calls)
+    if extra.get("FAIL") == "image inspect":
+        assert "Runtime image missing" in result.stderr
+        assert not any(c[:2] == ["docker", "compose"] and "run" in c for c in calls)
+    if "STALE_IMAGE" in extra:
+        assert "Runtime image is outdated" in result.stderr
 
 
 def test_seed_missing_source(workflow):
