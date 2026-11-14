@@ -74,6 +74,9 @@ No additional dataset download is required. Its source attribution, revision and
 SHA-256 are documented in [data/README.md](../../data/README.md).
 Seed checks prepared-image compatibility and mounts only that input directory read-only.
 It never builds/pulls images, starts dependencies, applies migrations or resets data.
+The local app service uses `pull_policy: never`, supported by Compose 2.22.0 and
+newer, instead of the newer `compose run --pull` option. Explicit setup/deploy
+builds and PostgreSQL/Redis image pulls remain unchanged.
 It uses canonical local configuration and verifies the connected PostgreSQL identity
 and Alembic revision through the existing importer. Unsupported Compose overrides fail.
 

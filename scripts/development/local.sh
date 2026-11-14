@@ -129,7 +129,7 @@ seed_data() {
   trap 'exit 130' INT
   trap 'exit 143' TERM
   seed_execute() {
-    env MSYS_NO_PATHCONV=1 "${compose[@]}" run --rm --no-deps -T --pull never \
+    env MSYS_NO_PATHCONV=1 "${compose[@]}" run --rm --no-deps -T \
       --name "$runner" --volume "$source_directory:/input:ro" app "$@" \
       >"$temporary/output" &
     active_pid=$!

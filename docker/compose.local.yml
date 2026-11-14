@@ -25,6 +25,7 @@ services:
       retries: 40
   app:
     image: goal-stats-service:runtime
+    pull_policy: never
     build:
       context: ..
       target: runtime
