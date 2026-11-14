@@ -1,7 +1,8 @@
 # Approved Women's World Cup data
 
 Local runtime/tooling images package approved manifests and verification evidence;
-developer `data/raw/` remains excluded. The production image separately downloads and
+the pinned CSV is included in Git for local seeding, while `data/raw/` remains excluded
+from Docker build contexts. The production image separately downloads and
 checksum-verifies the pinned `results.csv` into `/app/data/bootstrap/` for explicit
 production bootstrap. See [Render deployment](../docs/service/render.md). Prototype
 CSVs and their importer remain retired; reference mathematics uses explicit inputs.
@@ -20,7 +21,7 @@ The selection is exactly `tournament = FIFA World Cup`, with inclusive dates
 bounded, relevant Phase 1 dataset with 64 matches, 32 senior women's national teams,
 and one competition. These counts describe the **subset**, not the full upstream
 CSV. The pinned full file contains 11,650 result rows. It has been verified in memory;
-the local `data/raw/` copy is not tracked or copied into images. Production builds
+the exact `data/raw/` copy is tracked but not copied into local images. Production builds
 download the same pinned bytes separately for the explicit bootstrap mode.
 
 The explicit mapping is `FIFA World Cup` → `FIFA Women's World Cup`, edition `2023`,
@@ -99,7 +100,13 @@ Use the canonical `flask --app 'main:create_app()' import-football` command with
 `--dataset womens-world-cup-2023`, `--directory`, `--target`, `--expect-host`, and
 `--expect-database`. Omitted dataset/directory selections fail; no prototype import mode remains.
 Historical import never runs automatically during `make run` or `make deploy`.
-The importer reads an existing file; downloading is an explicit operator step.
+The importer reads the committed file at
+`data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv`.
+A fresh clone includes these exact bytes; no manual download is required. Git disables
+line-ending conversion for this file to preserve its checksum. All other raw files
+remain ignored. `make setup` prepares tooling, not records; `make deploy` starts the
+local providers and applies migrations before Flask. Then use the explicit seed
+commands below. The seed runner mounts the committed input directory read-only.
 There is no alternate manifest or checksum-bypass CLI flag.
 
 The entire CSV checksum is checked before parsing. Rows with malformed field counts

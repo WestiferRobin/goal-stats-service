@@ -24,5 +24,9 @@ jobs:
           python-version: "3.12"
       - name: Prepare repository Python environment
         run: python scripts/development/python_environment.py bootstrap
+      - name: Verify packaged historical source
+        run: |
+          git ls-files --error-unmatch -- data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src .venv/bin/python -B scripts/database/verify_historical_contracts.py
       - name: Test service
         run: make test

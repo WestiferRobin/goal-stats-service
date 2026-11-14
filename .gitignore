@@ -24,5 +24,10 @@ dist/
 *.egg-info/
 .DS_Store
 
-# Original historical sources stay local and outside application packaging.
-/data/raw/
+# Distribute only the approved, checksum-pinned historical source.
+/data/raw/*
+!/data/raw/martj42-womens-results/
+/data/raw/martj42-womens-results/*
+!/data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/
+/data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/*
+!/data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv
