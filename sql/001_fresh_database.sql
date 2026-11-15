@@ -363,5 +363,72 @@ CREATE INDEX ix_scenarios_owner_user_id ON scenarios (owner_user_id, created_at,
 
 UPDATE alembic_version SET version_num='e42b7c19a603' WHERE alembic_version.version_num = 'd91e6a4b208f';
 
+-- Running upgrade e42b7c19a603 -> f31a6e208b47
+
+CREATE TABLE ranking_releases (
+    release_id VARCHAR(100) NOT NULL,
+    published_on DATE NOT NULL,
+    retrieved_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    source_url VARCHAR NOT NULL,
+    sha256 VARCHAR(64) NOT NULL,
+    index_sha256 VARCHAR(64) NOT NULL,
+    release_metadata JSONB NOT NULL,
+    CONSTRAINT pk_ranking_releases PRIMARY KEY (release_id)
+);
+
+CREATE INDEX ix_ranking_releases_published_on ON ranking_releases (published_on);
+
+CREATE TABLE ranking_observations (
+    release_id VARCHAR(100) NOT NULL,
+    fifa_team_id VARCHAR(40) NOT NULL,
+    rank INTEGER,
+    points NUMERIC,
+    status INTEGER NOT NULL,
+    raw JSONB NOT NULL,
+    CONSTRAINT pk_ranking_observations PRIMARY KEY (release_id, fifa_team_id),
+    CONSTRAINT ck_ranking_observations_rank_positive CHECK (rank IS NULL OR rank > 0),
+    CONSTRAINT ck_ranking_observations_points_finite CHECK (points IS NULL OR (points >= 0 AND points < 'Infinity'::numeric)),
+    CONSTRAINT fk_ranking_observations_release_id_ranking_releases FOREIGN KEY(release_id) REFERENCES ranking_releases (release_id) ON DELETE RESTRICT
+);
+
+CREATE TABLE fifa_team_mappings (
+    team_id INTEGER NOT NULL,
+    fifa_team_id VARCHAR(40) NOT NULL,
+    source_name VARCHAR NOT NULL,
+    CONSTRAINT pk_fifa_team_mappings PRIMARY KEY (team_id),
+    CONSTRAINT fk_fifa_team_mappings_team_id_teams FOREIGN KEY(team_id) REFERENCES teams (team_id) ON DELETE RESTRICT,
+    CONSTRAINT uq_fifa_team_mappings_fifa_team_id UNIQUE (fifa_team_id)
+);
+
+CREATE TABLE rating_runs (
+    run_id VARCHAR(64) NOT NULL,
+    cutoff DATE NOT NULL,
+    model_version VARCHAR NOT NULL,
+    source_sha256 VARCHAR(64) NOT NULL,
+    source_url VARCHAR NOT NULL,
+    report JSONB NOT NULL,
+    CONSTRAINT pk_rating_runs PRIMARY KEY (run_id),
+    CONSTRAINT uq_rating_runs_cutoff UNIQUE (cutoff, model_version, source_sha256)
+);
+
+CREATE INDEX ix_rating_runs_cutoff ON rating_runs (cutoff);
+
+CREATE TABLE team_ratings (
+    run_id VARCHAR(64) NOT NULL,
+    team_id INTEGER NOT NULL,
+    offense FLOAT,
+    defense FLOAT,
+    form FLOAT,
+    evidence JSONB NOT NULL,
+    CONSTRAINT pk_team_ratings PRIMARY KEY (run_id, team_id),
+    CONSTRAINT ck_team_ratings_offense_range CHECK (offense BETWEEN 0 AND 100),
+    CONSTRAINT ck_team_ratings_defense_range CHECK (defense BETWEEN 0 AND 100),
+    CONSTRAINT ck_team_ratings_form_range CHECK (form BETWEEN 0 AND 100),
+    CONSTRAINT fk_team_ratings_run_id_rating_runs FOREIGN KEY(run_id) REFERENCES rating_runs (run_id) ON DELETE RESTRICT,
+    CONSTRAINT fk_team_ratings_team_id_teams FOREIGN KEY(team_id) REFERENCES teams (team_id) ON DELETE RESTRICT
+);
+
+UPDATE alembic_version SET version_num='f31a6e208b47' WHERE alembic_version.version_num = 'e42b7c19a603';
+
 COMMIT;
 

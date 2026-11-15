@@ -1,15 +1,24 @@
 """Historical team reads using the caller's transaction."""
 
+from __future__ import annotations
+
 from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from datetime import date
 
-from sqlalchemy import case, func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, case, func, or_, select, true
+from sqlalchemy.orm import Session, aliased
 
 from infra.resources.db import Database
 from models.competition import Competition
+from models.enrichment import (
+    FifaTeamMapping,
+    RankingObservation,
+    RankingRelease,
+    RatingRun,
+    TeamRating,
+)
 from models.match import Match
 from models.team import Team
 
@@ -48,6 +57,82 @@ class TeamRepository:
 
     def list(self, session: Session) -> list[Team]:
         return list(session.scalars(select(Team).order_by(Team.name, Team.team_id)))
+
+    def list_profiles(
+        self, session: Session, team_id: int | None = None
+    ) -> Sequence[tuple[Team, dict[str, object]]]:
+        """One SELECT and one database snapshot, including both latest cohorts."""
+        release = aliased(
+            RankingRelease,
+            select(RankingRelease)
+            .where(RankingRelease.published_on <= date.today())
+            .order_by(RankingRelease.published_on.desc())
+            .limit(1)
+            .subquery(),
+        )
+        run = aliased(
+            RatingRun,
+            select(RatingRun)
+            .where(RatingRun.cutoff <= date.today())
+            .order_by(RatingRun.cutoff.desc(), RatingRun.model_version.desc(), RatingRun.run_id)
+            .limit(1)
+            .subquery(),
+        )
+        statement = (
+            select(Team, FifaTeamMapping, release, RankingObservation, run, TeamRating)
+            .select_from(Team)
+            .outerjoin(FifaTeamMapping, FifaTeamMapping.team_id == Team.team_id)
+            .outerjoin(release, true())
+            .outerjoin(
+                RankingObservation,
+                and_(
+                    RankingObservation.release_id == release.release_id,
+                    RankingObservation.fifa_team_id == FifaTeamMapping.fifa_team_id,
+                ),
+            )
+            .outerjoin(run, true())
+            .outerjoin(
+                TeamRating,
+                and_(TeamRating.run_id == run.run_id, TeamRating.team_id == Team.team_id),
+            )
+            .order_by(Team.name, Team.team_id)
+        )
+        if team_id is not None:
+            statement = statement.where(Team.team_id == team_id)
+        result = []
+        for team, mapping, official, observation, cohort, rating in session.execute(statement):
+            values: dict[str, object] = {}
+            if official and mapping:
+                values.update(
+                    fifa_rank=observation.rank if observation else None,
+                    fifa_points=float(observation.points)
+                    if observation and observation.points is not None
+                    else None,
+                    ranking_date=official.published_on,
+                    ranking_source=official.source_url,
+                    ranking_release_id=official.release_id,
+                    fifa_team_id=mapping.fifa_team_id,
+                    ranking_status="ranked"
+                    if observation and observation.rank is not None
+                    else "unranked",
+                )
+            if cohort and rating:
+                values.update(
+                    offense=rating.offense,
+                    defense=rating.defense,
+                    form=rating.form,
+                    ratings_metadata={
+                        "run_id": cohort.run_id,
+                        "model": cohort.model_version,
+                        "cutoff": cohort.cutoff.isoformat(),
+                        "source": cohort.source_url,
+                        "source_sha256": cohort.source_sha256,
+                        "status": "experimental",
+                        "evidence": rating.evidence,
+                    },
+                )
+            result.append((team, values))
+        return result
 
     def summary(
         self,

@@ -1,8 +1,10 @@
 # PostgreSQL schema exports and verification
 
 `001_fresh_database.sql` is generated offline from the unchanged historical Alembic
-chain through head `e42b7c19a603`. Its final schema contains six application
-tables (`teams`, `competitions`, `matches`, `scenarios`, `predictions`, `users`)
+chain through head `f31a6e208b47`. Its final schema contains eleven application
+tables (`teams`, `competitions`, `matches`, `scenarios`, `predictions`, `users`,
+`ranking_releases`, `ranking_observations`, `fifa_team_mappings`, `rating_runs`,
+`team_ratings`)
 and `alembic_version`. Historical SQL creates then retires legacy
 tables; it never seeds prototype records. No prototype seed artifact is supported.
 
@@ -74,3 +76,7 @@ is retained in [Task #2 evidence](../docs/service/historical-catalog.md#historic
 
 The approved seed workflow is `make seed DATASET=womens-world-cup` with explicit
 target safeguards. There are no SQL data inserts replacing that importer.
+
+The five additive enrichment tables hold FIFA releases/observations/mappings and
+versioned rating runs/team snapshots. They do not replace historical tables. See
+[Teams enrichment](../docs/service/team-enrichment.md) for explicit imports.

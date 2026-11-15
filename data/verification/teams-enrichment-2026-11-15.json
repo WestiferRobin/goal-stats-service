@@ -1,0 +1,80 @@
+{
+  "releases": 96,
+  "observations_inserted": 16525,
+  "mapped_teams": 44,
+  "run_id": "64c76a332742bbb73ddf3d25cdf623c799729efd314786d2ba5aa7a05531fd74",
+  "cutoff": "2026-06-10",
+  "validation": {
+    "model": "international-recorded-score-poisson-v1",
+    "status": "experimental_not_calibrated",
+    "folds": [
+      {
+        "train_through": "2024-12-12",
+        "test_through": "2025-06-10",
+        "matches": 338,
+        "baseline_nll": 3.5392380113086026,
+        "opponent_adjusted_nll": 3.1594078688663796,
+        "with_form_nll": 3.213132927812117
+      },
+      {
+        "train_through": "2025-12-12",
+        "test_through": "2026-06-10",
+        "matches": 360,
+        "baseline_nll": 4.135178154798821,
+        "opponent_adjusted_nll": 3.306850143336334,
+        "with_form_nll": 3.327796441857928
+      }
+    ],
+    "parameters": {
+      "window_days": 1461,
+      "half_life_days": 730,
+      "l2": 8,
+      "form_days": 365,
+      "form_half_life_days": 180,
+      "form_shrinkage": 5
+    },
+    "limitations": [
+      "Recorded scores may include extra time; these are not per-90 ratings.",
+      "No uncertainty intervals or proof of incremental form predictive value.",
+      "Source completeness and opponent coverage vary; percentile scores are cohort-relative."
+    ]
+  },
+  "source_package_index_sha256": "cc4effae872859b5cc9be5168f2c058849ad2884fc2aa3f144c1d13732dce51b",
+  "original_tables_unchanged": {
+    "teams": {
+      "count": 44,
+      "sha256": "47002350f38454cf614fd89065a2b1dbff4547c7e73c73c0de827eddf149d224"
+    },
+    "competitions": {
+      "count": 9,
+      "sha256": "789ceb38a9924c35b19093cb8f779f1ef370e7600621d929b9a8a87d14e11308"
+    },
+    "matches": {
+      "count": 348,
+      "sha256": "2ecc629e684bab9c4a1a3b27ac151b6961796044337fda18afb8f1b22e25886e"
+    },
+    "scenarios": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "predictions": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "users": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "replay_inserts": {
+    "observations": 0,
+    "ratings": 0
+  },
+  "coverage": {
+    "official_rankings": 44,
+    "offense_defense_form": 43,
+    "insufficient_evidence": [
+      "Equatorial Guinea"
+    ]
+  }
+}

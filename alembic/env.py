@@ -4,6 +4,7 @@ from alembic import context
 from sqlalchemy.engine import Connection
 
 import models.competition  # noqa: F401
+import models.enrichment  # noqa: F401
 import models.match  # noqa: F401
 import models.prediction  # noqa: F401
 import models.scenario  # noqa: F401

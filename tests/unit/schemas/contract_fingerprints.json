@@ -1,5 +1,5 @@
 {
-  "openapi": "7d1fceca529abb0cd573c614dad11ff53c75e99355e945bfcacc93df15072b08",
+  "openapi": "4d708c52faa32562e97536985588f1080f1fe02aac6715408b026c1eb24c45fc",
   "schemas": {
     "CatalogCompetitionResponse": {
       "serialization": "f58d67ad9dd26be36c2ff0e74bfb9540177ff164b3c9dba7202a87e6ac047f54",
@@ -30,12 +30,12 @@
       "validation": "a1873acc88bd7b16f7e224b5c92d04c842d8dcff925542ca7e90d585707f5bef"
     },
     "CatalogTeamResponse": {
-      "serialization": "0144035f3d61f51188ad645ad2d44780d637c65dea68b7674969b7f08c089442",
-      "validation": "0144035f3d61f51188ad645ad2d44780d637c65dea68b7674969b7f08c089442"
+      "serialization": "c78825b1802bb120dc0a7f04520803f5024f562ba71867e305c44bbc86f1613b",
+      "validation": "c78825b1802bb120dc0a7f04520803f5024f562ba71867e305c44bbc86f1613b"
     },
     "CatalogTeamsResponse": {
-      "serialization": "39f8d48fe05e786f0f701295ad7eaf34dbe410eb415c092a2bdfc7280cd4e01e",
-      "validation": "39f8d48fe05e786f0f701295ad7eaf34dbe410eb415c092a2bdfc7280cd4e01e"
+      "serialization": "61e331e6886564aa57c2b5667edbc77f29112725afab9fb0ee14aae35c5fc3a0",
+      "validation": "61e331e6886564aa57c2b5667edbc77f29112725afab9fb0ee14aae35c5fc3a0"
     },
     "Confidence": {
       "serialization": "fafc60f0bcd0c89ea378ba5a10d67d65d588aa5c08eead2ef373a7af555f52b4",
@@ -96,6 +96,10 @@
     "PredictionResponse": {
       "serialization": "e4540e232e38aac32c5c6c4edb23e7b80551e2909f6e227a215817cce8837212",
       "validation": "e4540e232e38aac32c5c6c4edb23e7b80551e2909f6e227a215817cce8837212"
+    },
+    "RatingsMetadata": {
+      "serialization": "1a8fe7ad9a179566bee398bb9793f2845f5944854b9a99da37de924cdafc7390",
+      "validation": "1a8fe7ad9a179566bee398bb9793f2845f5944854b9a99da37de924cdafc7390"
     },
     "SavedEngineOutput": {
       "serialization": "de6c8f336ef9fac646f71e7ff694ae94a64d2acd48b20157dbbe820697e93c86",

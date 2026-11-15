@@ -39,6 +39,12 @@ def test_teams_detail_nulls_and_no_parallel_prediction_catalog(small_catalog, im
             "fifa_rank",
             "ranking_date",
             "prediction_ready",
+            "fifa_points",
+            "fifa_team_id",
+            "ranking_release_id",
+            "ranking_source",
+            "ranking_status",
+            "ratings_metadata",
         }
         assert all(
             team[key] is None

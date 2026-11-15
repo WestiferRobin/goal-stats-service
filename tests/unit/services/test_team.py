@@ -16,6 +16,9 @@ def test_team_responses_preserve_order_nulls_and_no_rating_fallback(service_cont
         "TeamRepository",
         SimpleNamespace(
             list=lambda: rows,
+            list_profiles=lambda identity=None: [
+                (r, {}) for r in rows if identity is None or r.team_id == identity
+            ],
             get_by_id=lambda identity: next((r for r in rows if r.team_id == identity), None),
         ),
     )
