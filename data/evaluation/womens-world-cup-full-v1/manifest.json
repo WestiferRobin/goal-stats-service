@@ -1,0 +1,190 @@
+{
+  "dataset_id": "womens-world-cup-full-v1",
+  "package_id": "womens-world-cup-1991-2023-evidence-v1",
+  "expected_catalog_matches": 348,
+  "expected_dataset_hash": "96449615bc6d7ab91252d5d6a988ee47772b22c22d5a6850c981fb132e1d3e88",
+  "source_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+  "source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+  "registry_sha256": "31eec9165083935f7f161f81f90c4714152db174f844ec5e3b35b60565cf8e7e",
+  "ratings_sha256": "5ab7edf902f93efb5234acb9b54addb673d197a15c52808d4bec8b734c1ad643",
+  "rules_sha256": "e695145c9ec693db7f8501ba0892956426052f104369811fecc838dffabd49dd",
+  "historical_availability_verified": false,
+  "rating_model_version": "international-recorded-score-poisson-v1",
+  "prediction_model_version": "road-to-the-final-heuristic-v2",
+  "protocol_version": "edition-regulation-v1",
+  "assumption_policy": "Explicit caller-named, versioned package; no defaults; no observed special ratings",
+  "rules": {
+    "editions": {
+      "1991": {
+        "regulation_minutes": 80,
+        "protocol": "pregame-regulation-80-v1",
+        "model_compatible": false,
+        "model_validation": "blocked_pending_80_minute_model_validation",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "1995": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "1999": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "golden_goal_then_shootout",
+        "third_place_exception": "1999 third-place match proceeded directly to penalties; see archive annotation",
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history",
+          "golden_1999"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2003": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "golden_goal_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history",
+          "golden_2003"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2007": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2011": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2015": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2019": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": null,
+        "rule_evidence": [
+          "duration_history"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original edition regulations, including complete tie-break procedure and extra-time maximum, not acquired."
+      },
+      "2023": {
+        "regulation_minutes": 90,
+        "protocol": "pregame-regulation-90-v1",
+        "model_compatible": true,
+        "model_validation": "existing_90_minute_adapter_experimental_not_calibrated",
+        "group_tiebreak": "draw_permitted_no_extra_time",
+        "knockout_rule": "extra_time_then_shootout",
+        "third_place_exception": null,
+        "extra_time_max_minutes": 30,
+        "rule_evidence": [
+          "duration_history",
+          "regulations_2023"
+        ],
+        "verification": "duration_and_observed_match_procedure_reviewed",
+        "remaining_evidence": "Original regulations PDF bytes unavailable; reviewed article facts retained."
+      }
+    },
+    "sources": {
+      "duration_history": {
+        "url": "https://www.ussoccer.com/stories/2023/07/womens-world-cup-memories-10-most-memorable-uswnt-world-cup-matches",
+        "publisher": "U.S. Soccer",
+        "location": "1991 championship discussion",
+        "reviewed_fact": "1991 matches lasted 80 minutes; changed for 1995.",
+        "retrieved_on": "2026-11-15"
+      },
+      "golden_1999": {
+        "url": "https://inside.fifa.com/tournaments/womens/womensworldcup/france2019/news/memorable-moment-sissi-s-golden-goal-2907473",
+        "publisher": "FIFA",
+        "location": "The background; Why so special?",
+        "reviewed_fact": "Brazil–Nigeria level 3–3 before extra time; golden goal ended the match.",
+        "retrieved_on": "2026-11-15"
+      },
+      "golden_2003": {
+        "url": "https://inside.fifa.com/en/tournaments/womens/womensworldcup/usa2003/news/worldcupathome-germany-sweden-usa-2003-3070050",
+        "publisher": "FIFA",
+        "location": "The summary; goal timeline",
+        "reviewed_fact": "Germany–Sweden 1–1 at regulation; golden goal at 98 minutes.",
+        "retrieved_on": "2026-11-15"
+      },
+      "regulations_2023": {
+        "url": "https://media.fff.fr/uploads/document/0ba7decfa86a35515495d74869e45740.pdf",
+        "publisher": "FIFA, hosted by FFF",
+        "location": "Articles 37.7 and 14.1–14.2",
+        "reviewed_fact": "90-minute regulation; knockout extra time and shootout separated.",
+        "retrieved_on": "2026-11-15",
+        "original_pdf_sha256": null
+      }
+    },
+    "hash_scope": "Checksum covers reviewed fact record, not original web pages or PDF bytes."
+  }
+}

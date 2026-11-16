@@ -15,7 +15,7 @@ from football.evaluation import metrics, outcome, probabilities
 from football.scenario_prediction import predict_state
 from infra.repositories.evaluation import EvaluationRepository, HistoricalCase
 from schemas.engine import TeamStats
-from schemas.evaluation.request import BacktestRequest
+from schemas.evaluation.request import FULL_DATASET, PILOT_DATASET, BacktestRequest
 from schemas.evaluation.response import BacktestResponse, CaseResult
 from schemas.prediction.request import PredictionPreview
 
@@ -43,6 +43,9 @@ class RegulationEvidence:
     source: str
     source_hash: str
     definition: str = "observed_score_at_end_of_regulation"
+    regulation_minutes: int | None = None
+    completion_status: str | None = None
+    provenance: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -69,10 +72,33 @@ class EvaluationPackage:
     labels: dict[str, RegulationEvidence] = field(default_factory=dict)
     strengths: dict[str, dict[int, ObservedStrength]] = field(default_factory=dict)
     historical_availability_verified: bool = False
+    match_keys: tuple[str, ...] = ()
+    provenance: dict[str, object] = field(default_factory=dict)
 
     @property
     def hash(self) -> str:
-        return digest(asdict(self))
+        value = asdict(self)
+        # Preserve the original empty recorded-v1 package identity.
+        if not self.match_keys and not self.provenance:
+            del value["match_keys"], value["provenance"]
+        return digest(value)
+
+
+def approved_package(dataset_id: str) -> EvaluationPackage:
+    if dataset_id == DATASET:
+        return EvaluationPackage()
+    if dataset_id not in (PILOT_DATASET, FULL_DATASET):
+        raise EvaluationError("Unapproved package")
+    from services.evaluation_pilot import load_pilot
+
+    try:
+        if dataset_id == FULL_DATASET:
+            from services.evaluation_full import load_full
+
+            return load_full()
+        return load_pilot()
+    except (ValueError, KeyError, TypeError, OSError):
+        raise EvaluationError("Approved pilot evidence is unavailable") from None
 
 
 def approved_source() -> list[team_ratings.Result]:
@@ -123,12 +149,23 @@ class EvaluationService:
         self, repo: EvaluationRepository, package: EvaluationPackage | None = None
     ) -> None:
         self.repo = repo
-        self.package = package or EvaluationPackage()
+        self.package = package
 
     def evaluate(self, body: BacktestRequest) -> dict[str, Any]:
-        package = self.package
+        package = self.package or approved_package(body.dataset_id)
         if package.dataset_id != body.dataset_id:
             raise EvaluationError("Dataset identity mismatch")
+        full_records: dict[str, Any] = {}
+        full_ratings: dict[str, Any] = {}
+        if body.dataset_id == FULL_DATASET:
+            from services.evaluation_full import assets
+
+            try:
+                _, registry, rating_artifact = assets()
+                full_records = {r["match_key"]: r for r in registry["records"]}
+                full_ratings = rating_artifact["populations"]
+            except (ValueError, KeyError, TypeError, OSError):
+                raise EvaluationError("Full evidence assets unavailable") from None
         with self.repo.transaction() as session:
             candidates = self.repo.candidates(session)
             if (
@@ -137,7 +174,19 @@ class EvaluationService:
                 or len({c.match_key for c in candidates}) != len(candidates)
             ):
                 raise EvaluationError("Incomplete or duplicate dataset")
-            selected = candidates[body.offset : body.offset + body.limit]
+            cohort = candidates
+            if package.match_keys:
+                if any(
+                    c.source_hash != package.source_hash or c.source_version != REVISION
+                    for c in candidates
+                ):
+                    raise EvaluationError("Catalog source integrity mismatch")
+                cohort = [c for c in candidates if c.match_key in package.match_keys]
+                if len(cohort) != len(package.match_keys):
+                    raise EvaluationError("Incomplete approved cohort")
+            if body.edition is not None:
+                cohort = [c for c in cohort if c.day.year == body.edition]
+            selected = cohort[body.offset : body.offset + body.limit]
             ranks = {
                 c.match_key: [
                     self.repo.ranking(session, c.home_id, c.day),
@@ -152,6 +201,8 @@ class EvaluationService:
                 for c in candidates
             ]
         )
+        if package.provenance.get("expected_dataset_hash", dataset_hash) != dataset_hash:
+            raise EvaluationError("Approved catalog projection changed")
         permitted = {
             (c.match_key, identity) for c in selected for identity in (c.home_id, c.away_id)
         }
@@ -175,6 +226,37 @@ class EvaluationService:
                 exclusion_reasons=[],
             )
             reasons = result.exclusion_reasons
+            population = full_ratings.get(cutoff.isoformat())
+            if full_records:
+                record = full_records[case.match_key]
+                result.edition = record["edition"]
+                result.regulation_minutes = record["regulation_minutes"]
+                result.evaluation_protocol = f"pregame-regulation-{result.regulation_minutes}-v1"
+                result.evidence_record = record
+                if result.regulation_minutes == 80:
+                    reasons.append("model_80_minute_horizon_unvalidated")
+                if population is None:
+                    result.rating_reconstruction = "unavailable"
+                    reasons.append("historical_reconstruction_unavailable")
+                else:
+                    participants = {
+                        n: population["ratings"].get(n)
+                        for n in (case.source_home, case.source_away)
+                    }
+                    complete = all(
+                        r is not None
+                        and all(r[f] is not None for f in ("offense", "defense", "form"))
+                        for r in participants.values()
+                    )
+                    result.rating_reconstruction = "complete" if complete else "insufficient"
+                    result.rating_evidence = {
+                        **{k: v for k, v in population.items() if k != "ratings"},
+                        "participants": participants,
+                        "rating_model": team_ratings.MODEL,
+                        "source_hash": package.source_hash,
+                    }
+                    if not complete:
+                        reasons.append("historical_ratings_insufficient")
             label = package.labels.get(case.match_key)
             if case.source_hash != package.source_hash or (
                 package.evidence_kind == "historical" and case.source_version != REVISION
@@ -196,6 +278,10 @@ class EvaluationService:
                     result.label_provenance = asdict(label)
                 except ValueError:
                     reasons.append("regulation_outcome_evidence_invalid")
+                if type(label.regulation_minutes) is not int or label.regulation_minutes != 90:
+                    reasons.append("regulation_duration_incompatible")
+                if label.completion_status != "completed":
+                    reasons.append("match_completion_unverified")
             special = []
             special_provenance: list[dict[str, object]] = []
             for identity in (case.home_id, case.away_id):
@@ -244,7 +330,17 @@ class EvaluationService:
                         source = approved_source()
                     earlier = [r for r in source if r.day <= cutoff]
                     if cutoff not in fitted:
-                        fitted[cutoff] = team_ratings.calculate(earlier, cutoff)
+                        fitted[cutoff] = (
+                            population["ratings"]
+                            if population is not None
+                            else team_ratings.calculate(earlier, cutoff)
+                        )
+                    if population is not None and (
+                        len(earlier) != population["source_rows"]
+                        or digest([r.__dict__ for r in earlier])
+                        != population["source_population_hash"]
+                    ):
+                        raise ValueError("Rating reference population changed")
                     ratings = fitted[cutoff]
                     if any(
                         name not in ratings
@@ -287,6 +383,18 @@ class EvaluationService:
                                 "publication_timing": "verified"
                                 if package.historical_availability_verified
                                 else "match_dates_only_retrospective",
+                                "evaluation_package": package.provenance,
+                                "rating_reconstruction_hash": digest(
+                                    {
+                                        "model": team_ratings.MODEL,
+                                        "source_hash": package.source_hash,
+                                        "cutoff": cutoff,
+                                        "ratings": {
+                                            n: ratings[n]
+                                            for n in (case.source_home, case.source_away)
+                                        },
+                                    }
+                                ),
                             }
                             scored.append((p, actual))
                 except (ValueError, OSError):
@@ -295,7 +403,7 @@ class EvaluationService:
             result.warnings = sorted(set(result.warnings))
             cases.append(CaseResult.model_validate(result.model_dump()))
         counts = Counter(reason for c in cases for reason in c.exclusion_reasons)
-        result_body = {
+        result_body: dict[str, Any] = {
             "mode": body.mode,
             "status": "available" if scored else "unavailable",
             "interpretation": (
@@ -322,6 +430,7 @@ class EvaluationService:
             ),
             "evidence_kind": package.evidence_kind,
             "dataset_match_count": len(candidates),
+            "cohort_match_count": len(cohort),
             "offset": body.offset,
             "limit": body.limit,
             "total_candidate_matches": len(selected),
@@ -333,6 +442,14 @@ class EvaluationService:
             "assumption_package_id": body.assumption_package_id,
             "cases": cases,
             "limitations": [
+                *(
+                    [
+                        "Two-match retrospective pilot; insufficient for meaningful model accuracy "
+                        "conclusions. No prospective forecasting claim."
+                    ]
+                    if body.dataset_id == PILOT_DATASET
+                    else []
+                ),
                 "Metrics cover this page only; combine page metrics using eligible-case weights.",
                 "Rankings are optional; missing observations never borrow from older releases.",
                 "Experimental ratings use recorded scores including extra time; "
@@ -341,4 +458,60 @@ class EvaluationService:
                 "Regulation labels and observed strengths require reviewed package evidence.",
             ],
         }
+        if full_records:
+            from football.backtesting_evidence import EDITION_COUNTS
+
+            result_body.update(
+                protocol_version="edition-regulation-v1",
+                prediction_horizon="pregame_80_minutes_model_unvalidated"
+                if body.edition == 1991
+                else "edition_specific_80_and_90_minutes"
+                if body.edition is None
+                else "pregame_90_minutes_no_extra_time_or_shootouts",
+                edition=body.edition,
+                edition_summaries=[
+                    self.summary(
+                        [c for c in cases if c.edition == year], edition=year, catalog_total=total
+                    )
+                    for year, total in EDITION_COUNTS.items()
+                    if body.edition in (None, year)
+                ],
+                protocol_summaries=[
+                    self.summary(
+                        [c for c in cases if c.regulation_minutes == minutes],
+                        regulation_minutes=minutes,
+                    )
+                    for minutes in (80, 90)
+                ],
+            )
+            result_body["limitations"].extend(
+                [
+                    "1991 uses an 80-minute protocol and is blocked pending model validation; "
+                    "all published numerical metrics cover eligible 90-minute cases only.",
+                    "RSSSF archive attribution and discrepancies are retained per case. "
+                    "martj42 cites RSSSF; these are not independent observations.",
+                    "Original regulations for 1991–2019 remain unacquired; reviewed duration "
+                    "and observed knockout procedures are recorded separately.",
+                ]
+            )
         return BacktestResponse.model_validate(result_body).model_dump(mode="json")
+
+    @staticmethod
+    def summary(cases: list[CaseResult], **identity: object) -> dict[str, Any]:
+        scored = [
+            (c.probabilities, c.outcome)
+            for c in cases
+            if c.probabilities is not None and c.outcome is not None
+        ]
+        return {
+            **identity,
+            "total": len(cases),
+            "verified_labels": sum(c.label_provenance is not None for c in cases),
+            "rating_complete": sum(c.rating_reconstruction == "complete" for c in cases),
+            "eligible": len(scored),
+            "excluded": len(cases) - len(scored),
+            "exclusion_reasons": dict(
+                sorted(Counter(r for c in cases for r in c.exclusion_reasons).items())
+            ),
+            **metrics(scored),
+        }

@@ -1,0 +1,19 @@
+{
+  "source_url": "https://media.fff.fr/uploads/document/0ba7decfa86a35515495d74869e45740.pdf",
+  "publisher": "FIFA; hosted by Federation Francaise de Football",
+  "retrieved_on": "2026-11-15",
+  "verification_status": "verified_browser_pdf_text",
+  "evidence_locations": [
+    "PDF page 54 (printed 53), article 37.7",
+    "PDF page 26 (printed 25), articles 14.1 and 14.2"
+  ],
+  "reviewed_facts": {
+    "regulation_minutes": 90,
+    "half_minutes": 45,
+    "extra_time": "Knockout matches tied after regulation use two 15-minute extra-time periods.",
+    "shootout": "Knockout matches still tied after extra time proceed to a penalty shootout."
+  },
+  "hash_scope": "UTF-8 bytes of this reviewed evidence record, not original PDF bytes",
+  "original_pdf_sha256": null,
+  "retrieval_limitation": "Direct PDF-byte retrieval returned HTTP 403. Regulations verified in browser PDF text; no original PDF checksum claimed."
+}

@@ -2,11 +2,11 @@
 
 `POST /api/v1/evaluations/backtests` performs read-only evaluation, not prediction
 persistence. Existing production bearer service authentication applies unchanged.
-The Next.js proxy and Analytics placeholder are deliberately unchanged in this phase.
+The existing Next.js proxy and Analytics Backtesting interface consume this endpoint.
 
 ## Approved package and release status
 
-The only HTTP-selectable package is `womens-world-cup-recorded-v1`: the nine approved
+The original HTTP-selectable package is `womens-world-cup-recorded-v1`: the nine approved
 Women's World Cup editions, 1991–2023, with 348 records from revision
 `1855e313ae8bcd0330426e62c8e4cf15ce45077c` of Mart Jürisoo's international results.
 The source SHA-256 is
@@ -112,6 +112,60 @@ Its exclusions are `regulation_outcome_evidence_missing`,
 `historical_source_availability_unverified`. This is an unavailable result, not 0%
 accuracy. All candidate cases remain discoverable by pagination.
 
+## 2023 Retrospective Evaluation Pilot
+
+The additional selector `womens-world-cup-2023-opening-pilot-v1` loads the reviewed
+package `2023-opening-official-regulation-v1` from
+`data/evaluation/womens-world-cup-2023-opening-pilot-v1/`. The original package is
+unchanged and remains unavailable. The pilot contains official regulation labels
+for New Zealand–Norway and Australia–Republic of Ireland on 20 July 2023, both 1–0.
+Each label explicitly certifies 90-minute regulation, completed group-stage play,
+and no extra time or shootout. Source URLs, evidence locations, retrieval dates,
+hash scopes and checksum values are in the package manifest and evidence record.
+
+The full catalog is still required to contain exactly 348 distinct records with
+the approved source revision/hash. The pilot additionally verifies the approved
+catalog projection hash, then selects by its two source keys, never hardcoded
+database IDs. Response `dataset_match_count` remains 348; `cohort_match_count` is 2.
+Offset/limit paginate that selected cohort. Original-dataset cohort count is 348.
+For example, the complete strict pilot inspection is:
+
+```json
+{"dataset_id":"womens-world-cup-2023-opening-pilot-v1","mode":"strict_historical","offset":0,"limit":2}
+```
+
+Strict mode excludes both cases for missing historical Star Power/Clutch and
+unverified source availability. Pilot retrospective requests require a nonblank
+`assumption_package_id`; an empty/partial assumptions list returns explicit
+per-case missing-assumption exclusions. Each complete entry still requires the
+source match key, current catalog team ID, and finite 0–100 values for both ratings.
+Entries outside the selected page or duplicate match/team entries are rejected.
+No default assumptions or production example results are supplied.
+
+The frontend lists **2023 Retrospective Evaluation Pilot**, defaults its page to
+offset 0 / limit 2, and labels the two-match sample, experimental historical
+ratings and lack of prospective forecasting evidence. Loading participant inputs
+also displays strict-mode exclusions. Blank pilot fields remain missing; no
+prediction or metric is shown for an excluded case. Metrics describe only eligible
+cases on the selected page; exclusions remain visible when a page is partly scored.
+
+The rating verification artifact records reconstruction through 2023-07-19 from
+9,416 earlier results, latest event 2023-07-18. Runtime uses the existing calculator
+and latest pre-match ranking release, not the artifact or current stored ratings.
+Per-case manifests include a reconstruction hash and the package provenance.
+
+All approved labels now require 90-minute duration and completed status before
+scoring; an 80-minute label is excluded even if its scores are valid. The package
+loader verifies pinned artifact hashes without network requests. The FFF source
+was verified through browser PDF text, but direct PDF retrieval returned HTTP 403:
+its recorded checksum is explicitly for the reviewed evidence extract, not the
+unavailable original PDF bytes. FIFA match report hashes identify original bytes.
+
+Release classification: **Retrospective assumption-based evaluation**. Two matches
+are insufficient for meaningful accuracy conclusions. Historical special ratings
+and input publication timing remain unverified. Test-only assumptions used by
+automated checks are not historical observations or user-approved pilot results.
+
 The following is **synthetic request syntax**, not a genuine historical observation;
 replace the key and IDs with those returned for the selected page:
 
@@ -133,7 +187,8 @@ assumptions outside the page are rejected. Errors follow existing safe Problem
 Details handling; internal paths and exception messages are not returned.
 
 Counts and metrics describe the selected page; `dataset_match_count` describes the
-whole approved catalog. Traverse with a stable `dataset_hash` and `package_hash`;
+whole approved catalog and `cohort_match_count` the selected package's cohort.
+Traverse with a stable `dataset_hash` and `package_hash`;
 restart if either changes. Do not average page averages unweighted. Combine scored
 cases (or eligible-count-weighted losses/accuracy and summed confusion matrices).
 For eventual expensive eligible cohorts, clients should start with `limit: 1`.
@@ -153,8 +208,13 @@ were consulted only for separating labels from inputs and aggregating results.
 Winner-only scoring, CSV defaults, terminal rendering and mutable prototype state
 were not copied.
 
-Prompt 4 can implement the Next.js proxy allowance, typed client, eligibility and
-provenance display, explicit assumption entry, page handling and unavailable states.
-Browser E2E must use isolated data. Real historical metrics remain blocked until
-reviewed regulation labels and compatible historical input evidence exist; frontend
-integration must not weaken those gates.
+The Next.js proxy, typed client, eligibility/provenance display, explicit assumption
+entry, pagination and unavailable states are implemented. Browser E2E uses isolated
+data. The pilot exercises retrospective scoring only with explicit test assumptions;
+strict historical metrics remain blocked by the unchanged historical-input gates.
+
+## Full 1991–2023 evidence package
+
+The full project package now accounts for all 348 matches and all nine editions.
+See [full coverage, protocols, source review and remaining work](backtesting-full.md).
+The original recorded package and the two-match pilot remain available unchanged.

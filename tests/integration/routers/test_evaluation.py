@@ -209,7 +209,17 @@ def test_synthetic_positive_api_and_assumption_manifest(
     service.package = replace(
         service.package,
         labels={
-            "a" * 64: RegulationEvidence(day, "Alpha", "Beta", 0, 0, "synthetic://label", "e" * 64)
+            "a" * 64: RegulationEvidence(
+                day,
+                "Alpha",
+                "Beta",
+                0,
+                0,
+                "synthetic://label",
+                "e" * 64,
+                regulation_minutes=90,
+                completion_status="completed",
+            )
         },
     )
     rows = [

@@ -36,7 +36,17 @@ CASE = HistoricalCase(
     team_ratings.SOURCE_SHA,
     "synthetic",
 )
-LABEL = RegulationEvidence(DAY, "Alpha", "Beta", 0, 0, "synthetic://regulation", "b" * 64)
+LABEL = RegulationEvidence(
+    DAY,
+    "Alpha",
+    "Beta",
+    0,
+    0,
+    "synthetic://regulation",
+    "b" * 64,
+    regulation_minutes=90,
+    completion_status="completed",
+)
 
 
 class FakeRepository:

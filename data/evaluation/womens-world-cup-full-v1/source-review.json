@@ -1,0 +1,16 @@
+{
+  "candidate": "https://github.com/hudl/open-data",
+  "publisher": "StatsBomb / Hudl",
+  "decision": "No event data imported; redistribution and commercial-use permissions not established for this application",
+  "terms_url": "https://github.com/hudl/open-data/blob/master/LICENSE.pdf",
+  "terms_sha256": "a5462e69aeb71a39268b760b110c5c2190a2e0cee3015ba976f66bd71f6c2bb4",
+  "terms_date": "2023-09-08",
+  "reviewed_on": "2026-11-15",
+  "relevant_sections": [
+    "1.2.1",
+    "1.2.2",
+    "1.4",
+    "7"
+  ],
+  "scope": "Source rights review only, not an approved outcome source"
+}

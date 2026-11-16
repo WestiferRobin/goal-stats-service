@@ -29,12 +29,19 @@ class CaseResult(Contract):
     outcome: Literal["home_win", "draw", "away_win"] | None = None
     input_manifest: dict[str, object] | None = None
     label_provenance: dict[str, object] | None = None
+    edition: int | None = None
+    regulation_minutes: Literal[80, 90] = 90
+    evaluation_protocol: str = "pregame-regulation-90-v1"
+    evidence_record: dict[str, object] | None = None
+    rating_evidence: dict[str, object] | None = None
 
     @model_validator(mode="after")
     def consistent_case(self) -> Self:
         if self.cutoff >= self.match_date:
             raise ValueError("Cutoff must predate the match")
         if self.status == "eligible":
+            if self.regulation_minutes != 90:
+                raise ValueError("The current model is not validated for 80-minute cases")
             if (
                 self.exclusion_reasons
                 or self.probabilities is None
@@ -56,7 +63,9 @@ class BacktestResponse(Contract):
     mode: Mode
     status: Literal["available", "unavailable"]
     interpretation: str
-    protocol_version: Literal["pregame-regulation-v1"] = "pregame-regulation-v1"
+    protocol_version: Literal["pregame-regulation-v1", "edition-regulation-v1"] = (
+        "pregame-regulation-v1"
+    )
     prediction_model_version: Literal["road-to-the-final-heuristic-v2"] = (
         "road-to-the-final-heuristic-v2"
     )
@@ -67,9 +76,11 @@ class BacktestResponse(Contract):
     source_hash: Digest
     manifest_hash: Digest
     evidence_kind: Literal["historical", "synthetic"]
-    prediction_horizon: Literal["pregame_90_minutes_no_extra_time_or_shootouts"] = (
-        "pregame_90_minutes_no_extra_time_or_shootouts"
-    )
+    prediction_horizon: Literal[
+        "pregame_90_minutes_no_extra_time_or_shootouts",
+        "edition_specific_80_and_90_minutes",
+        "pregame_80_minutes_model_unvalidated",
+    ] = "pregame_90_minutes_no_extra_time_or_shootouts"
     cutoff_policy: Literal["strictly_before_match_day_previous_calendar_day_inclusive"] = (
         "strictly_before_match_day_previous_calendar_day_inclusive"
     )
@@ -79,11 +90,12 @@ class BacktestResponse(Contract):
         "away_win",
     )
     dataset_match_count: int = Field(ge=0, le=348)
+    cohort_match_count: int = Field(ge=0, le=348)
     offset: int = Field(ge=0)
-    limit: int = Field(ge=1, le=16)
-    total_candidate_matches: int = Field(ge=0, le=16)
-    eligible_matches: int = Field(ge=0, le=16)
-    excluded_matches: int = Field(ge=0, le=16)
+    limit: int = Field(ge=1, le=348)
+    total_candidate_matches: int = Field(ge=0, le=348)
+    eligible_matches: int = Field(ge=0, le=348)
+    excluded_matches: int = Field(ge=0, le=348)
     exclusion_reasons: dict[str, int]
     accuracy: Probability | None
     log_loss: float | None = Field(ge=0, allow_inf_nan=False)
@@ -91,11 +103,21 @@ class BacktestResponse(Contract):
     confusion_matrix: list[list[Annotated[int, Field(strict=True, ge=0)]]] | None
     assumptions: list[Assumption]
     assumption_package_id: str | None
-    cases: list[CaseResult] = Field(max_length=16)
+    cases: list[CaseResult] = Field(max_length=348)
+    edition: int | None = None
+    edition_summaries: list[dict[str, object]] = Field(default_factory=list)
+    protocol_summaries: list[dict[str, object]] = Field(default_factory=list)
+    metrics_horizon_minutes: Literal[90] = 90
     limitations: list[str]
 
     @model_validator(mode="after")
     def consistent_counts(self) -> Self:
+        if (
+            self.cohort_match_count > self.dataset_match_count
+            or self.total_candidate_matches
+            != min(self.limit, max(0, self.cohort_match_count - self.offset))
+        ):
+            raise ValueError("Inconsistent cohort pagination")
         if self.total_candidate_matches != len(
             self.cases
         ) or self.eligible_matches + self.excluded_matches != len(self.cases):
