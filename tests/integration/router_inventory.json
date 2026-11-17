@@ -80,6 +80,19 @@
       }
     ],
     [
+      "/api/v1/catalog/teams/<team_id>/summary",
+      "team.catalog_team_summary",
+      [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ],
+      true,
+      {
+        "team_id": "UnicodeConverter"
+      }
+    ],
+    [
       "/api/v1/competitions/simulate",
       "competition.simulate",
       [

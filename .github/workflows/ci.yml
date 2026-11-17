@@ -2,7 +2,7 @@ name: Service CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, member/wes]
   pull_request:
   workflow_dispatch:
 

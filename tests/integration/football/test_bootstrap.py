@@ -52,10 +52,17 @@ def target(database):
     return ImportTarget("test", url.host, url.database)
 
 
-def test_fresh_then_complete_skips_import(fresh_database, prepared_source, monkeypatch):
+@pytest.mark.parametrize("existing_user", [False, True])
+def test_fresh_then_complete_skips_import(
+    fresh_database, prepared_source, monkeypatch, existing_user
+):
     database = fresh_database
     assert inspect(database.engine).get_table_names() == []
     assert boot.bootstrap(database, target(database), prepared_source) == "imported"
+    with database.engine.begin() as connection:
+        assert connection.scalar(text("SELECT count(*) FROM users")) == 0
+        if existing_user:
+            connection.exec_driver_sql("INSERT INTO users DEFAULT VALUES")
     before = snapshot(database)
     assert [len(before[t]) for t in ("teams", "competitions", "matches")] == [44, 9, 348]
 

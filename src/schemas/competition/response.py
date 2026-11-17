@@ -19,6 +19,7 @@ class CatalogCompetitionsResponse(RootModel[list[CatalogCompetitionResponse]]):
 
 
 class SimulationResult(Contract):
+    team_id: int = Field(gt=0)
     team: str
     fifa_rank: int | None
     semifinal_probability: float = Field(ge=0, le=100)
@@ -27,12 +28,16 @@ class SimulationResult(Contract):
 
 
 class SimulationFinal(Contract):
+    team1_id: int = Field(gt=0)
+    team2_id: int = Field(gt=0)
     team1: str
     team2: str
     probability: float = Field(ge=0, le=100)
 
 
 class TournamentResponse(Contract):
+    seed: int = Field(strict=True, ge=0, le=4294967295)
+    predicted_champion_id: int = Field(gt=0)
     kind: Literal["hypothetical_knockout"] = "hypothetical_knockout"
     results: list[SimulationResult]
     predicted_champion: str

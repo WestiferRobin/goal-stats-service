@@ -34,3 +34,15 @@ def test_invalid_bracket(kind):
         entries[0]["team_id"] = "1"
     with pytest.raises(ValidationError):
         TournamentRequest(**body)
+
+
+@pytest.mark.parametrize("seed", [0, 4294967295, None])
+def test_seed_contract(seed):
+    request = TournamentRequest(teams=[team(i) for i in range(1, 5)], seed=seed)
+    assert request.seed == seed
+
+
+@pytest.mark.parametrize("seed", [-1, 4294967296, True, "1", 1.5])
+def test_invalid_seed(seed):
+    with pytest.raises(ValidationError):
+        TournamentRequest(teams=[team(i) for i in range(1, 5)], seed=seed)

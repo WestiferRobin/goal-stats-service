@@ -8,8 +8,8 @@ Synthetic edge-case fixtures are preserved; historical data is not seeded global
 
 Source revision: `1855e313ae8bcd0330426e62c8e4cf15ce45077c`.
 Approved SHA-256: `de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
-The original ignored CSV remains unchanged. The macOS runner verifies the source and
-nine manifests, copies it into a private UDRO/HFS+ image, and uses `hdiutil` to mount
+The exact pinned CSV is committed and included unchanged in fresh clones. The macOS
+runner verifies the source and nine manifests, copies it into a private UDRO/HFS+ image, and uses `hdiutil` to mount
 read-only. The test fixture independently verifies canonical path, checksum,
 `ST_RDONLY` and the invocation's mount receipt. No Docker bind or chmod shortcut is used.
 Missing/incorrect source, invalid manifests, unowned/writable mounts and creation failure
@@ -22,7 +22,8 @@ per-edition CLI imports: **44 teams, nine editions, 348 matches, 1,081 goals**. 
 all match dates, participants, scores and source ordinals with the mounted CSV and
 checks all edition counts, provenance, foreign keys and prepared SQL acceptance rules.
 Schema inspection and Alembic metadata comparison require only teams, competitions,
-matches, scenarios and predictions, plus `alembic_version`; prototype tables are absent.
+matches, scenarios, predictions and users, plus `alembic_version` at head
+`e42b7c19a603`; prototype tables are absent.
 
 Flask checks cover catalog teams/competitions/matches, pagination, filters and detail;
 the Spain–England 2023 final (1–0) and head-to-head comparison; unsaved preview; and
@@ -58,7 +59,7 @@ and must not be used as current operational instructions.
 
 # Data architecture integration — Prompt 6
 
-Current implementation note: Prompt 1 consolidates the backend to five normalized
+Historical implementation note: Prompt 1 consolidated the backend to five normalized
 application tables and 15 application operations. The evidence below predates that
 adaptation unless explicitly dated otherwise. See [current contracts](../service/frontend-api.md)
 and [phase boundaries](../service/football.md#phase-boundaries). The canonical runner

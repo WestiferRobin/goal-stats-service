@@ -1,0 +1,127 @@
+selection,edition,csv_line,date,home_team,away_team,home_score,away_score,team,goals_for,goals_against,result
+United States,1991,595,1991-11-17,Sweden,United States,2,3,United States,3,2,W
+United States,1991,601,1991-11-19,Brazil,United States,0,5,United States,5,0,W
+United States,1991,606,1991-11-21,Japan,United States,0,3,United States,3,0,W
+United States,1991,613,1991-11-24,United States,Taiwan,7,0,United States,7,0,W
+United States,1991,615,1991-11-27,Germany,United States,2,5,United States,5,2,W
+United States,1991,617,1991-11-30,Norway,United States,1,2,United States,2,1,W
+United States,1995,850,1995-06-06,United States,China,3,3,United States,3,3,D
+United States,1995,856,1995-06-08,United States,Denmark,2,0,United States,2,0,W
+United States,1995,862,1995-06-10,United States,Australia,4,1,United States,4,1,W
+United States,1995,864,1995-06-13,Japan,United States,0,4,United States,4,0,W
+United States,1995,868,1995-06-15,United States,Norway,0,1,United States,0,1,L
+United States,1995,870,1995-06-17,China,United States,0,2,United States,2,0,W
+United States,1999,1424,1999-06-19,United States,Denmark,3,0,United States,3,0,W
+United States,1999,1436,1999-06-24,United States,Nigeria,7,1,United States,7,1,W
+United States,1999,1445,1999-06-27,United States,North Korea,3,0,United States,3,0,W
+United States,1999,1450,1999-07-01,United States,Germany,3,2,United States,3,2,W
+United States,1999,1452,1999-07-04,United States,Brazil,2,0,United States,2,0,W
+United States,1999,1455,1999-07-10,United States,China,0,0,United States,0,0,D
+United States,2003,2257,2003-09-21,United States,Sweden,3,1,United States,3,1,W
+United States,2003,2267,2003-09-25,United States,Nigeria,5,0,United States,5,0,W
+United States,2003,2279,2003-09-28,United States,North Korea,3,0,United States,3,0,W
+United States,2003,2283,2003-10-01,United States,Norway,1,0,United States,1,0,W
+United States,2003,2287,2003-10-05,United States,Germany,0,3,United States,0,3,L
+United States,2003,2289,2003-10-11,United States,Canada,3,1,United States,3,1,W
+United States,2007,3254,2007-09-11,United States,North Korea,2,2,United States,2,2,D
+United States,2007,3266,2007-09-14,Sweden,United States,0,2,United States,2,0,W
+United States,2007,3276,2007-09-18,Nigeria,United States,0,1,United States,1,0,W
+United States,2007,3283,2007-09-22,United States,England,3,0,United States,3,0,W
+United States,2007,3287,2007-09-27,United States,Brazil,0,4,United States,0,4,L
+United States,2007,3288,2007-09-30,Norway,United States,1,4,United States,4,1,W
+United States,2011,4363,2011-06-28,United States,North Korea,2,0,United States,2,0,W
+United States,2011,4386,2011-07-02,United States,Colombia,3,0,United States,3,0,W
+United States,2011,4409,2011-07-06,Sweden,United States,2,1,United States,1,2,L
+United States,2011,4424,2011-07-10,Brazil,United States,2,2,United States,2,2,D
+United States,2011,4425,2011-07-13,France,United States,1,3,United States,3,1,W
+United States,2011,4428,2011-07-17,Japan,United States,2,2,United States,2,2,D
+United States,2015,5748,2015-06-08,United States,Australia,3,1,United States,3,1,W
+United States,2015,5760,2015-06-12,United States,Sweden,0,0,United States,0,0,D
+United States,2015,5771,2015-06-16,Nigeria,United States,0,1,United States,1,0,W
+United States,2015,5783,2015-06-22,United States,Colombia,2,0,United States,2,0,W
+United States,2015,5786,2015-06-26,China,United States,0,1,United States,1,0,W
+United States,2015,5799,2015-06-30,United States,Germany,2,0,United States,2,0,W
+United States,2015,5814,2015-07-05,United States,Japan,5,2,United States,5,2,W
+United States,2019,7536,2019-06-11,United States,Thailand,13,0,United States,13,0,W
+United States,2019,7551,2019-06-16,United States,Chile,3,0,United States,3,0,W
+United States,2019,7571,2019-06-20,Sweden,United States,0,2,United States,2,0,W
+United States,2019,7579,2019-06-24,Spain,United States,1,2,United States,2,1,W
+United States,2019,7584,2019-06-28,France,United States,1,2,United States,2,1,W
+United States,2019,7587,2019-07-02,England,United States,1,2,United States,2,1,W
+United States,2019,7590,2019-07-07,United States,Netherlands,2,0,United States,2,0,W
+United States,2023,9426,2023-07-22,United States,Vietnam,3,0,United States,3,0,W
+United States,2023,9440,2023-07-27,United States,Netherlands,1,1,United States,1,1,D
+United States,2023,9458,2023-08-01,Portugal,United States,0,0,United States,0,0,D
+United States,2023,9469,2023-08-06,Sweden,United States,0,0,United States,0,0,D
+Germany,1991,596,1991-11-17,Germany,Nigeria,4,0,Germany,4,0,W
+Germany,1991,603,1991-11-19,Taiwan,Germany,0,3,Germany,3,0,W
+Germany,1991,609,1991-11-21,Italy,Germany,0,2,Germany,2,0,W
+Germany,1991,610,1991-11-24,Denmark,Germany,1,2,Germany,2,1,W
+Germany,1991,615,1991-11-27,Germany,United States,2,5,Germany,2,5,L
+Germany,1991,616,1991-11-29,Sweden,Germany,4,0,Germany,0,4,L
+Germany,1995,846,1995-06-05,Germany,Japan,1,0,Germany,1,0,W
+Germany,1995,852,1995-06-07,Sweden,Germany,3,2,Germany,2,3,L
+Germany,1995,859,1995-06-09,Brazil,Germany,1,6,Germany,6,1,W
+Germany,1995,866,1995-06-13,Germany,England,3,0,Germany,3,0,W
+Germany,1995,869,1995-06-15,Germany,China,1,0,Germany,1,0,W
+Germany,1995,871,1995-06-18,Germany,Norway,0,2,Germany,0,2,L
+Germany,1999,1429,1999-06-20,Germany,Italy,1,1,Germany,1,1,D
+Germany,1999,1439,1999-06-24,Germany,Mexico,6,0,Germany,6,0,W
+Germany,1999,1446,1999-06-27,Germany,Brazil,3,3,Germany,3,3,D
+Germany,1999,1450,1999-07-01,United States,Germany,3,2,Germany,2,3,L
+Germany,2003,2255,2003-09-20,Germany,Canada,4,1,Germany,4,1,W
+Germany,2003,2264,2003-09-24,Germany,Japan,3,0,Germany,3,0,W
+Germany,2003,2276,2003-09-27,Argentina,Germany,1,6,Germany,6,1,W
+Germany,2003,2284,2003-10-02,Germany,Russia,7,1,Germany,7,1,W
+Germany,2003,2287,2003-10-05,United States,Germany,0,3,Germany,3,0,W
+Germany,2003,2291,2003-10-12,Germany,Sweden,2,1,Germany,2,1,W
+Germany,2007,3250,2007-09-10,Germany,Argentina,11,0,Germany,11,0,W
+Germany,2007,3265,2007-09-14,England,Germany,0,0,Germany,0,0,D
+Germany,2007,3274,2007-09-17,Germany,Japan,2,0,Germany,2,0,W
+Germany,2007,3282,2007-09-22,Germany,North Korea,3,0,Germany,3,0,W
+Germany,2007,3286,2007-09-26,Germany,Norway,3,0,Germany,3,0,W
+Germany,2007,3289,2007-09-30,Germany,Brazil,2,0,Germany,2,0,W
+Germany,2011,4351,2011-06-26,Germany,Canada,2,1,Germany,2,1,W
+Germany,2011,4373,2011-06-30,Germany,Nigeria,1,0,Germany,1,0,W
+Germany,2011,4399,2011-07-05,Germany,France,4,2,Germany,4,2,W
+Germany,2011,4420,2011-07-09,Germany,Japan,0,1,Germany,0,1,L
+Germany,2015,5744,2015-06-07,Germany,Ivory Coast,10,0,Germany,10,0,W
+Germany,2015,5755,2015-06-11,Germany,Norway,1,1,Germany,1,1,D
+Germany,2015,5767,2015-06-15,Thailand,Germany,0,4,Germany,4,0,W
+Germany,2015,5777,2015-06-20,Germany,Sweden,4,1,Germany,4,1,W
+Germany,2015,5785,2015-06-26,Germany,France,1,1,Germany,1,1,D
+Germany,2015,5799,2015-06-30,United States,Germany,2,0,Germany,0,2,L
+Germany,2015,5813,2015-07-04,Germany,England,0,1,Germany,0,1,L
+Germany,2019,7527,2019-06-08,Germany,China,1,0,Germany,1,0,W
+Germany,2019,7539,2019-06-12,Germany,Spain,1,0,Germany,1,0,W
+Germany,2019,7556,2019-06-17,South Africa,Germany,0,4,Germany,4,0,W
+Germany,2019,7575,2019-06-22,Germany,Nigeria,3,0,Germany,3,0,W
+Germany,2019,7586,2019-06-29,Germany,Sweden,1,2,Germany,1,2,L
+Germany,2023,9432,2023-07-24,Germany,Morocco,6,0,Germany,6,0,W
+Germany,2023,9451,2023-07-30,Germany,Colombia,1,2,Germany,1,2,L
+Germany,2023,9464,2023-08-03,South Korea,Germany,1,1,Germany,1,1,D
+Spain,2015,5749,2015-06-09,Spain,Costa Rica,1,1,Spain,1,1,D
+Spain,2015,5761,2015-06-13,Brazil,Spain,1,0,Spain,0,1,L
+Spain,2015,5774,2015-06-17,South Korea,Spain,2,1,Spain,1,2,L
+Spain,2019,7528,2019-06-08,Spain,South Africa,3,1,Spain,3,1,W
+Spain,2019,7539,2019-06-12,Germany,Spain,1,0,Spain,0,1,L
+Spain,2019,7557,2019-06-17,China,Spain,0,0,Spain,0,0,D
+Spain,2019,7579,2019-06-24,Spain,United States,1,2,Spain,1,2,L
+Spain,2023,9422,2023-07-21,Spain,Costa Rica,3,0,Spain,3,0,W
+Spain,2023,9438,2023-07-26,Spain,Zambia,5,0,Spain,5,0,W
+Spain,2023,9454,2023-07-31,Japan,Spain,4,0,Spain,0,4,L
+Spain,2023,9466,2023-08-05,Switzerland,Spain,1,5,Spain,5,1,W
+Spain,2023,9474,2023-08-11,Spain,Netherlands,2,1,Spain,2,1,W
+Spain,2023,9478,2023-08-15,Spain,Sweden,2,1,Spain,2,1,W
+Spain,2023,9481,2023-08-20,Spain,England,1,0,Spain,1,0,W
+Japan 2011,2011,4356,2011-06-27,Japan,New Zealand,2,1,Japan,2,1,W
+Japan 2011,2011,4379,2011-07-01,Japan,Mexico,4,0,Japan,4,0,W
+Japan 2011,2011,4401,2011-07-05,England,Japan,2,0,Japan,0,2,L
+Japan 2011,2011,4420,2011-07-09,Germany,Japan,0,1,Japan,1,0,W
+Japan 2011,2011,4426,2011-07-13,Japan,Sweden,3,1,Japan,3,1,W
+Japan 2011,2011,4428,2011-07-17,Japan,United States,2,2,Japan,2,2,D
+Panama,2023,9430,2023-07-24,Brazil,Panama,4,0,Panama,0,4,L
+Panama,2023,9446,2023-07-29,Panama,Jamaica,0,1,Panama,0,1,L
+Panama,2023,9460,2023-08-02,Panama,France,3,6,Panama,3,6,L
+USA 1999 final,1999,1455,1999-07-10,United States,China,0,0,United States,0,0,D
+Germany 2003 final,2003,2291,2003-10-12,Germany,Sweden,2,1,Germany,2,1,W

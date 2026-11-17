@@ -36,10 +36,18 @@ DIRECT_KEYS = frozenset(
 
 def read_private(path: Path, keys: frozenset[str]) -> dict[str, str]:
     try:
-        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        # Windows has no O_NOFOLLOW/O_NONBLOCK or POSIX owner/mode semantics.
+        # Reject reparse-point symlinks before opening; Windows ACLs control access.
+        if os.name == "nt" and path.is_symlink():
+            raise OSError("symlink configuration")
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        fd = os.open(path, flags)
         with os.fdopen(fd, encoding="utf-8") as stream:
             info = os.fstat(stream.fileno())
-            if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_mode & 0o077:
+            invalid_private_file = not stat.S_ISREG(info.st_mode)
+            if os.name != "nt":
+                invalid_private_file |= info.st_uid != os.getuid() or bool(info.st_mode & 0o077)
+            if invalid_private_file:
                 raise ConfigurationError(
                     f"{path.name}: configuration must be a private regular file owned by this user."
                 )

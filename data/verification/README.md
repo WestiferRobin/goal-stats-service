@@ -1,5 +1,12 @@
 # Historical verification evidence
 
+The canonical Phase 2 review is [Task 2 acceptance](../../docs/service/historical-catalog.md#task-2-acceptance)
+(2026-11-13): nine-edition source verification, bounded authoritative comparisons,
+accepted current statistics definitions and explicit validation limitations. Supporting evidence:
+[fixture comparisons and discrepancy ledger](task2-historical-comparisons.md) and
+[independent calculations](task2-calculations.md). These supplement, and do not
+replace, the original regression artifact below.
+
 [womens-world-cup-coverage.json](womens-world-cup-coverage.json) records verification
 of the pinned Mart Jürisoo CSV on 2026-10-11. All nine selections pass: **348 matches,
 44 distinct participants, 1,081 goals**. The full source has 11,650 rows. Its revision
@@ -23,9 +30,13 @@ The current importer validates all nine approved editions: 1991, 1995, 1999, 200
 and validates participants, goals, ordering and identity policy. The existing 2023
 manifest and source-record-key algorithm remain unchanged.
 
-Runtime support does not mean the data has been imported. The persistent development
-catalog currently contains only 2023: 32 teams, one competition and 64 matches.
-Additional editions require explicit authorized imports; startup imports nothing.
+The pinned source covers nine editions; runtime support does not mean they have
+been imported. The [2026-10-08 local acceptance](../../docs/service/historical-catalog.md#historical-2023-acceptance)
+observed a 2023-only catalog: 32 teams, one competition and 64 matches. That is a
+historical observation, not a statement of current database contents. Current
+database state was not inspected during this review; environments may contain
+different imported editions. Additional editions require explicit authorized
+imports; startup imports nothing.
 
 ## Reproduce the read-only source verification
 
@@ -53,7 +64,7 @@ and total goals still agree. It is a reproducibility check, not independent proo
 that every upstream fact is correct.
 
 `make test` is the standard automated verification command. Its synthetic fixtures
-exercise rejection paths without depending on the ignored raw CSV. It also validates
+exercise rejection paths without depending on the pinned raw CSV. It also validates
 all nine tracked manifest/coverage pairs and current nine-edition runtime support.
 The source verifier preserves the original evidence flags while checking source facts.
 
@@ -76,9 +87,11 @@ agreement is not official FIFA certification, and source independence is not pro
 Ordering and city/country disagreements remain unresolved; no source bytes are changed
 to reconcile them. Approval is limited to the pinned basic-results contract.
 
-Raw sources remain ignored and excluded from Docker images. Prototype RoadToTheFinal
-inputs remain separate, with unchanged startup behavior. No historical import,
-persistent database migration or `make seed` implementation is part of this step.
+The exact pinned CSV is committed and included in fresh clones; local seeding reads
+it from the repository. Other raw sources remain ignored. `data/raw/` is excluded
+from Docker build contexts; the production image separately downloads and verifies
+the approved source. Prototype inputs remain separate. This read-only verification
+does not import records or migrate a persistent database.
 
 ## Explicit historical seeding
 

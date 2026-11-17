@@ -1,15 +1,21 @@
 # GoalStats developer interface: exactly nine supported commands.
-PYTHON ?= python3.12
 ifeq ($(OS),Windows_NT)
-BASH := C:/Progra~1/Git/bin/bash.exe
+ifeq ($(origin PYTHON),undefined)
+PYTHON := $(shell py -3.12 -c "import sys; print(sys.executable.replace(chr(92), '/'))" 2>NUL)
+ifeq ($(strip $(PYTHON)),)
+PYTHON := python
+endif
+endif
+BASH ?= C:/Progra~1/Git/bin/bash.exe
 else
-BASH := /bin/bash
+PYTHON ?= python3.12
+BASH ?= /bin/bash
 endif
 .DEFAULT_GOAL := help
 
 .PHONY: setup infra run deploy seed test certify stop help
 setup infra run deploy stop:
-	@PYTHON="$(PYTHON)" $(BASH) scripts/development/local.sh $@
+	@$(BASH) scripts/development/local.sh $@
 
 test:
 	@$(BASH) scripts/testing/test.sh

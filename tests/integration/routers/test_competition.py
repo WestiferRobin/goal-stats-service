@@ -53,8 +53,6 @@ def test_one_select_per_endpoint_and_no_writes(small_catalog, import_database, p
 
 @pytest.mark.postgres
 def test_simulation_uses_normalized_ids_without_writes(catalog_client, import_database):
-    import random
-
     from models.team import Team
     from tests.fixtures.historical_database import snapshot
 
@@ -71,14 +69,9 @@ def test_simulation_uses_normalized_ids_without_writes(catalog_client, import_da
     ]
     body = dict(teams=teams, simulations=1000)
     before = snapshot(import_database)
-    state = random.getstate()
-    try:
-        random.seed(514)
-        first = catalog_client.post("/api/v1/competitions/simulate", json=body)
-        random.seed(514)
-        second = catalog_client.post("/api/v1/competitions/simulate", json=body)
-    finally:
-        random.setstate(state)
+    body["seed"] = 514
+    first = catalog_client.post("/api/v1/competitions/simulate", json=body)
+    second = catalog_client.post("/api/v1/competitions/simulate", json=body)
     assert first.status_code == 200, first.json
     assert first.json == second.json
     result = first.json

@@ -1,5 +1,5 @@
 {
-  "openapi": "d04e2d0f193446d14f6879482cf2345a31ec4f88dbf9240552df887e86ac828c",
+  "openapi": "7d1fceca529abb0cd573c614dad11ff53c75e99355e945bfcacc93df15072b08",
   "schemas": {
     "CatalogCompetitionResponse": {
       "serialization": "f58d67ad9dd26be36c2ff0e74bfb9540177ff164b3c9dba7202a87e6ac047f54",
@@ -142,12 +142,12 @@
       "validation": "b6c95599dddd1da79823316a3ad0272e4df123628d14d2805cf3fcc86779eb6a"
     },
     "SimulationFinal": {
-      "serialization": "39f35d107c6dc91d4ca3e5cdd19ee9794b1d7f32ae5908abb60c0b0e580a9d76",
-      "validation": "39f35d107c6dc91d4ca3e5cdd19ee9794b1d7f32ae5908abb60c0b0e580a9d76"
+      "serialization": "771f9abee83bca037506c8895cf114dc411fbd37b2b0212e4da942a9463c64f9",
+      "validation": "771f9abee83bca037506c8895cf114dc411fbd37b2b0212e4da942a9463c64f9"
     },
     "SimulationResult": {
-      "serialization": "f3f28c983c7ae9793d9c42049059c06053926e49993b0bf93dad6850e304eb94",
-      "validation": "f3f28c983c7ae9793d9c42049059c06053926e49993b0bf93dad6850e304eb94"
+      "serialization": "20004122017ba5bb6a8ebd23013d5a35614dad53c3bc8fdb56e650186389cf19",
+      "validation": "20004122017ba5bb6a8ebd23013d5a35614dad53c3bc8fdb56e650186389cf19"
     },
     "SimulationTeam": {
       "serialization": "63e810049df1827798ec0cdd71bd77db435c5a160330cafeb871af6967e4d540",
@@ -157,13 +157,21 @@
       "serialization": "0b31f71a3be123785d283f0929707fb42a818f4ea06b060cad195a120d2b1433",
       "validation": "0b31f71a3be123785d283f0929707fb42a818f4ea06b060cad195a120d2b1433"
     },
+    "TeamSummaryQuery": {
+      "serialization": "82927a7a218f383b61c63c9b9c969f9c9fdb015e4d984ff7d7477610817dc067",
+      "validation": "82927a7a218f383b61c63c9b9c969f9c9fdb015e4d984ff7d7477610817dc067"
+    },
+    "TeamSummaryResponse": {
+      "serialization": "e8045631d18cc8686c46023b167bd774c9477d38756ed7c2d04517e33cadae08",
+      "validation": "e8045631d18cc8686c46023b167bd774c9477d38756ed7c2d04517e33cadae08"
+    },
     "TournamentRequest": {
-      "serialization": "c2136ccf4815f14551dc8c44b3e1cddf5b38e2488f224deaa716c5072c74a816",
-      "validation": "c2136ccf4815f14551dc8c44b3e1cddf5b38e2488f224deaa716c5072c74a816"
+      "serialization": "498fc4d8a4dc95de1ba458bdc4fa39907c2fcac8e9f51f0fb6e3c38d83a6d201",
+      "validation": "498fc4d8a4dc95de1ba458bdc4fa39907c2fcac8e9f51f0fb6e3c38d83a6d201"
     },
     "TournamentResponse": {
-      "serialization": "7ae862c2c5ce1a6c65f24ea03fb8fe54e72fad5440c2505a715c48e4e328c2d8",
-      "validation": "7ae862c2c5ce1a6c65f24ea03fb8fe54e72fad5440c2505a715c48e4e328c2d8"
+      "serialization": "48773792c6fdd8513803fd703413c468a5681463373ff6897bdc72cb507232c5",
+      "validation": "48773792c6fdd8513803fd703413c468a5681463373ff6897bdc72cb507232c5"
     },
     "ValidConfidence": {
       "serialization": "4672e9fb0a12f62ad0b102ed896bf95826f0bd332e87e6ad254d75b6fa83a2a5",

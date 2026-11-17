@@ -48,9 +48,10 @@ def test_adapter_translates_all_team_fields_and_preserves_report(monkeypatch, ad
             for field in TeamStats.model_fields:
                 if field != "modifiers":
                     assert getattr(team, field) == getattr(adapter_inputs, prefix + field)
-        assert match.team1.modifiers == [("Saved scenario modifier total", -7.0)]
+        assert match.team1.modifiers == [("Supplied hypothetical modifier total", -7.0)]
         assert match.team2.modifiers == []
         assert match.match_minute == 65
+        assert match.regulation_horizon is True
         assert match.match_extra_minute == 0 and match.match_status_short == ""
         return expected
 
@@ -79,7 +80,7 @@ def test_boundary_inputs_keep_real_engine_probabilities_and_metadata(
     monkeypatch.setattr(adapter, "report", measured)
     output = adapter.predict_inputs(inputs)
     assert output is reports[0]
-    assert output["model"] == "road-to-the-final-heuristic-v1"
+    assert output["model"] == "road-to-the-final-heuristic-v2"
     assert sum(output["probabilities"].values()) == pytest.approx(1, abs=1e-9)
     assert all(0 <= p <= 1 for p in output["probabilities"].values())
     assert output["team1"] == "Alpha" and output["team2"] == "Beta"
@@ -95,3 +96,27 @@ def test_engine_failure_propagates_without_mutating_inputs(monkeypatch, adapter_
     with pytest.raises(RuntimeError, match="engine unavailable"):
         adapter.predict_inputs(adapter_inputs)
     assert adapter_inputs.model_dump() == before
+
+
+@pytest.mark.parametrize("minute", [0, 45, 89, 90, 91, 105, 120])
+def test_adapter_activates_corrected_horizon(adapter_inputs, minute):
+    inputs = PredictionInputs.model_validate(
+        {**adapter_inputs.model_dump(), "match_minute": minute, "team1_goals": 2, "team2_goals": 1}
+    )
+    output = adapter.predict_inputs(inputs)
+    assert output["model"] == "road-to-the-final-heuristic-v2"
+    assert output["minute"] == minute
+    if minute >= 90:
+        assert output["expected_goals_remaining"] == {"team1": 0, "team2": 0}
+        assert output["probabilities"] == {"team1": 1, "draw": 0, "team2": 0}
+        assert output["most_likely_score"] == [2, 1]
+    else:
+        assert all(value > 0 for value in output["expected_goals_remaining"].values())
+
+
+@pytest.mark.parametrize("status,extra", [("FT", 0), ("ET", 30), ("anything", 5)])
+def test_preview_metadata_does_not_change_adapter_math(adapter_inputs, status, extra):
+    values = adapter_inputs.model_dump()
+    baseline = adapter.predict_state(values)
+    output = adapter.predict_state(values, status=status, extra_minute=extra)
+    assert output == {**baseline, "status": status}

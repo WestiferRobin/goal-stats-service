@@ -26,6 +26,7 @@ class Scenario(Base):
             "abs(team1_possession + team2_possession - 100) <= 0.01", name="possession_total"
         ),
         Index("ix_scenarios_created_at", "created_at", "scenario_id"),
+        Index("ix_scenarios_owner_user_id", "owner_user_id", "created_at", "scenario_id"),
         CheckConstraint("match_minute BETWEEN 0 AND 120", name="match_minute_range"),
         CheckConstraint("team1_goals BETWEEN 0 AND 1000", name="team1_goals_range"),
         CheckConstraint("team1_shots BETWEEN 0 AND 1000", name="team1_shots_range"),
@@ -79,6 +80,9 @@ class Scenario(Base):
         CheckConstraint("team2_fifa_rank > 0", name="team2_fifa_rank_positive"),
     )
     scenario_id: Mapped[int] = mapped_column(Identity(), primary_key=True)
+    owner_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.user_id", ondelete="RESTRICT")
+    )
     title: Mapped[str | None] = mapped_column(String(120))
     team1_id: Mapped[int] = mapped_column(
         ForeignKey("teams.team_id", ondelete="RESTRICT"), index=True

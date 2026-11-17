@@ -7,6 +7,11 @@ import sys
 from pathlib import Path
 
 
+def venv_python(venv):
+    """Return the virtual environment interpreter path for the current platform."""
+    return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
 def probe(executable, root):
     """Inspect the selected interpreter, never import application configuration."""
     if not (root / "requirements.txt").is_file():
@@ -45,11 +50,11 @@ print(json.dumps({'version': list(sys.version_info[:2]), 'prefix': sys.prefix,
 
 def verify(root, *, dependencies=True):
     venv = root / ".venv"
-    executable = venv / "bin/python"
+    executable = venv_python(venv)
     if venv.is_symlink():
         raise RuntimeError(".venv must be a repository-local directory, not a symlink.")
     if not executable.is_file():
-        raise RuntimeError(".venv/bin/python is missing. Run make setup.")
+        raise RuntimeError(f"{executable.relative_to(root)} is missing. Run make setup.")
     info = probe(executable, root)
     if (
         info["version"] != [3, 12]
@@ -93,7 +98,7 @@ def bootstrap(root):
         print("Creating repository .venv with Python 3.12", flush=True)
         subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True)
     info = verify(root, dependencies=False)
-    executable = venv / "bin/python"
+    executable = venv_python(venv)
     if info["missing"]:
         print("Installing pinned requirements.txt into .venv", flush=True)
         subprocess.run(

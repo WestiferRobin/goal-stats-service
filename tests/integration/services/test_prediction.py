@@ -11,6 +11,7 @@ from football.report import report
 from models.prediction import Prediction
 from models.team import Team
 from tests.fixtures.historical_database import count, generate, history_url
+from tests.unit.services.test_prediction import frozen_v1_row
 
 
 @pytest.mark.postgres
@@ -43,9 +44,13 @@ def test_engine_parity_effective_inputs_and_no_transaction_during_compute(
         team.shots = max(team.shots, team.shots_on_target)
         total = saved_scenario[prefix + "modifier_total"]
         if total:
-            team.add_modifier("Saved scenario modifier total", total)
+            team.add_modifier("Supplied hypothetical modifier total", total)
         expected_teams.append(team)
-    expected = report(EngineMatch(*expected_teams, match_minute=saved_scenario["match_minute"]))
+    expected = report(
+        EngineMatch(
+            *expected_teams, match_minute=saved_scenario["match_minute"], regulation_horizon=True
+        )
+    )
     calls = []
 
     def wrapped(match):
@@ -62,7 +67,7 @@ def test_engine_parity_effective_inputs_and_no_transaction_during_compute(
     response = generate(scenario_client, saved_scenario)
     saved = response.json
     assert len(calls) == 1 and saved["output"] == expected
-    assert saved["model_version"] == expected["model"] == "road-to-the-final-heuristic-v1"
+    assert saved["model_version"] == expected["model"] == "road-to-the-final-heuristic-v2"
     assert datetime.fromisoformat(saved["generated_at"]).tzinfo is not None
     assert saved["input_snapshot"]["team1_shots"] == 4
     assert saved["input_snapshot"]["team1_modifier_total"] == -7
@@ -211,3 +216,59 @@ def test_database_failure_rolls_back(scenario_client, saved_scenario, import_dat
         scenario_client.get(f"/api/v1/scenarios/{saved_scenario['scenario_id']}").status_code == 200
     )
     assert count(import_database) == 0
+
+
+@pytest.mark.postgres
+def test_frozen_v1_and_new_v2_survive_patch_history_and_restart(
+    scenario_client, saved_scenario, import_database, app_factory, postgres_config, monkeypatch
+):
+    legacy, row = frozen_v1_row(saved_scenario["scenario_id"])
+    # Insert frozen output into the disposable test DB; never generate the legacy fixture.
+    with import_database.transaction() as session:
+        session.add(row)
+        session.flush()
+        legacy["prediction_id"] = row.prediction_id
+    legacy_url = f"/api/v1/predictions/{legacy['prediction_id']}"
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Stored predictions must not be recalculated")
+
+    with monkeypatch.context() as blocked:
+        blocked.setattr("services.prediction.predict_inputs", forbidden)
+        blocked.setattr("services.prediction.predict_state", forbidden)
+        blocked.setattr(EngineMatch, "calculate_probabilities", forbidden)
+        assert scenario_client.get(legacy_url).json == legacy
+
+    path = f"/api/v1/scenarios/{saved_scenario['scenario_id']}"
+    first_v2 = generate(scenario_client, saved_scenario).json
+    assert (
+        scenario_client.patch(path, json={"match_minute": 105, "team2_goals": 2}).status_code == 200
+    )
+    assert scenario_client.patch(path, json={"team1_offense": 99}).status_code == 400
+    assert scenario_client.patch(path, json={"team1_id": 3}).status_code == 400
+    second_v2 = generate(scenario_client, saved_scenario).json
+    for value in (first_v2, second_v2):
+        assert (
+            value["model_version"] == value["output"]["model"] == "road-to-the-final-heuristic-v2"
+        )
+        assert value["input_snapshot"]["adapter_version"] == "scenario-v1"
+        assert value["input_snapshot"]["status"] == ""
+        assert value["input_snapshot"]["extra_minute"] == 0
+    assert first_v2["output"]["minute"] == 65
+    assert second_v2["output"]["minute"] == 105
+    assert second_v2["output"]["expected_goals_remaining"] == {"team1": 0, "team2": 0}
+    assert second_v2["output"]["most_likely_score"] == [0, 2]
+    assert len({value["prediction_id"] for value in (legacy, first_v2, second_v2)}) == 3
+
+    monkeypatch.setattr("services.prediction.predict_inputs", forbidden)
+    monkeypatch.setattr("services.prediction.predict_state", forbidden)
+    monkeypatch.setattr(EngineMatch, "calculate_probabilities", forbidden)
+    import_database.dispose()
+    reopened = app_factory(postgres_config).test_client()
+    assert reopened.get(legacy_url).json == legacy
+    for value in (first_v2, second_v2):
+        assert reopened.get(f"/api/v1/predictions/{value['prediction_id']}").json == value
+    url = history_url(saved_scenario)
+    assert reopened.get(url).json == [second_v2, first_v2, legacy]
+    assert reopened.get(url + "?limit=1&offset=2").json == [legacy]
+    assert count(import_database) == 3

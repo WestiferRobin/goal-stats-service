@@ -1,5 +1,5 @@
 # mypy: disable-error-code="no-untyped-call"
-"""Adapt validated saved inputs to the unchanged RoadToTheFinal engine."""
+"""Adapt explicit scenario inputs to prediction-only regulation-horizon calculations."""
 
 from typing import Any
 
@@ -35,9 +35,9 @@ def predict_state(
         # Scenario stores the explicit sum. Engine performs its original event-score cap.
         total = values[prefix + "modifier_total"]
         if total:
-            team.add_modifier("Saved scenario modifier total", total)
+            team.add_modifier("Supplied hypothetical modifier total", total)
         teams.append(team)
-    match = Match(teams[0], teams[1], match_minute=values["match_minute"])
+    match = Match(teams[0], teams[1], match_minute=values["match_minute"], regulation_horizon=True)
     match.match_extra_minute = extra_minute
     match.match_status_short = status
     return report(match)

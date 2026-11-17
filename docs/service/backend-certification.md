@@ -209,7 +209,8 @@ Current allowlist rejects the new paths; PATCH is not exported/typed; all POSTs
 currently require JSON, conflicting with bodyless saved-generation POST. Location
 rewriting handles only snapshots, and error messages/status mappings need updating.
 
-[Exact frontend changes](frontend-api.md#frontend-proxy-integration) are documented.
+For maintained integration contracts, see [the current API reference](frontend-api.md).
+The frontend observations in this dated report are historical.
 Use server-only `FOOTBALL_API_BASE_URL=http://127.0.0.1:5100` on a host-running frontend;
 the proxy appends `/api/v1`. `SERVICE_API_BASE_URL` configures a separate Home client.
 Browser calls remain same-origin. Flask does not advertise permissive CORS, and

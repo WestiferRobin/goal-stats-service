@@ -16,6 +16,7 @@ from models.base import Base
 from models.match import Match
 from models.scenario import Scenario
 from models.team import Team
+from models.user import User
 from tests.fixtures.historical_database import create, scenario
 
 
@@ -57,6 +58,7 @@ def test_schema_migration_preserves_existing_data(scenario_client, scenario_body
             ("team1_id",),
             ("team2_id",),
             ("match_id",),
+            ("owner_user_id",),
         }
         assert all(k["options"]["ondelete"] == "RESTRICT" for k in keys)
         assert {tuple(i["column_names"]) for i in inspector.get_indexes("scenarios")} == {
@@ -64,6 +66,7 @@ def test_schema_migration_preserves_existing_data(scenario_client, scenario_body
             ("team2_id",),
             ("match_id",),
             ("created_at", "scenario_id"),
+            ("owner_user_id", "created_at", "scenario_id"),
         }
         context = MigrationContext.configure(connection, opts={"compare_server_default": True})
         assert compare_metadata(context, Base.metadata) == []
@@ -108,6 +111,63 @@ def test_database_rejects_invalid_values(scenario_client, scenario_body, import_
 
 
 URL = "/api/v1/scenarios"
+
+
+@pytest.mark.postgres
+def test_optional_ownership_preserves_shared_api(scenario_client, scenario_body, import_database):
+    with import_database.transaction() as session:
+        assert session.scalar(text("SELECT count(*) FROM users")) == 0
+    saved = create(scenario_client, scenario_body).json
+    identity = saved["scenario_id"]
+    path = f"{URL}/{identity}"
+    assert "owner_user_id" not in saved
+    with import_database.transaction() as session:
+        row = session.get(Scenario, identity)
+        assert row.owner_user_id is None
+        user = User()
+        session.add(user)
+        session.flush()
+        assert user.user_id > 0 and user.created_at.tzinfo is not None
+        owner = user.user_id
+        row.owner_user_id = owner
+    for statement, params, state in [
+        (
+            "UPDATE scenarios SET owner_user_id=2147483647 WHERE scenario_id=:id",
+            {"id": identity},
+            "23503",
+        ),
+        ("DELETE FROM users WHERE user_id=:id", {"id": owner}, "23503"),
+        ("INSERT INTO users(user_id) VALUES (:id)", {"id": owner}, "23505"),
+        ("INSERT INTO users(user_id) VALUES (NULL)", {}, "23502"),
+        ("INSERT INTO users(created_at) VALUES (NULL)", {}, "23502"),
+    ]:
+        with pytest.raises(IntegrityError) as error:
+            with import_database.transaction() as session:
+                session.execute(text(statement), params)
+        assert error.value.orig.sqlstate == state
+    assert scenario_client.get(path).json == saved
+    assert saved in scenario_client.get(URL).json
+    assert scenario_client.patch(path, json={"owner_user_id": owner}).status_code == 400
+    assert (
+        scenario_client.post(URL, json={**scenario_body, "owner_user_id": owner}).status_code == 400
+    )
+    assert scenario_client.patch(path, json={"match_minute": 70}).status_code == 200
+    prediction = scenario_client.post(path + "/predictions")
+    assert prediction.status_code == 201
+    assert "owner_user_id" not in prediction.json["input_snapshot"]
+    with import_database.transaction() as session:
+        assert session.get(Scenario, identity).owner_user_id == owner
+        assert (
+            session.scalar(
+                text(
+                    "SELECT s.owner_user_id FROM predictions p "
+                    "JOIN scenarios s USING (scenario_id) "
+                    "WHERE p.prediction_id=:id"
+                ),
+                {"id": prediction.json["prediction_id"]},
+            )
+            == owner
+        )
 
 
 @pytest.mark.postgres

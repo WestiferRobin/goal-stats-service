@@ -1,8 +1,9 @@
 # PostgreSQL schema exports and verification
 
 `001_fresh_database.sql` is generated offline from the unchanged historical Alembic
-chain plus forward head `d91e6a4b208f`. Its final schema contains the five normalized
-application tables and `alembic_version`. Historical SQL creates then retires legacy
+chain through head `e42b7c19a603`. Its final schema contains six application
+tables (`teams`, `competitions`, `matches`, `scenarios`, `predictions`, `users`)
+and `alembic_version`. Historical SQL creates then retires legacy
 tables; it never seeds prototype records. No prototype seed artifact is supported.
 
 Regenerate with `python scripts/database/export_football_sql.py --mode schema`,
@@ -63,7 +64,7 @@ authenticity or security certificate.
 No historical SQL INSERT generator exists. Real data uses the guarded Flask importer.
 No prediction ratings are inferred from historical results. Source ordering/venue
 limitations remain. Explicit historical `make seed` now invokes the guarded Flask importer; it does not execute these SQL exports. Dated local acceptance
-is retained in [Task #2 evidence](../docs/service/task2-acceptance.md).
+is retained in [Task #2 evidence](../docs/service/historical-catalog.md#historical-2023-acceptance).
 
 
 ## Artifact inventory

@@ -83,3 +83,65 @@ def test_existing_modes_do_not_require_authentication(app_factory, explicit_conf
     app = app_factory({**explicit_config, "APP_ENV": mode})
     app.add_url_rule("/probe", view_func=lambda: "accepted", methods=["POST"])
     assert app.test_client().post("/probe").status_code == 200
+
+
+@pytest.mark.postgres
+def test_production_domain_workflow_preserves_v2_and_seeded_simulation(
+    scenario_client, app_factory, postgres_config, import_database, scenario_body
+):
+    from models.team import Team
+    from tests.fixtures.historical_database import snapshot
+
+    with import_database.transaction() as session:
+        session.add(Team(team_id=4, name="Fourth", name_key="fourth", category="test"))
+    client = app_factory(production_config(postgres_config)).test_client()
+    headers = {"Authorization": "Bearer " + TOKEN}
+    preview_body = {k: v for k, v in scenario_body.items() if k not in {"title", "match_id"}}
+    simulation = {
+        "teams": [
+            dict(team_id=i, offense=70, defense=70, form=70, star_power=70, clutch=70)
+            for i in range(1, 5)
+        ],
+        "simulations": 1000,
+        "seed": 2026,
+    }
+    before = snapshot(import_database)
+    for url, body in [
+        ("/api/v1/predictions/preview", preview_body),
+        ("/api/v1/scenarios", scenario_body),
+        ("/api/v1/competitions/simulate", simulation),
+    ]:
+        for denied in ({}, {"Authorization": "Bearer wrong"}):
+            assert client.post(url, json=body, headers=denied).status_code == 401
+    assert snapshot(import_database) == before
+    preview = client.post("/api/v1/predictions/preview", json=preview_body, headers=headers)
+    assert preview.status_code == 200
+    assert preview.json["model"] == "road-to-the-final-heuristic-v2"
+    assert snapshot(import_database) == before
+    created = client.post("/api/v1/scenarios", json=scenario_body, headers=headers)
+    assert created.status_code == 201
+    url = created.headers["Location"]
+    before = snapshot(import_database)
+    for denied in ({}, {"Authorization": "Bearer wrong"}):
+        assert client.post(url + "/predictions", headers=denied).status_code == 401
+        assert client.patch(url, json={"match_minute": 105}, headers=denied).status_code == 401
+    assert snapshot(import_database) == before
+    first = client.post(url + "/predictions", headers=headers)
+    assert first.status_code == 201
+    assert first.json["output"] == preview.json
+    assert client.patch(url, json={"match_minute": 105}, headers=headers).status_code == 200
+    second = client.post(url + "/predictions", headers=headers)
+    assert second.status_code == 201
+    assert second.json["prediction_id"] != first.json["prediction_id"]
+    assert second.json["output"]["expected_goals_remaining"] == {"team1": 0, "team2": 0}
+    assert client.get(first.headers["Location"]).json == first.json
+    assert client.get(url + "/predictions").json == [second.json, first.json]
+    before = snapshot(import_database)
+    result = client.post("/api/v1/competitions/simulate", json=simulation, headers=headers)
+    assert result.status_code == 200
+    assert result.json["seed"] == 2026
+    assert (
+        client.post("/api/v1/competitions/simulate", json=simulation, headers=headers).json
+        == result.json
+    )
+    assert snapshot(import_database) == before

@@ -123,3 +123,36 @@ def test_head_to_head_matches_both_orientations_and_has_stable_pagination(databa
             for r in repo.list(session, team_id=20, opponent_team_id=30, limit=1, offset=1)
         ] == [30]
         assert repo.list(session, team_id=10, opponent_team_id=30) == []
+
+
+@pytest.mark.postgres
+@pytest.mark.parametrize(
+    "column,value,sqlstate",
+    [
+        ("home_team_id", 999, "23503"),
+        ("away_team_id", 999, "23503"),
+        ("competition_id", 999, "23503"),
+        ("home_score", -1, "23514"),
+        ("away_score", -1, "23514"),
+        ("away_team_id", 10, "23514"),
+        (
+            "source_record_key",
+            "0000000000000000000000000000000000000000000000000000000000000014",
+            "23505",
+        ),
+    ],
+)
+def test_match_constraints_reject_invalid_write_without_changes(database, column, value, sqlstate):
+    from sqlalchemy.exc import IntegrityError
+
+    from tests.fixtures.historical_database import snapshot
+
+    before = snapshot(database)
+    with pytest.raises(IntegrityError) as error:
+        with database.transaction() as session:
+            session.execute(
+                text(f"UPDATE matches SET {column}=:value WHERE match_id=10"),
+                {"value": value},
+            )
+    assert error.value.orig.sqlstate == sqlstate
+    assert snapshot(database) == before

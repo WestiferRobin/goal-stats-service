@@ -166,6 +166,7 @@ def test_preview_is_read_only_and_matches_saved_calculation(
     before = snapshot(import_database)
     response = scenario_client.post("/api/v1/predictions/preview", json=body)
     assert response.status_code == 200, response.json
+    assert response.json["model"] == "road-to-the-final-heuristic-v2"
     assert snapshot(import_database) == before
     saved = scenario_client.post("/api/v1/scenarios", json=scenario_body)
     prediction = scenario_client.post(saved.headers["Location"] + "/predictions")
@@ -183,3 +184,62 @@ def test_preview_is_read_only_and_matches_saved_calculation(
             == status
         )
     assert snapshot(import_database) == before
+
+
+@pytest.mark.postgres
+@pytest.mark.parametrize("minute", [0, 45, 89, 90, 91, 105, 120])
+def test_v2_http_preview_save_and_horizon(scenario_client, scenario_body, import_database, minute):
+    from tests.fixtures.historical_database import snapshot
+
+    body = {
+        **scenario_body,
+        "match_minute": minute,
+        "team1_goals": 2,
+        "team2_goals": 1,
+        "team1_shots": 0,
+        "team1_shots_on_target": 4,
+    }
+    preview_body = {key: value for key, value in body.items() if key not in {"title", "match_id"}}
+    before = snapshot(import_database)
+    response = scenario_client.post("/api/v1/predictions/preview", json=preview_body)
+    assert response.status_code == 200, response.json
+    preview = response.json
+    assert snapshot(import_database) == before
+    assert preview["model"] == "road-to-the-final-heuristic-v2"
+    assert preview["minute"] == minute
+    assert sum(preview["probabilities"].values()) == pytest.approx(1, abs=1e-9)
+    assert sum(preview["advancement"].values()) == pytest.approx(1, abs=1e-9)
+    assert sum(preview["momentum_percent"].values()) == pytest.approx(100)
+    if minute >= 90:
+        assert preview["expected_goals_remaining"] == {"team1": 0, "team2": 0}
+        assert preview["probabilities"] == {"team1": 1, "draw": 0, "team2": 0}
+        assert preview["most_likely_score"] == [2, 1]
+        assert preview["top_scorelines"] == [{"team1_goals": 2, "team2_goals": 1, "probability": 1}]
+        assert "No future match period is modeled" in " ".join(preview["reasoning"])
+    else:
+        assert sum(preview["expected_goals_remaining"].values()) == pytest.approx(
+            2.6 * (90 - minute) / 90
+        )
+    created = scenario_client.post("/api/v1/scenarios", json=body)
+    assert created.status_code == 201, created.json
+    saved = scenario_client.post(created.headers["Location"] + "/predictions")
+    assert saved.status_code == 201, saved.json
+    assert saved.json["output"] == preview
+    assert saved.json["model_version"] == preview["model"]
+    assert saved.json["input_snapshot"]["team1_shots"] == 4
+    assert scenario_client.get(created.headers["Location"]).json["team1_shots"] == 0
+
+
+@pytest.mark.postgres
+def test_v2_preview_metadata_remains_accepted_without_phase_inference(
+    scenario_client, scenario_body
+):
+    body = {key: value for key, value in scenario_body.items() if key not in {"title", "match_id"}}
+    body["match_minute"] = 45
+    baseline = scenario_client.post("/api/v1/predictions/preview", json=body)
+    response = scenario_client.post(
+        "/api/v1/predictions/preview", json={**body, "status": "ft", "extra_minute": 30}
+    )
+    assert baseline.status_code == response.status_code == 200
+    assert response.json == {**baseline.json, "status": "FT"}
+    assert sum(response.json["expected_goals_remaining"].values()) == pytest.approx(1.3)

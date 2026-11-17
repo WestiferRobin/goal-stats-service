@@ -589,7 +589,7 @@ def test_pinned_source_import_repeat_and_application_restart(
 
             saved_prediction = prediction.json
             SavedPredictionResponse.model_validate(saved_prediction)
-            assert saved_prediction["model_version"] == "road-to-the-final-heuristic-v1"
+            assert saved_prediction["model_version"] == "road-to-the-final-heuristic-v2"
             captured = saved_prediction["input_snapshot"]
             assert captured["adapter_version"] == "scenario-v1"
             assert captured["team1_name"] == "Spain" and captured["team2_name"] == "England"

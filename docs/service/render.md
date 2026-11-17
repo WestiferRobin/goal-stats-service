@@ -95,6 +95,16 @@ ownership, or dependencies. Resolve refusals separately; do not delete records o
 over failures. Database timeouts are bounded, so lock contention may abort migrations.
 Do not run concurrent migration jobs/deploys.
 
+Ownership preparation at `e42b7c19a603` requires coordinated deployment: old
+readiness rejects the new head, and new ORM reads require the new schema. Use a
+rehearsed maintenance window and verified backup; drain traffic before migration
+and start the matching application after success. The default command only serves;
+`--migrate` and `--bootstrap --confirm-production` migrate before Gunicorn starts.
+The additive DDL/index can block reads or writes, and the 3-second statement
+timeout can abort it. No zero-downtime guarantee is made. Downgrade refuses populated
+users or ownership. See the [ownership plan](architecture.md#ownership-and-migration-acceptance).
+This schema change leaves service-token checks and shared-record visibility unchanged.
+
 ### Automatic production bootstrap (Free or paid)
 
 Leave Pre-Deploy Command blank. Set **Docker Command** exactly to:
@@ -108,8 +118,8 @@ The single startup process (never Gunicorn workers):
 1. Requires production configuration, explicit confirmation, exact target identity, and
    verified TLS. Validates all nine source selections before making database changes.
 2. Takes the historical importer lock and runs Alembic `upgrade head` with existing guards.
-3. Imports only when all five application tables are empty, using the existing cloud-safe
-   importer for 1991, 1995, 1999, 2003, 2007, 2011, 2015, 2019, and 2023.
+3. Imports only when all five catalog/scenario/prediction tables are empty (users may
+   exist), using the existing cloud-safe importer for 1991, 1995, 1999, 2003, 2007, 2011, 2015, 2019, and 2023.
 4. Requires exactly 44 historical teams, nine competitions, and 348 matches. Verifies
    every match's facts, participant links, edition and provenance against the pinned source.
    Edition match counts are 26, 26, 32, 32, 32, 32, 52, 52, and 64.

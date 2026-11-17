@@ -7,6 +7,8 @@ from flask_openapi3.models.tag import Tag
 from exceptions.handlers import object_body
 from routers.openapi import errors
 from schemas.team import CatalogTeamPath, CatalogTeamResponse, CatalogTeamsResponse
+from schemas.team.request import TeamSummaryQuery
+from schemas.team.response import TeamSummaryResponse
 from services.team import TeamService
 
 
@@ -28,5 +30,22 @@ def create_team_blueprint(team_service: TeamService) -> APIBlueprint:
     def catalog_team(path: CatalogTeamPath) -> Response:
         """Read a historical team by ID. Fetch two team IDs independently for comparison."""
         return jsonify(team_service.get(path.team_id))
+
+    @api.get(
+        "/catalog/teams/<team_id>/summary",
+        responses={
+            200: TeamSummaryResponse,
+            "404": errors()["default"],
+            "500": errors()["default"],
+        },
+    )
+    def catalog_team_summary(path: CatalogTeamPath, query: TeamSummaryQuery) -> Response:
+        """Summarize all matching imported World Cup records, independently of pagination.
+
+        Provisional definitions: recorded scores include extra time and exclude shootouts;
+        ties count as draws. Appearances count filtered editions. Date bounds are inclusive.
+        Empty results describe available records, not verified absence of historical play.
+        """
+        return jsonify(team_service.summary(path.team_id, query))
 
     return api

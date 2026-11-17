@@ -114,7 +114,7 @@
         "team2_yellow_cards": 0,
         "title": "Synthetic scenario fixture"
       },
-      "model_version": "road-to-the-final-heuristic-v1",
+      "model_version": "road-to-the-final-heuristic-v2",
       "output": {
         "advancement": {
           "team1": 0.5,
@@ -129,7 +129,7 @@
           "team2": 0.36111111111111116
         },
         "minute": 65,
-        "model": "road-to-the-final-heuristic-v1",
+        "model": "road-to-the-final-heuristic-v2",
         "momentum_percent": {
           "team1": 50.0,
           "team2": 50.0
@@ -144,7 +144,14 @@
           "team2": 0.22445060262002908
         },
         "reasoning": [
-          "The model is calculating remaining goals from minute 65."
+          "Team ratings and match statistics are user-provided hypothetical inputs. Historical browsing does not automatically supply these ratings.",
+          "Predictions are calculated estimates, not recorded historical match results.",
+          "The model estimates additional goals from minute 65 through the nominal 90-minute horizon.",
+          "Stoppage time, extra time, and penalty shootouts are not forecast.",
+          "Preview status and extra_minute are metadata; they do not establish match completion, a match phase, or a supported future prediction horizon.",
+          "Confidence is a heuristic based on the margin between the two leading outcome probabilities, not measured prediction accuracy.",
+          "Advancement uses a hypothetical clutch-weighted tiebreak assumption when the modeled score is tied (equal shares if both clutch ratings are zero); it is not a recorded shootout outcome.",
+          "For calculation, total shots are normalized upward to shots on target when shots on target exceed submitted shots. Prediction does not modify the scenario."
         ],
         "status": "",
         "team1": "First",
@@ -288,7 +295,7 @@
           "team2_yellow_cards": 0,
           "title": "Synthetic scenario fixture"
         },
-        "model_version": "road-to-the-final-heuristic-v1",
+        "model_version": "road-to-the-final-heuristic-v2",
         "output": {
           "advancement": {
             "team1": 0.5,
@@ -303,7 +310,7 @@
             "team2": 0.36111111111111116
           },
           "minute": 65,
-          "model": "road-to-the-final-heuristic-v1",
+          "model": "road-to-the-final-heuristic-v2",
           "momentum_percent": {
             "team1": 50.0,
             "team2": 50.0
@@ -318,7 +325,14 @@
             "team2": 0.22445060262002908
           },
           "reasoning": [
-            "The model is calculating remaining goals from minute 65."
+            "Team ratings and match statistics are user-provided hypothetical inputs. Historical browsing does not automatically supply these ratings.",
+            "Predictions are calculated estimates, not recorded historical match results.",
+            "The model estimates additional goals from minute 65 through the nominal 90-minute horizon.",
+            "Stoppage time, extra time, and penalty shootouts are not forecast.",
+            "Preview status and extra_minute are metadata; they do not establish match completion, a match phase, or a supported future prediction horizon.",
+            "Confidence is a heuristic based on the margin between the two leading outcome probabilities, not measured prediction accuracy.",
+            "Advancement uses a hypothetical clutch-weighted tiebreak assumption when the modeled score is tied (equal shares if both clutch ratings are zero); it is not a recorded shootout outcome.",
+            "For calculation, total shots are normalized upward to shots on target when shots on target exceed submitted shots. Prediction does not modify the scenario."
           ],
           "status": "",
           "team1": "First",
@@ -570,7 +584,7 @@
         "team2_yellow_cards": 0,
         "title": "Synthetic scenario fixture"
       },
-      "model_version": "road-to-the-final-heuristic-v1",
+      "model_version": "road-to-the-final-heuristic-v2",
       "output": {
         "advancement": {
           "team1": 0.5,
@@ -585,7 +599,7 @@
           "team2": 0.36111111111111116
         },
         "minute": 65,
-        "model": "road-to-the-final-heuristic-v1",
+        "model": "road-to-the-final-heuristic-v2",
         "momentum_percent": {
           "team1": 50.0,
           "team2": 50.0
@@ -600,7 +614,14 @@
           "team2": 0.22445060262002908
         },
         "reasoning": [
-          "The model is calculating remaining goals from minute 65."
+          "Team ratings and match statistics are user-provided hypothetical inputs. Historical browsing does not automatically supply these ratings.",
+          "Predictions are calculated estimates, not recorded historical match results.",
+          "The model estimates additional goals from minute 65 through the nominal 90-minute horizon.",
+          "Stoppage time, extra time, and penalty shootouts are not forecast.",
+          "Preview status and extra_minute are metadata; they do not establish match completion, a match phase, or a supported future prediction horizon.",
+          "Confidence is a heuristic based on the margin between the two leading outcome probabilities, not measured prediction accuracy.",
+          "Advancement uses a hypothetical clutch-weighted tiebreak assumption when the modeled score is tied (equal shares if both clutch ratings are zero); it is not a recorded shootout outcome.",
+          "For calculation, total shots are normalized upward to shots on target when shots on target exceed submitted shots. Prediction does not modify the scenario."
         ],
         "status": "",
         "team1": "First",

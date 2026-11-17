@@ -1,5 +1,9 @@
 # Item/Action backend retirement — Prompt 2
 
+Historical retirement-stage evidence: revision, deployment and local-runtime
+observations below describe that execution, not current state. The current schema
+has six application tables at `e42b7c19a603`; see [current migration acceptance](../service/architecture.md#ownership-and-migration-acceptance).
+
 The checkout retires Item/Action. Five normalized domains (Team, Competition,
 Match, Scenario, Prediction) and RoadToTheFinal remain supported. The original
 [Prompt 1 evidence](item-action-retirement.md) and

@@ -17,6 +17,7 @@ from models.match import Match
 from models.prediction import Prediction
 from models.scenario import Scenario
 from models.team import Team
+from models.user import User
 from settings.base import ConfigurationError
 from settings.database import DatabaseSettings, ImportTarget
 
@@ -70,6 +71,7 @@ def is_ready(database: Database) -> bool:
                 Match,
                 Scenario,
                 Prediction,
+                User,
             ):
                 connection.execute(select(model).limit(1)).all()
             return True

@@ -320,7 +320,7 @@ $approved$::jsonb) AS e(edition text, start date, finish date, matches integer,
     SELECT 'database identity' AS check_name,
            s.database_name IS NULL OR s.database_name = current_database() AS passed FROM settings s
     UNION ALL SELECT 'Alembic head',
-        (SELECT count(*) = 1 AND min(version_num) = 'd91e6a4b208f' FROM alembic_version)
+        (SELECT count(*) = 1 AND min(version_num) = 'e42b7c19a603' FROM alembic_version)
     UNION ALL SELECT 'competition identity/category', NOT EXISTS (
         SELECT 1 FROM selected_competitions WHERE name <> 'FIFA Women''s World Cup'
           OR name_key <> 'fifa women''s world cup' OR category <> 'women_senior_national')
