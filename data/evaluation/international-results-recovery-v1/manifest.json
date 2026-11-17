@@ -1,0 +1,13 @@
+{
+  "package_id": "international-results-recovery-v1",
+  "original_manifest_sha256": "47c947db3f117a14761930da3c0dcfa3b68b50e94b6e12904b9bf7ddc75a0a28",
+  "overlay_sha256": "8e80eeea6cc3d6bd10ec4b26e966e6cb7376d4037a5ebd6e88155e3e3df23b61",
+  "ratings_sha256": "5034b17ff458be1495da893f5f95be875ca25f9b7cc8598a84121973dd0490fa",
+  "coverage_sha256": "5bb5658f21aa91b40921d88dbe10377c0977968783ef9fd176586f3029be2ae4",
+  "historical_availability_verified": false,
+  "model": "international-recorded-score-poisson-v1",
+  "merged_source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+  "original_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+  "expected_cases": 348,
+  "expected_cutoffs": 137
+}

@@ -1,0 +1,13 @@
+{
+  "eligible": 0,
+  "files": {
+    ".gitattributes": "9e8f041ed812cb5288282cc6b187de804e96b688d56647fdae181c49fec71863",
+    "README.md": "d8833adc7b28972a96593e929e85981481cec0fed099d6666a1b7773ca345606",
+    "coverage.json": "83eb6a812de74b442d3845418b0c1917666d7efefed15b4b071effac57c4dbb8",
+    "preservation.json": "b4e9f7c6aad8f4442e03c8247f42e617a6a2a4f7fb3911b3f67ab8730bf124c6",
+    "rules-audit.json": "19f6b893246dd8f92b367485c09d27842d917d689d6fa067e699c260f086c6e4"
+  },
+  "model": "odf-exposure-80-evidence-blocked-v1",
+  "package": "duration-80-v1",
+  "status": "evidence_blocked"
+}

@@ -6,7 +6,7 @@ from typing import Annotated, Literal, Self
 from pydantic import Field, model_validator
 
 from schemas.common import Contract
-from schemas.evaluation.request import Assumption, Digest, Mode
+from schemas.evaluation.request import Assumption, Digest, Mode, PredictionModel
 
 Probability = Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)]
 
@@ -66,10 +66,9 @@ class BacktestResponse(Contract):
     protocol_version: Literal["pregame-regulation-v1", "edition-regulation-v1"] = (
         "pregame-regulation-v1"
     )
-    prediction_model_version: Literal["road-to-the-final-heuristic-v2"] = (
-        "road-to-the-final-heuristic-v2"
-    )
+    prediction_model_version: PredictionModel = "road-to-the-final-heuristic-v2"
     rating_model_version: str
+    recovery_package_id: Literal["international-results-recovery-v1"] | None = None
     dataset_id: str
     dataset_hash: Digest
     package_hash: Digest
@@ -109,9 +108,20 @@ class BacktestResponse(Contract):
     protocol_summaries: list[dict[str, object]] = Field(default_factory=list)
     metrics_horizon_minutes: Literal[90] = 90
     limitations: list[str]
+    research_validation: dict[str, object] | None = None
 
     @model_validator(mode="after")
     def consistent_counts(self) -> Self:
+        research = self.prediction_model_version != "road-to-the-final-heuristic-v2"
+        if self.mode == "retrospective_replay" and not research:
+            raise ValueError("Replay requires a research model")
+        if research and (
+            self.mode == "retrospective_assumptions"
+            or (self.eligible_matches > 0 and self.mode != "retrospective_replay")
+            or self.research_validation is None
+            or self.research_validation.get("production_eligible") is not False
+        ):
+            raise ValueError("Research scoring requires explicit retrospective classification")
         if (
             self.cohort_match_count > self.dataset_match_count
             or self.total_candidate_matches

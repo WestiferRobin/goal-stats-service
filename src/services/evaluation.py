@@ -4,13 +4,16 @@ import hashlib
 import json
 import re
 from collections import Counter
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
 from exceptions.base import DomainError
 from football import team_ratings
+from football.duration_research import MODEL as DURATION_MODEL
+from football.duration_research import SPEC as DURATION_SPEC
+from football.duration_research import inspect_case
 from football.evaluation import metrics, outcome, probabilities
 from football.scenario_prediction import predict_state
 from infra.repositories.evaluation import EvaluationRepository, HistoricalCase
@@ -18,6 +21,7 @@ from schemas.engine import TeamStats
 from schemas.evaluation.request import FULL_DATASET, PILOT_DATASET, BacktestRequest
 from schemas.evaluation.response import BacktestResponse, CaseResult
 from schemas.prediction.request import PredictionPreview
+from services.evaluation_research import MANIFEST_SHA as RESEARCH_MANIFEST_SHA
 
 PROTOCOL = "pregame-regulation-v1"
 PREDICTION_MODEL = "road-to-the-final-heuristic-v2"
@@ -61,7 +65,8 @@ class ObservedStrength:
 class EvaluationPackage:
     """Server-owned approval boundary, never deserialized from a request.
 
-    New evidence requires a reviewed, versioned package and a new dataset ID.
+    Outcome evidence requires a reviewed package and dataset ID; rating-only additions
+    require a separately versioned, pinned recovery package selected explicitly.
     Synthetic packages are injected only by tests and remain explicitly labeled.
     """
 
@@ -155,6 +160,8 @@ class EvaluationService:
         package = self.package or approved_package(body.dataset_id)
         if package.dataset_id != body.dataset_id:
             raise EvaluationError("Dataset identity mismatch")
+        rating_source_hash = package.source_hash
+        recovered_source: list[team_ratings.Result] | None = None
         full_records: dict[str, Any] = {}
         full_ratings: dict[str, Any] = {}
         if body.dataset_id == FULL_DATASET:
@@ -164,8 +171,32 @@ class EvaluationService:
                 _, registry, rating_artifact = assets()
                 full_records = {r["match_key"]: r for r in registry["records"]}
                 full_ratings = rating_artifact["populations"]
+                if body.recovery_package_id is not None:
+                    from services.evaluation_recovery import assets as recovery_assets
+
+                    recovery_manifest, recovered, recovered_source = recovery_assets(
+                        approved_source(), set(full_ratings)
+                    )
+                    full_ratings = recovered["populations"]
+                    rating_source_hash = recovery_manifest["merged_source_hash"]
+                    package = replace(
+                        package,
+                        provenance={**package.provenance, "rating_recovery": recovery_manifest},
+                    )
             except (ValueError, KeyError, TypeError, OSError):
                 raise EvaluationError("Full evidence assets unavailable") from None
+        research_data: dict[str, Any] = {}
+        research_cases: dict[str, Any] = {}
+        research_results: dict[str, Any] = {}
+        if body.prediction_model_version != PREDICTION_MODEL:
+            from services.evaluation_research import assets as research_assets
+
+            try:
+                research_data, research_cases, research_results = research_assets()
+                if set(research_cases) != set(full_records):
+                    raise ValueError("Research cohort mismatch")
+            except (ValueError, KeyError, TypeError, OSError):
+                raise EvaluationError("Pinned research replay unavailable") from None
         with self.repo.transaction() as session:
             candidates = self.repo.candidates(session)
             if (
@@ -211,7 +242,7 @@ class EvaluationService:
         assumption_map = {(a.match_key, a.team_id): a for a in body.assumptions}
         cases: list[CaseResult] = []
         fitted: dict[date, dict[str, dict[str, Any]]] = {}
-        source: list[team_ratings.Result] | None = None
+        source: list[team_ratings.Result] | None = recovered_source
         scored: list[tuple[tuple[float, float, float], str]] = []
         for case in selected:
             cutoff = case.day - timedelta(days=1)
@@ -253,7 +284,7 @@ class EvaluationService:
                         **{k: v for k, v in population.items() if k != "ratings"},
                         "participants": participants,
                         "rating_model": team_ratings.MODEL,
-                        "source_hash": package.source_hash,
+                        "source_hash": rating_source_hash,
                     }
                     if not complete:
                         reasons.append("historical_ratings_insufficient")
@@ -282,6 +313,67 @@ class EvaluationService:
                     reasons.append("regulation_duration_incompatible")
                 if label.completion_status != "completed":
                     reasons.append("match_completion_unverified")
+            if research_cases:
+                row = research_cases[case.match_key]
+                if (
+                    row["date"] != case.day.isoformat()
+                    or row["cutoff"] != cutoff.isoformat()
+                    or row["home"] != case.source_home
+                    or row["away"] != case.source_away
+                    or row["outcome_source_hash"] != full_records[case.match_key]["source_sha256"]
+                    or population is None
+                    or row["source_population_hash"] != population["source_population_hash"]
+                    or row["rating_population_hash"] != population["population_hash"]
+                ):
+                    raise EvaluationError("Research case provenance mismatch")
+                result.ranking_provenance = ranks[case.match_key]
+                for rank in result.ranking_provenance:
+                    if (
+                        rank.get("published_on")
+                        and str(rank["published_on"]) >= case.day.isoformat()
+                    ):
+                        reasons.append("ranking_cutoff_violation")
+                if body.mode == "strict_historical":
+                    reasons.append("historical_source_availability_unverified")
+                if body.prediction_model_version not in row["predictions"]:
+                    reasons.extend(row["exclusion_reasons"])
+                    if result.regulation_minutes == 90 and row["rating_complete"]:
+                        reasons.append("calibration_not_available_before_match")
+                if body.research_model_version is not None and result.regulation_minutes == 80:
+                    research = inspect_case(
+                        full_records[case.match_key], cutoff, row["rating_complete"]
+                    )
+                    result.evidence_record = {**full_records[case.match_key], "research": research}
+                    reasons.extend(research["exclusion_reasons"])
+                if not reasons:
+                    p = probabilities(row["predictions"][body.prediction_model_version])
+                    assert label is not None
+                    actual = outcome(label.home_score, label.away_score)
+                    if actual != ("home_win", "draw", "away_win")[row["truth"]]:
+                        raise EvaluationError("Research label mismatch")
+                    result.status, result.probabilities, result.outcome = "eligible", p, actual
+                    result.input_manifest = {
+                        "classification": "research_only",
+                        "publication_timing": "match_dates_only_retrospective",
+                        "production_eligible": False,
+                        "prediction_model_version": body.prediction_model_version,
+                        "protocol_hash": research_data["protocol_hash"],
+                        "research_manifest_sha256": RESEARCH_MANIFEST_SHA,
+                        "period": row["period"],
+                        "cutoff": row["cutoff"],
+                        "inputs": row["inputs"],
+                        "ranking_used": False,
+                        "rating_source_hash": rating_source_hash,
+                        "source_population_hash": row["source_population_hash"],
+                        "rating_population_hash": row["rating_population_hash"],
+                        "calibration": research_data["calibration"]
+                        if body.prediction_model_version == "odf-temperature-research-v1"
+                        else None,
+                    }
+                    scored.append((p, actual))
+                result.exclusion_reasons = sorted(set(reasons))
+                cases.append(CaseResult.model_validate(result.model_dump()))
+                continue
             special = []
             special_provenance: list[dict[str, object]] = []
             for identity in (case.home_id, case.away_id):
@@ -322,6 +414,24 @@ class EvaluationService:
                     and date.fromisoformat(str(rank["published_on"])) >= case.day
                 ):
                     reasons.append("ranking_cutoff_violation")
+            if body.research_model_version is not None and result.regulation_minutes == 80:
+                research = inspect_case(
+                    full_records[case.match_key], cutoff, result.rating_reconstruction == "complete"
+                )
+                result.evidence_record = {**full_records[case.match_key], "research": research}
+                # This three-input interface does not require hypothetical Star/Clutch.
+                reasons[:] = [
+                    r
+                    for r in reasons
+                    if r
+                    not in (
+                        "historical_star_power_clutch_evidence_missing",
+                        "explicit_star_power_clutch_assumptions_missing",
+                        "regulation_duration_incompatible",
+                        "model_80_minute_horizon_unvalidated",
+                    )
+                ]
+                reasons.extend(research["exclusion_reasons"])
             # Excluded evidence cannot be rescued by a numerical result or user assumptions.
             if not reasons:
                 result.rating_reconstruction = "unavailable"
@@ -373,7 +483,7 @@ class EvaluationService:
                                 },
                                 "ranking_evidence": rank_evidence,
                                 "special_ratings": special_provenance,
-                                "rating_source_hash": package.source_hash,
+                                "rating_source_hash": rating_source_hash,
                                 "cutoff": cutoff.isoformat(),
                                 "source_rows_before_cutoff": len(earlier),
                                 "latest_source_day": max(
@@ -387,7 +497,7 @@ class EvaluationService:
                                 "rating_reconstruction_hash": digest(
                                     {
                                         "model": team_ratings.MODEL,
-                                        "source_hash": package.source_hash,
+                                        "source_hash": rating_source_hash,
                                         "cutoff": cutoff,
                                         "ratings": {
                                             n: ratings[n]
@@ -405,6 +515,7 @@ class EvaluationService:
         counts = Counter(reason for c in cases for reason in c.exclusion_reasons)
         result_body: dict[str, Any] = {
             "mode": body.mode,
+            "prediction_model_version": body.prediction_model_version,
             "status": "available" if scored else "unavailable",
             "interpretation": (
                 "Assumption-based retrospective analysis, "
@@ -414,17 +525,38 @@ class EvaluationService:
             else "Strict evidence-gated historical evaluation; unavailable cases are never scored.",
             "rating_model_version": team_ratings.MODEL,
             "dataset_id": package.dataset_id,
+            "recovery_package_id": body.recovery_package_id,
             "dataset_hash": dataset_hash,
             "package_hash": package.hash,
             "source_hash": package.source_hash,
             "manifest_hash": digest(
                 {
                     "protocol": PROTOCOL,
-                    "prediction_model": PREDICTION_MODEL,
+                    "prediction_model": body.prediction_model_version,
+                    **(
+                        {"research_manifest_sha256": RESEARCH_MANIFEST_SHA}
+                        if research_cases
+                        else {}
+                    ),
                     "rating_model": team_ratings.MODEL,
                     "dataset_hash": dataset_hash,
                     "package_hash": package.hash,
-                    "request": body.model_dump(mode="json"),
+                    "request": body.model_dump(
+                        mode="json",
+                        exclude={
+                            k
+                            for k in (
+                                "recovery_package_id",
+                                "research_model_version",
+                                "prediction_model_version",
+                            )
+                            if getattr(body, k) is None
+                            or (
+                                k == "prediction_model_version"
+                                and body.prediction_model_version == PREDICTION_MODEL
+                            )
+                        },
+                    ),
                     "cases": [c.model_dump(mode="json") for c in cases],
                 }
             ),
@@ -450,7 +582,8 @@ class EvaluationService:
                     if body.dataset_id == PILOT_DATASET
                     else []
                 ),
-                "Metrics cover this page only; combine page metrics using eligible-case weights.",
+                "Metrics cover this page only; combine eligible-case weighted pages only within "
+                "the same model, horizon, mode and source versions.",
                 "Rankings are optional; missing observations never borrow from older releases.",
                 "Experimental ratings use recorded scores including extra time; "
                 "they are not calibrated regulation forecasts.",
@@ -493,6 +626,44 @@ class EvaluationService:
                     "Original regulations for 1991–2019 remain unacquired; reviewed duration "
                     "and observed knockout procedures are recorded separately.",
                 ]
+            )
+            if body.research_model_version is not None:
+                for group in result_body["protocol_summaries"]:
+                    group["prediction_model_version"] = (
+                        DURATION_MODEL
+                        if group["regulation_minutes"] == 80
+                        else body.prediction_model_version
+                    )
+                    if group["regulation_minutes"] == 80:
+                        group["research_protocol"] = DURATION_SPEC
+                result_body["limitations"].append(
+                    "Selected 80-minute research interface has no defensible fitted parameters. "
+                    "No 1991 probabilities or metrics are computed. Top-level model and metrics "
+                    "describe only the preserved 90-minute path; protocol groups identify models."
+                )
+        if research_cases:
+            from services.evaluation_research import diagnostics
+
+            result_body["research_validation"] = diagnostics(
+                research_data, research_results, body.edition
+            )
+            if body.mode == "strict_historical":
+                result_body["research_validation"]["comparisons"] = {}
+                result_body["research_validation"]["period_comparisons"] = {}
+            result_body["interpretation"] = (
+                "Research-only retrospective temporal replay; not independently validated, "
+                "not strict historical accuracy or prospective forecasting."
+                if body.mode == "retrospective_replay"
+                else "Strict research scoring blocked: publication availability unverified."
+            )
+            for group in result_body["protocol_summaries"]:
+                if group["regulation_minutes"] == 90:
+                    group["prediction_model_version"] = body.prediction_model_version
+            result_body["limitations"].append(
+                "Research parameters and data are pinned to Prompt 3. Historical outcomes were "
+                "previously exposed; calibration uses 2007 only, applicable from 2011 onward. "
+                "Comparisons use explicitly identified common cohorts; diagnostics cover the "
+                "selected cohort, while top-level metrics cover this page only."
             )
         return BacktestResponse.model_validate(result_body).model_dump(mode="json")
 

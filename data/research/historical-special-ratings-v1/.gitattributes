@@ -1,0 +1,2 @@
+# Preserve checksum-pinned research artifacts across checkouts.
+*.json -text

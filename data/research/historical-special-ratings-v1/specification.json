@@ -1,0 +1,48 @@
+{
+  "star_version": "star-role-rapm-aggregation-research-v1",
+  "clutch_version": "clutch-regulation-residual-contrast-research-v1",
+  "rapm_version": "player-segment-ridge-goal-difference-v1",
+  "star": {
+    "window_days": 730,
+    "minimum_minutes": 900,
+    "minimum_role_peers": 30,
+    "minimum_peer_teams": 5,
+    "maximum_reference_age_days": 30,
+    "maximum_availability_age_days": 7,
+    "minimum_available_squad": 11,
+    "top_per_role": {
+      "GK": 1,
+      "DF": 2,
+      "MF": 2,
+      "FW": 2
+    },
+    "role_weights": "equal_quarters",
+    "ridge_lambda": 20,
+    "uncertainty": "input_interval_sensitivity_not_confidence_interval"
+  },
+  "clutch": {
+    "window_days": 4383,
+    "minimum_pressure": 6,
+    "minimum_control": 6,
+    "minimum_pressure_editions": 2,
+    "maximum_pressure_age_days": 1461,
+    "shrinkage_pseudocount": 12,
+    "pressure": [
+      "round_of_16",
+      "quarterfinal",
+      "semifinal",
+      "final"
+    ],
+    "control": "group",
+    "minutes": 90,
+    "uncertainty": "approximate_independent_residual_interval_not_calibrated"
+  },
+  "cutoff_policy": "All observations through previous calendar day; no evaluated-match inputs",
+  "star_formula": "Mean of four role means of top 1 GK / 2 DF / 2 MF / 2 FW midrank percentiles",
+  "rapm_formula": "min sum(minutes/90 * (90*goal_difference/minutes - intercepts - X*beta)^2) + 20*sum(beta^2)",
+  "rapm_segments": "Prior 730 days; regulation 11v11 only; home and competition intercepts; no fitted model provided",
+  "clutch_formula": "clip(50+50*(neff/(neff+12))*(mean_pressure_residual-mean_group_residual),0,100)",
+  "clutch_residual": "win=1/draw=0.5/loss=0 minus (pregame_p_win+0.5*pregame_p_draw); neff=1/(1/nP+1/nC)",
+  "clutch_context": "Verified published pre-match context; no third place, shootouts or extra-time goals",
+  "status": "unvalidated_research_not_production_eligible"
+}

@@ -58,6 +58,86 @@ def test_full_http_cohort_metrics_replay_protocols_and_preservation(
             52,
             64,
         ]
+        recovered_body = {**body, "recovery_package_id": "international-results-recovery-v1"}
+        recovered_response = client.post(url, json=recovered_body)
+        assert recovered_response.status_code == 200
+        recovered = recovered_response.json
+        assert recovered["dataset_hash"] == strict["dataset_hash"]
+        assert recovered["package_hash"] != strict["package_hash"]
+        assert recovered["eligible_matches"] == 0 and recovered["accuracy"] is None
+        assert [s["rating_complete"] for s in recovered["edition_summaries"]] == [
+            20,
+            26,
+            30,
+            32,
+            32,
+            32,
+            52,
+            52,
+            64,
+        ]
+        assert client.post(url, json=recovered_body).json == recovered
+        research_body = {
+            **recovered_body,
+            "research_model_version": "odf-exposure-80-evidence-blocked-v1",
+        }
+        research_response = client.post(url, json=research_body)
+        assert research_response.status_code == 200
+        research = research_response.json
+        assert len(research["cases"]) == 348
+        assert research["accuracy"] is None
+        assert research["metrics_horizon_minutes"] == 90
+        assert client.post(url, json=research_body).json == research
+        for prior, current in zip(recovered["cases"], research["cases"], strict=True):
+            if current["regulation_minutes"] == 90:
+                assert current == prior
+            else:
+                assert current["evidence_record"]["research"]["eligible"] is False
+                assert current["probabilities"] is None
+                assert (
+                    "historical_star_power_clutch_evidence_missing"
+                    not in current["exclusion_reasons"]
+                )
+        group = research["protocol_summaries"][0]
+        assert group["total"] == group["excluded"] == 26
+        assert group["rating_complete"] == 20 and group["accuracy"] is None
+        assert group["research_protocol"]["parameters"] is None
+        selected = client.post(url, json={**research_body, "edition": 1991}).json
+        assert selected["cohort_match_count"] == 26 and len(selected["cases"]) == 26
+        assert client.post(url, json={**research_body, "edition": 2023}).status_code == 400
+        replay_body = {
+            **recovered_body,
+            "prediction_model_version": "odf-cross-goal-rate-research-v1",
+            "mode": "retrospective_replay",
+        }
+        replay_response = client.post(url, json=replay_body)
+        assert replay_response.status_code == 200
+        replay = replay_response.json
+        assert replay["eligible_matches"] == 320 and replay["excluded_matches"] == 28
+        assert replay["accuracy"] == 0.553125
+        assert replay["research_validation"]["production_eligible"] is False
+        assert client.post(url, json=replay_body).json == replay
+        pages = [
+            client.post(url, json={**replay_body, "limit": 174, "offset": o}).json for o in (0, 174)
+        ]
+        assert sum(p["eligible_matches"] for p in pages) == replay["eligible_matches"]
+        assert [c for p in pages for c in p["cases"]] == replay["cases"]
+        for metric in ("accuracy", "log_loss", "brier_score"):
+            combined = sum(p[metric] * p["eligible_matches"] for p in pages) / 320
+            assert abs(combined - replay[metric]) < 1e-12
+        strict_research = client.post(url, json={**replay_body, "mode": "strict_historical"}).json
+        assert strict_research["eligible_matches"] == 0 and strict_research["accuracy"] is None
+        calibrated = client.post(
+            url, json={**replay_body, "prediction_model_version": "odf-temperature-research-v1"}
+        ).json
+        assert calibrated["eligible_matches"] == 200
+        assert all(c["edition"] > 2007 for c in calibrated["cases"] if c["status"] == "eligible")
+        assert (
+            client.post(
+                url, json={**replay_body, "prediction_model_version": "unapproved"}
+            ).status_code
+            == 400
+        )
         request = {
             **body,
             "mode": "retrospective_assumptions",
@@ -72,6 +152,20 @@ def test_full_http_cohort_metrics_replay_protocols_and_preservation(
             for team in (c["home_team_id"], c["away_team_id"])
         ]
         scored_request = {**request, "assumptions": assumptions}
+        recovered_scored = client.post(
+            url, json={**scored_request, "recovery_package_id": "international-results-recovery-v1"}
+        )
+        assert recovered_scored.status_code == 200
+        recovered_result = recovered_scored.json
+        assert recovered_result["eligible_matches"] == 320
+        for case in recovered_result["cases"]:
+            if case["status"] == "eligible":
+                provenance = case["input_manifest"]
+                assert provenance["rating_source_hash"] != team_ratings.SOURCE_SHA
+                assert (
+                    provenance["rating_source_hash"]
+                    == (provenance["evaluation_package"]["rating_recovery"]["merged_source_hash"])
+                )
         response = client.post(url, json=scored_request)
         assert response.status_code == 200
         result = response.json

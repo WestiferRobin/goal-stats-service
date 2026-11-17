@@ -1,0 +1,2 @@
+# Preserve content-pinned research data and probability artifacts.
+*.json -text
