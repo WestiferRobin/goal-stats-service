@@ -8,6 +8,7 @@ from datetime import date
 import pytest
 from pydantic import ValidationError
 
+from exceptions.base import EvaluationAssetUnavailable
 from schemas.evaluation.request import PILOT_DATASET, BacktestRequest
 from services.evaluation import EvaluationError, EvaluationPackage, EvaluationService, digest
 from services.evaluation_pilot import MANIFEST_SHA256, ROOT, load_pilot, verified_json
@@ -50,7 +51,7 @@ def test_tampered_evidence_fails_closed(tmp_path, monkeypatch, filename):
     with (tmp_path / filename).open("ab") as output:
         output.write(b" ")
     monkeypatch.setattr("services.evaluation_pilot.ROOT", tmp_path)
-    with pytest.raises(EvaluationError):
+    with pytest.raises(EvaluationAssetUnavailable):
         EvaluationService(FakeRepository()).evaluate(BacktestRequest(dataset_id=PILOT_DATASET))
 
 

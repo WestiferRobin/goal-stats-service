@@ -9,6 +9,26 @@ backend.
 
 ## Reproduce locally
 
+To restore the reviewed reference population, reuse the retained, validated
+`.host-sessions/fifa-enrichment-20261115` package; do not reacquire a different
+snapshot. Back up the target database first and verify the backup with
+`pg_restore --list`. From the repository root, run:
+
+```sh
+PYTHONPATH=src .venv/bin/python -B -m football.enrichment import \
+  --directory .host-sessions/fifa-enrichment-20261115 --cutoff 2026-06-10 \
+  --target local --expect-host 127.0.0.1 \
+  --expect-database goal_stats_service_local
+```
+
+Review the read-only result before adding `--apply` to that exact command.
+The reference population is 96 releases, 16,525 observations, 44 mappings,
+one rating run and 44 rating records; unavailable O/D/F remains null.
+Repeat without `--apply` afterward: no observations or ratings should be proposed.
+Preserve catalog/scenario/prediction hashes and the same package/cutoff.
+The importer uses the host CSV; the running Docker evaluator additionally needs
+the single-file Compose mount documented in [development](development.md).
+
 Use the existing Python 3.12 virtual environment. Apply the reviewed additive
 Alembic migration with the repository's normal target verification first.
 Acquisition requires network access; replay/import uses only the saved package

@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
-from exceptions.base import DomainError
+from exceptions.base import DomainError, EvaluationAssetUnavailable
 from football import team_ratings
 from football.duration_research import MODEL as DURATION_MODEL
 from football.duration_research import SPEC as DURATION_SPEC
@@ -102,8 +102,8 @@ def approved_package(dataset_id: str) -> EvaluationPackage:
 
             return load_full()
         return load_pilot()
-    except (ValueError, KeyError, TypeError, OSError):
-        raise EvaluationError("Approved pilot evidence is unavailable") from None
+    except (ValueError, KeyError, TypeError, OSError) as error:
+        raise EvaluationAssetUnavailable("approved_evidence_package", error) from None
 
 
 def approved_source() -> list[team_ratings.Result]:
@@ -183,8 +183,8 @@ class EvaluationService:
                         package,
                         provenance={**package.provenance, "rating_recovery": recovery_manifest},
                     )
-            except (ValueError, KeyError, TypeError, OSError):
-                raise EvaluationError("Full evidence assets unavailable") from None
+            except (ValueError, KeyError, TypeError, OSError) as error:
+                raise EvaluationAssetUnavailable("full_evidence_and_recovery", error) from None
         research_data: dict[str, Any] = {}
         research_cases: dict[str, Any] = {}
         research_results: dict[str, Any] = {}
@@ -195,8 +195,8 @@ class EvaluationService:
                 research_data, research_cases, research_results = research_assets()
                 if set(research_cases) != set(full_records):
                     raise ValueError("Research cohort mismatch")
-            except (ValueError, KeyError, TypeError, OSError):
-                raise EvaluationError("Pinned research replay unavailable") from None
+            except (ValueError, KeyError, TypeError, OSError) as error:
+                raise EvaluationAssetUnavailable("research_replay", error) from None
         with self.repo.transaction() as session:
             candidates = self.repo.candidates(session)
             if (
@@ -437,7 +437,12 @@ class EvaluationService:
                 result.rating_reconstruction = "unavailable"
                 try:
                     if source is None:
-                        source = approved_source()
+                        try:
+                            source = approved_source()
+                        except (ValueError, OSError) as error:
+                            raise EvaluationAssetUnavailable(
+                                "approved_rating_source", error
+                            ) from None
                     earlier = [r for r in source if r.day <= cutoff]
                     if cutoff not in fitted:
                         fitted[cutoff] = (

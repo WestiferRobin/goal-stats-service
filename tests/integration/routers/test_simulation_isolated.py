@@ -61,6 +61,7 @@ def test_duplicate_names_progression_and_replay(simulation_app, size):
     assert response.status_code == 200
     result = response.json
     assert result == post(simulation_app, {**body, "seed": result["seed"]}).json
+    assert result["model_version"] == "five-input-poisson-knockout-v1"
     assert result["kind"] == "hypothetical_knockout"
     assert result["probability_unit"] == "percent"
     assert result["simulations"] == 1000

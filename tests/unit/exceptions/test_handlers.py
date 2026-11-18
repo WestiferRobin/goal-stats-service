@@ -87,3 +87,23 @@ def test_object_body_checks_only_supported_write_methods(method, payload, valid)
     with app.test_request_context(method="POST", data="private"):
         with pytest.raises(BadRequest):
             object_body()
+
+
+def test_asset_error_is_safe_service_unavailable_with_diagnostic_code(caplog):
+    from exceptions.base import EvaluationAssetUnavailable
+
+    app = Flask(__name__)
+    register_error_handlers(app)
+
+    @app.get("/asset")
+    def unavailable():
+        raise EvaluationAssetUnavailable(
+            "approved_rating_source", FileNotFoundError("/private/secret/password")
+        )
+
+    response = app.test_client().get("/asset")
+    assert response.status_code == 503
+    assert response.json["reason"] == "evaluation_asset_unavailable"
+    assert "approved_rating_source" in caplog.text and "FileNotFoundError" in caplog.text
+    assert "/private" not in response.get_data(as_text=True) + caplog.text
+    assert "password" not in response.get_data(as_text=True) + caplog.text

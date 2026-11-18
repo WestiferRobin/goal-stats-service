@@ -232,6 +232,23 @@ def test_local_app_never_pulls_but_providers_keep_default_policy():
     assert content.count("pull_policy:") == 1
 
 
+def test_local_evaluation_source_mount_is_narrow_read_only_and_fail_closed():
+    content = (ROOT / "docker/compose.local.yml").read_text()
+    source = (
+        "../data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv"
+    )
+    assert (
+        "      - type: bind\n"
+        f"        source: {source}\n"
+        "        target: /app/data/bootstrap/results.csv\n"
+        "        read_only: true\n"
+        "        bind:\n"
+        "          create_host_path: false\n"
+    ) in content
+    assert (ROOT / "docker" / source).resolve().is_file()
+    assert content.count("data/raw/") == 1
+
+
 @pytest.mark.parametrize("dataset", APPROVED_DATASETS)
 def test_seed_individual(workflow, dataset):
     run, _ = workflow

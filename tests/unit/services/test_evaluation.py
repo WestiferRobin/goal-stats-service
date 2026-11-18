@@ -6,6 +6,7 @@ from datetime import date, timedelta
 
 import pytest
 
+from exceptions.base import EvaluationAssetUnavailable
 from football import team_ratings
 from infra.repositories.evaluation import HistoricalCase
 from schemas.evaluation.request import BacktestRequest
@@ -212,9 +213,10 @@ def test_unsupported_source_model_and_invalid_probabilities(reconstructed, monke
         "services.evaluation.approved_source",
         lambda: (_ for _ in ()).throw(ValueError("private path")),
     )
-    result = service.evaluate(request())
-    assert "private path" not in str(result)
-    assert result["exclusion_reasons"] == {"historical_reconstruction_unavailable": 1}
+    with pytest.raises(EvaluationAssetUnavailable) as caught:
+        service.evaluate(request())
+    assert "private path" not in str(caught.value)
+    assert caught.value.asset == "approved_rating_source"
 
 
 def test_dataset_and_manifest_identity(reconstructed):

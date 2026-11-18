@@ -30,7 +30,7 @@ def create_evaluation_blueprint(service: EvaluationService) -> APIBlueprint:
                 raise RequestEntityTooLarge()
         return object_body()
 
-    @api.post("/evaluations/backtests", responses={200: BacktestResponse})
+    @api.post("/evaluations/backtests", responses={200: BacktestResponse, 503: errors()["default"]})
     def backtest(body: BacktestRequest) -> Response:
         """Evaluate a bounded page of an approved package without persistence."""
         return jsonify(service.evaluate(body))

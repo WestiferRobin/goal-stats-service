@@ -187,3 +187,23 @@ def test_snapshot_and_existence_borrow_session_without_validation(scenario_proje
         service.require_exists_in_transaction(session=session, scenario_id=999)
     assert vars(service) == original
     assert service.database is database
+
+
+def test_shot_patch_validates_effective_state_before_writing(service_context, scenario_projection):
+    from exceptions.base import MatchStatisticsError
+
+    repo, _, _ = repositories(service_context, scenario_projection)
+    service = scenario.ScenarioService(
+        repo=service_context.repositories["ScenarioRepository"],
+        team_service=service_context.services["TeamService"],
+        match_service=service_context.services["MatchService"],
+    )
+    service.update(7, ScenarioPatch(team1_shots=4))
+    service.update(7, ScenarioPatch(team1_shots_on_target=4))
+    repo.flush.reset_mock()
+    with pytest.raises(MatchStatisticsError) as caught:
+        service.update(7, ScenarioPatch(team1_shots=0))
+    assert caught.value.fields == ["team1_shots_on_target"]
+    assert scenario_projection.scenario.team1_shots == 4
+    assert not repo.flush.called
+    assert service.update(7, ScenarioPatch(team1_shots_on_target=0))["team1_shots"] == 4

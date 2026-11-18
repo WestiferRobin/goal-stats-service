@@ -8,6 +8,7 @@ from datetime import date, timedelta
 import pytest
 from pydantic import ValidationError
 
+from exceptions.base import EvaluationAssetUnavailable
 from football.backtesting_evidence import EDITION_COUNTS, reconcile, validate_inventory
 from infra.repositories.evaluation import HistoricalCase
 from schemas.evaluation.request import FULL_DATASET, BacktestRequest
@@ -119,7 +120,7 @@ def test_full_package_checksums_fail_closed(filename, tmp_path, monkeypatch):
     path = tmp_path / "package" / filename
     path.write_bytes(path.read_bytes() + b" ")
     monkeypatch.setattr("services.evaluation_full.ROOT", tmp_path / "package")
-    with pytest.raises(EvaluationError):
+    with pytest.raises(EvaluationAssetUnavailable):
         EvaluationService(FakeRepository()).evaluate(BacktestRequest(dataset_id=FULL_DATASET))
 
 

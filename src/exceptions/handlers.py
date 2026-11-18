@@ -6,17 +6,33 @@ from flask import Flask, Response, current_app, jsonify
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-from exceptions.base import DomainError, PredictionGenerationError
+from exceptions.base import (
+    DomainError,
+    EvaluationAssetUnavailable,
+    MatchStatisticsError,
+    PredictionGenerationError,
+)
 from schemas.problem import ProblemDetailSchema
 
 _INVALID_VALUES_DETAIL = "The request contains invalid values."
 
 
-def problem(status: int, detail: str) -> Response:
+def problem(
+    status: int,
+    detail: str,
+    *,
+    reason: str | None = None,
+    field_errors: dict[str, str] | None = None,
+) -> Response:
     response = jsonify(
         ProblemDetailSchema(
-            type="about:blank", title=HTTPStatus(status).phrase, status=status, detail=detail
-        ).model_dump(mode="json")
+            type="about:blank",
+            title=HTTPStatus(status).phrase,
+            status=status,
+            detail=detail,
+            reason=reason,
+            field_errors=field_errors,
+        ).model_dump(mode="json", exclude_none=True)
     )
     response.status_code = status
     response.content_type = "application/problem+json"
@@ -24,6 +40,22 @@ def problem(status: int, detail: str) -> Response:
 
 
 def register_error_handlers(app: Flask) -> None:
+    @app.errorhandler(MatchStatisticsError)
+    def statistics_error(error: MatchStatisticsError) -> Response:
+        return problem(
+            400,
+            error.public_detail,
+            reason=error.reason,
+            field_errors={field: error.public_detail for field in error.fields},
+        )
+
+    @app.errorhandler(EvaluationAssetUnavailable)
+    def asset_error(error: EvaluationAssetUnavailable) -> Response:
+        current_app.logger.error(
+            "Evaluation asset unavailable: asset=%s cause=%s", error.asset, error.cause_type
+        )
+        return problem(503, error.public_detail, reason=error.reason)
+
     @app.errorhandler(DomainError)
     def domain_error(error: DomainError) -> Response:
         return problem(400, error.public_detail)
@@ -59,6 +91,17 @@ def register_error_handlers(app: Flask) -> None:
 
 
 def request_validation(error: ValidationError) -> Response:
+    fields = [
+        str(e["loc"][-1]) for e in error.errors() if e["type"] == "shots_on_target_exceeds_total"
+    ]
+    if fields:
+        safe = MatchStatisticsError(fields)
+        return problem(
+            400,
+            safe.public_detail,
+            reason=safe.reason,
+            field_errors={field: safe.public_detail for field in safe.fields},
+        )
     return problem(400, "The request could not be understood.")
 
 

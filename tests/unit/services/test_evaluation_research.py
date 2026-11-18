@@ -7,6 +7,7 @@ from datetime import date
 import pytest
 from pydantic import ValidationError
 
+from exceptions.base import EvaluationAssetUnavailable
 from football.evaluation import CLASSES, metrics
 from schemas.evaluation.request import FULL_DATASET, BacktestRequest
 from services import evaluation_research as research
@@ -80,7 +81,7 @@ def test_invalid_research_selection(changes):
 
 def test_unavailable_and_corrupt_sources_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(research, "ROOT", tmp_path)
-    with pytest.raises(EvaluationError):
+    with pytest.raises(EvaluationAssetUnavailable):
         EvaluationService(repository()).evaluate(request())
     (tmp_path / "manifest.json").write_text("{}")
     with pytest.raises(ValueError, match="manifest checksum"):

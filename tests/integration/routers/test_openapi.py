@@ -9,6 +9,32 @@ import pytest
 from schemas.scenario import ScenarioState
 
 
+def original_contract(spec):
+    """Assert the additive contracts before checking every pre-existing spec byte."""
+    schemas = spec["components"]["schemas"]
+    tournament = schemas["TournamentResponse"]
+    assert tournament["properties"].pop("model_version") == {
+        "const": "five-input-poisson-knockout-v1",
+        "title": "Model Version",
+        "type": "string",
+    }
+    tournament["required"].remove("model_version")
+    problem = schemas["ProblemDetailSchema"]
+    assert problem["properties"].pop("reason") == {
+        "anyOf": [{"type": "string"}, {"type": "null"}],
+        "default": None,
+        "title": "Reason",
+    }
+    assert problem["properties"].pop("field_errors") == {
+        "anyOf": [{"additionalProperties": {"type": "string"}, "type": "object"}, {"type": "null"}],
+        "default": None,
+        "title": "Field Errors",
+    }
+    responses = spec["paths"]["/api/v1/evaluations/backtests"]["post"]["responses"]
+    assert responses.pop("503") == responses["default"]
+    return spec
+
+
 def test_full_openapi_matches_current_contract(app):
     baseline = json.loads(
         (
@@ -19,14 +45,16 @@ def test_full_openapi_matches_current_contract(app):
     assert response.status_code == 200
     assert (
         hashlib.sha256(
-            json.dumps(response.json, sort_keys=True, separators=(",", ":")).encode()
+            json.dumps(
+                original_contract(response.json), sort_keys=True, separators=(",", ":")
+            ).encode()
         ).hexdigest()
         == baseline["openapi"]
     )
 
 
 def test_evaluation_addition_preserves_original_openapi_contract(app):
-    spec = app.test_client().get("/swagger/v1/swagger.json").json
+    spec = original_contract(app.test_client().get("/swagger/v1/swagger.json").json)
     del spec["paths"]["/api/v1/evaluations/backtests"]
     for name in ("Assumption", "BacktestRequest", "BacktestResponse", "CaseResult"):
         del spec["components"]["schemas"][name]

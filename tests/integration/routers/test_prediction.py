@@ -196,7 +196,7 @@ def test_v2_http_preview_save_and_horizon(scenario_client, scenario_body, import
         "match_minute": minute,
         "team1_goals": 2,
         "team2_goals": 1,
-        "team1_shots": 0,
+        "team1_shots": 4,
         "team1_shots_on_target": 4,
     }
     preview_body = {key: value for key, value in body.items() if key not in {"title", "match_id"}}
@@ -227,7 +227,7 @@ def test_v2_http_preview_save_and_horizon(scenario_client, scenario_body, import
     assert saved.json["output"] == preview
     assert saved.json["model_version"] == preview["model"]
     assert saved.json["input_snapshot"]["team1_shots"] == 4
-    assert scenario_client.get(created.headers["Location"]).json["team1_shots"] == 0
+    assert scenario_client.get(created.headers["Location"]).json["team1_shots"] == 4
 
 
 @pytest.mark.postgres

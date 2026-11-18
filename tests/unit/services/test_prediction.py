@@ -333,7 +333,7 @@ def test_preview_generation_v2_parity_without_scenario_mutation(
     scenario_projection.scenario.match_minute = minute
     scenario_projection.scenario.team1_shots_on_target = 4
     body = {k: v for k, v in scenario_body.items() if k not in {"title", "match_id"}}
-    body.update(match_minute=minute, team1_shots_on_target=4)
+    body.update(match_minute=minute, team1_shots=4, team1_shots_on_target=4)
     preview = service.preview(PredictionPreview(**body))
     assert saved == []
     generated = service.generate(7)
@@ -389,6 +389,7 @@ def test_preview_captures_ids_then_computes_without_writes(
 
     monkeypatch.setattr(prediction, "predict_state", calculate)
     body = {k: v for k, v in scenario_body.items() if k not in {"title", "match_id"}}
+    body["team1_shots"] = 4
     body["team1_shots_on_target"] = 4
     result = service.preview(PredictionPreview(**body))
     assert result["team1"] == "Spain" and saved == []

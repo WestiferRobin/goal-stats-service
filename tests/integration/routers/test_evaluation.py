@@ -271,3 +271,22 @@ def test_synthetic_positive_api_and_assumption_manifest(
         ).status_code
         == 400
     )
+
+
+@pytest.mark.postgres
+def test_unavailable_approved_asset_is_503_but_invalid_request_stays_400(
+    evaluation_client, monkeypatch, tmp_path, caplog
+):
+    evaluation_client.application.extensions["evaluation_under_test"].package = None
+    monkeypatch.setattr("services.evaluation_full.ROOT", tmp_path)
+    logger = evaluation_client.application.logger
+    logger.addHandler(caplog.handler)
+    try:
+        response = evaluation_client.post(URL, json={"dataset_id": "womens-world-cup-full-v1"})
+    finally:
+        logger.removeHandler(caplog.handler)
+    assert response.status_code == 503
+    assert response.json["reason"] == "evaluation_asset_unavailable"
+    assert str(tmp_path) not in response.get_data(as_text=True)
+    assert "Evaluation asset unavailable" in caplog.text
+    assert evaluation_client.post(URL, json={"dataset_id": "unknown"}).status_code == 400

@@ -9,10 +9,11 @@ from datetime import date
 import pytest
 from pydantic import ValidationError
 
+from exceptions.base import EvaluationAssetUnavailable
 from football import results_recovery as recovery
 from football import team_ratings
 from schemas.evaluation.request import FULL_DATASET, PILOT_DATASET, BacktestRequest
-from services.evaluation import EvaluationError, EvaluationService, approved_source, digest
+from services.evaluation import EvaluationService, approved_source, digest
 from services.evaluation_full import assets as original_assets
 from services.evaluation_recovery import assets
 from tests.unit.services.test_evaluation_full import repository
@@ -127,7 +128,7 @@ def test_pins_and_json_types_fail_closed(tmp_path, monkeypatch):
     monkeypatch.setattr(recovery, "ROOT", tmp_path)
     with pytest.raises(ValueError, match="checksum"):
         recovery.load_overlay()
-    with pytest.raises(EvaluationError, match="assets unavailable"):
+    with pytest.raises(EvaluationAssetUnavailable, match="full_evidence_and_recovery"):
         EvaluationService(repository()).evaluate(
             BacktestRequest(dataset_id=FULL_DATASET, recovery_package_id=recovery.RECOVERY_ID)
         )

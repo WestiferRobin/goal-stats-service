@@ -4,6 +4,20 @@
 `make deploy` runs Flask and both providers in Docker, locally only.
 Both use one `.env.local`, one database, the same migrations and football data.
 
+Local Docker requires the approved, Git-tracked CSV at
+`data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv`.
+Compose mounts this single file read-only at `/app/data/bootstrap/results.csv` for
+historical evaluation. Missing host files fail instead of creating directories.
+The source SHA-256 must be
+`de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0`.
+Do not broaden `.dockerignore` or mount the whole raw source directory. The
+standalone production image separately includes its checksum-verified bootstrap CSV.
+
+`make deploy` builds and migrates; it does not populate data. `make seed` imports
+only the historical catalog. FIFA rankings and experimental ratings require the
+separate [enrichment workflow](team-enrichment.md). Do not run `make infra` after
+deployment: it intentionally stops the Docker application.
+
 ## Preparation
 
 Use Python 3.12, GNU Make, and running Docker/Compose v2 on macOS, Linux, or WSL.

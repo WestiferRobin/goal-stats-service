@@ -7,3 +7,5 @@ class ProblemDetailSchema(BaseModel):
     title: str
     status: int
     detail: str
+    reason: str | None = None
+    field_errors: dict[str, str] | None = None

@@ -8,7 +8,7 @@ from football.engine import Team, simulate_tournament
 from infra.repositories.competition import CompetitionRepository
 from schemas.competition import CatalogCompetitionResponse
 from schemas.competition.request import TournamentRequest
-from schemas.competition.response import TournamentResponse
+from schemas.competition.response import SIMULATION_MODEL_VERSION, TournamentResponse
 from services.team import TeamService
 
 
@@ -38,6 +38,7 @@ class CompetitionService:
         results, champion, count, final = simulate_tournament(teams, body.simulations, seed=seed)
         return TournamentResponse.model_validate(
             dict(
+                model_version=SIMULATION_MODEL_VERSION,
                 seed=seed,
                 predicted_champion_id=results[0]["team_id"],
                 results=results,
