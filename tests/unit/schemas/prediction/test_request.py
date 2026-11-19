@@ -27,9 +27,7 @@ def test_preview_requires_explicit_ratings_and_distinct_ids(scenario_body):
 
 
 @pytest.mark.parametrize("minute", [0, 45, 89, 90, 91, 105, 120])
-def test_preview_preserves_time_metadata_and_shot_normalization_compatibility(
-    scenario_body, minute
-):
+def test_preview_preserves_time_metadata_and_consistent_shots(scenario_body, minute):
     body = {k: v for k, v in scenario_body.items() if k not in {"title", "match_id"}}
     request = PredictionPreview(
         **{
@@ -37,13 +35,13 @@ def test_preview_preserves_time_metadata_and_shot_normalization_compatibility(
             "match_minute": minute,
             "extra_minute": 30,
             "status": "arbitrary",
-            "team1_shots": 0,
+            "team1_shots": 4,
             "team1_shots_on_target": 4,
         }
     )
     assert (request.match_minute, request.extra_minute, request.status) == (minute, 30, "arbitrary")
-    # Request validation still accepts this combination; computation normalizes a copy.
-    assert request.team1_shots == 0 and request.team1_shots_on_target == 4
+    # Valid requests preserve the submitted counts.
+    assert request.team1_shots == 4 and request.team1_shots_on_target == 4
 
 
 @pytest.mark.parametrize(

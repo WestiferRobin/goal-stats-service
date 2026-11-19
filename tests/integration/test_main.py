@@ -58,7 +58,8 @@ def test_empty_database_startup_never_imports(
         for path in ("/health", "/ready", "/swagger", "/swagger/v1/swagger.json"):
             assert client.get(path).status_code == 200, path
         spec = client.get("/swagger/v1/swagger.json").json
-        assert len(spec["paths"]) == 15
+        assert len(spec["paths"]) == 16
+        assert "/api/v1/evaluations/backtests" in spec["paths"]
         for path in (
             "/api/v1/catalog/teams",
             "/api/v1/catalog/matches",
@@ -308,7 +309,8 @@ assert importlib.util.find_spec('services.football') is None
 assert importlib.util.find_spec('routers.football') is None
 assert importlib.util.find_spec('football.import_data') is None
 assert set(Base.metadata.tables) == {
-    'teams', 'competitions', 'matches', 'scenarios', 'predictions', 'users'
+    'teams', 'competitions', 'matches', 'scenarios', 'predictions', 'users',
+    'ranking_releases', 'ranking_observations', 'fifa_team_mappings', 'rating_runs', 'team_ratings'
 }
 app = create_app({'APP_ENV': 'test', 'DATABASE_URL': 'postgresql://u:p@127.0.0.1:1/goalstats_test_import'})
 assert app.test_client().get('/health').text == 'Healthy'

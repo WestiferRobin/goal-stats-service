@@ -1,0 +1,10 @@
+{
+  "package_id": "historical-special-ratings-v1",
+  "method_hash": "4fc836ea673f096c88a0e66b3a4e237cfabc0bc0a303d9a8266754743a664fe1",
+  "status": "unvalidated_research_not_production_eligible",
+  "files": {
+    "specification.json": "0e388fb748ffc34cfb4a4ca4d635b6a568d24c38ad53df27825a959788257ab5",
+    "coverage.json": "4328c1326fd8a7325bbed3cf5c9df930afa4a73dd0b9ad115def389629191149",
+    "sources.json": "5564e4dbb1fb7b7646e31fe143aedc815a69eac1a13236b4412034cb8dcf2ecc"
+  }
+}

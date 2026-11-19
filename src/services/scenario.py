@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from werkzeug.exceptions import BadRequest, Conflict, NotFound
 
+from exceptions.base import MatchStatisticsError
 from infra.repositories.scenario import ScenarioProjection, ScenarioRepository
 from infra.resources.db import Database
 from models.scenario import Scenario
@@ -99,7 +100,14 @@ class ScenarioService:
                 values.update(body.model_dump(exclude_unset=True))
                 try:
                     state = ScenarioState.model_validate(values)
-                except ValidationError:
+                except ValidationError as error:
+                    fields = [
+                        str(e["loc"][-1])
+                        for e in error.errors()
+                        if e["type"] == "shots_on_target_exceeds_total"
+                    ]
+                    if fields:
+                        raise MatchStatisticsError(fields) from None
                     raise BadRequest() from None
                 for name, value in state.model_dump().items():
                     setattr(row, name, value)

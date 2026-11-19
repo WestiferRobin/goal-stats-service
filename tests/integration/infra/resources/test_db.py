@@ -125,7 +125,14 @@ def test_ownership_upgrade_preserves_old_columns_and_failed_ddl(
         command.upgrade(config, "head")
         command.upgrade(config, "head")
         inspector = inspect(connection)
-        assert set(inspector.get_table_names()) == set(before) | {"users"}
+        assert set(inspector.get_table_names()) == set(before) | {
+            "users",
+            "ranking_releases",
+            "ranking_observations",
+            "fifa_team_mappings",
+            "rating_runs",
+            "team_ratings",
+        }
         assert connection.scalar(text("SELECT count(*) FROM users")) == 0
         assert (
             connection.scalar(
@@ -175,7 +182,7 @@ def test_standalone_schema_path(postgres_app):
             connection.exec_driver_sql(sql)
             connection.commit()
             context = MigrationContext.configure(connection)
-            assert context.get_current_revision() == "e42b7c19a603"
+            assert context.get_current_revision() == "f31a6e208b47"
             assert compare_metadata(context, Base.metadata) == []
             assert schema_contract(connection) == expected
             assert connection.scalar(text("SELECT count(*) FROM users")) == 0
@@ -284,7 +291,7 @@ def test_ownership_downgrade_dependency_failure_is_atomic(import_database):
     assert error.value.orig.sqlstate == "2BP01"
     with import_database.engine.connect() as connection:
         assert schema_contract(connection) == before
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "e42b7c19a603"
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "f31a6e208b47"
         connection.exec_driver_sql("SELECT * FROM owner_dependency")
 
 
@@ -349,6 +356,11 @@ def test_forward_retirement_preserves_normalized_records_and_guards_loss(
             "scenarios",
             "predictions",
             "users",
+            "ranking_releases",
+            "ranking_observations",
+            "fifa_team_mappings",
+            "rating_runs",
+            "team_ratings",
         }
     after = snapshot(import_database)
     for table in ["teams", "competitions", "matches", "scenarios", "predictions"]:

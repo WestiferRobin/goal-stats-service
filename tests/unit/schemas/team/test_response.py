@@ -24,7 +24,16 @@ def test_historical_team_nulls_and_readiness():
     )
     row = CatalogTeamResponse(**values)
     assert CatalogTeamsResponse([row]).model_dump(mode="json") == [
-        {**values, "prediction_ready": False}
+        {
+            **values,
+            "prediction_ready": False,
+            "fifa_points": None,
+            "fifa_team_id": None,
+            "ranking_release_id": None,
+            "ranking_source": None,
+            "ranking_status": "unavailable",
+            "ratings_metadata": None,
+        }
     ]
     with pytest.raises(ValidationError):
         CatalogTeamResponse(**values, prediction_ready=True)

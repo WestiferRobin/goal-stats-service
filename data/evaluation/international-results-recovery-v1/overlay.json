@@ -1,0 +1,2044 @@
+{
+  "package_id": "international-results-recovery-v1",
+  "version": 1,
+  "original_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+  "original_source_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+  "reviewed_on": "2026-11-16",
+  "historical_availability_verified": false,
+  "sources": {
+    "dfb2011": {
+      "url": "https://datencenter.dfb.de/competitions/laenderspiel-1066/seasons/2010-2011",
+      "publisher": "German Football Association",
+      "revision": "2010/11 season; publication date unknown",
+      "sha256": "3510bcba7444c16e990c795b0a221673ad187b40b63859d9f684e535fdbae850",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "dfb1999": {
+      "url": "https://datencenter.dfb.de/competitions/laenderspiel-1066/seasons/1998-1999",
+      "publisher": "German Football Association",
+      "revision": "1998/99 season; publication date unknown",
+      "sha256": "46c85cce4931990c3fae4b2eb57496e3b1a5de0e4ed9bb2cfdf11944f6f97c24",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "rfef2015": {
+      "url": "https://rfef.es/es/noticias/cronica-tablas-primer-amistoso-frente-nueva-zelanda-2-2",
+      "publisher": "Royal Spanish Football Federation",
+      "revision": "2015-03-03",
+      "sha256": "4b5ebc972a8f794ad0fd377e19e4397c66e01c24b06e70b111c1a8a6140f7a92",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": "2015-03-03",
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "canada": {
+      "url": "https://canadasoccer.com/match/432/",
+      "publisher": "Canada Soccer",
+      "revision": "Match 432; publication date unknown",
+      "sha256": "c893ab8d1d2aaf57d64988370fe80b44387d346362bb6e4167f5d1989e1a13ee",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "australia.pdf": {
+      "url": "https://matildas.com.au/sites/default/files/2024-06/CommBank%20Matildas%20-%20Official%20Media%20Guide%20FWWC2023%20%281%29.pdf",
+      "publisher": "Football Australia",
+      "revision": "FWWC2023 media guide; June 2024 upload path",
+      "sha256": "91bed8554201631a2ec0ccea9e4132eb6fae9d0aa8d7ca4202206447fd60d64c",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "ecuador": {
+      "url": "https://www.rsssf.org/tabless/sam-women2014.html",
+      "publisher": "RSSSF / Roberto Di Maggio",
+      "revision": "2024-08-29",
+      "sha256": "d8b27fac4ad966909d12b12dc75210315e24bc7bcf255b56b314ab4235fa1417",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Archive footer permits whole or partial copying with author acknowledgement; publisher/author attribution preserved here and in source snapshot.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": "2024-08-29",
+      "compiled_on": null,
+      "snapshot": "sources/ecuador.html"
+    },
+    "brazil": {
+      "url": "https://rsssfbrasil.com/sel/brazilaw.htm",
+      "publisher": "RSSSF Brasil / Marcelo Leme de Arruda",
+      "revision": "2026-10-13",
+      "sha256": "681dbf3bed49e77bd5552406ff129b33bb05447b6763ea5b0008cd2122173c50",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Archive footer permits whole or partial copying with author acknowledgement; publisher/author attribution preserved here and in source snapshot.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": "2026-10-13",
+      "compiled_on": null,
+      "snapshot": "sources/brazil.html"
+    },
+    "ghana": {
+      "url": "https://www.rsssf.org/tablesg/gha-wom-intres.html",
+      "publisher": "RSSSF / Martin Neu",
+      "revision": "2024-02-20",
+      "sha256": "c105242625c5f10e2e48e121b744849ade2002f3f5fa09b0fdaba388d4014c80",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Archive footer permits whole or partial copying with author acknowledgement; publisher/author attribution preserved here and in source snapshot.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": "2024-02-20",
+      "compiled_on": null,
+      "snapshot": "sources/ghana.html"
+    },
+    "usa": {
+      "url": "https://www.ussoccerhistory.org/ASHA/ASHA/usawomen.html",
+      "publisher": "Society for American Soccer History / David Litterer",
+      "revision": "All-time archive through 2014; publication date unknown",
+      "sha256": "92e797d5a373dfa77aafac32fd96dca667654eeb50a93e13716eb80a1956803d",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Structured match facts only; no source prose, photographs or complete official document redistributed. No blanket source license asserted.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": null,
+      "compiled_on": null
+    },
+    "southafrica": {
+      "url": "https://www.rsssf.org/tablesz/zaf-wom-intres.html",
+      "publisher": "RSSSF / Sebastien Duret",
+      "revision": "2003-11-05",
+      "sha256": "2884bda11ed2887018fa1dfe25805382b05927c3d75acb31bc208994219dcf04",
+      "retrieved_on": "2026-11-16",
+      "rights_basis": "Archive footer permits whole or partial copying with author acknowledgement; publisher/author attribution preserved here and in source snapshot.",
+      "publication_availability": "unverified_at_historical_cutoff",
+      "published_on": null,
+      "archive_revision_on": "2003-11-05",
+      "compiled_on": null,
+      "snapshot": "sources/southafrica.html"
+    }
+  },
+  "fixtures": [
+    {
+      "fixture_id": "2d4f7a3073a721042f81f6185e6ec2b175bdcd0eae2b8fd1b98855d8c0dbd32e",
+      "date": "1991-04-02",
+      "home": "Bulgaria",
+      "away": "United States",
+      "home_score": 0,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "Bulgaria",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "Bulgaria",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "832d93a677cf895b64069fed7826416eeead5c6473cf5b2745126f9875527e4a",
+      "date": "1991-04-03",
+      "home": "United States",
+      "away": "Hungary",
+      "home_score": 6,
+      "away_score": 0,
+      "neutral": true,
+      "venue_country": "Bulgaria",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Hungary"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "5053445e09e95446068ccaadc1bfd8356a4da94fd7d1998635f670ce82516bae",
+      "date": "1991-04-05",
+      "home": "United States",
+      "away": "France",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": true,
+      "venue_country": "Bulgaria",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "France"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "944acf4976c7e06189a7af93f51405b03e9c426193c4c93d82a5d61c7746a773",
+      "date": "1991-04-07",
+      "home": "United States",
+      "away": "Russia",
+      "home_score": 5,
+      "away_score": 0,
+      "neutral": true,
+      "venue_country": "Bulgaria",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Russia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "fad279f04d39cc95812485ff753706236c87646c940efbc59084aa50c8833108",
+      "date": "1991-05-18",
+      "home": "France",
+      "away": "United States",
+      "home_score": 0,
+      "away_score": 4,
+      "neutral": false,
+      "venue_country": "France",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "France",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "e667787ceb9a7d4ec518f114d1e755093c2a53b8f5af9bac4d28d70a0d8a1024",
+      "date": "1991-05-25",
+      "home": "United States",
+      "away": "England",
+      "home_score": 3,
+      "away_score": 1,
+      "neutral": true,
+      "venue_country": "France",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "England"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "37146aa5040254c2015ab7d9844616073a88ed9be78d6b751f6c6897644c6131",
+      "date": "1991-05-28",
+      "home": "Netherlands",
+      "away": "United States",
+      "home_score": 4,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "Netherlands",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "Netherlands",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "c73c0206290f9441d68d2900b6f3b91c379a9a603438f3d8ee25493618ba7e4d",
+      "date": "1991-05-30",
+      "home": "Germany",
+      "away": "United States",
+      "home_score": 2,
+      "away_score": 4,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "1673c98b9c2ef2a6011d33e5c79bdcb20fcf9e029630c73ab4ff0d3e4f3f6e98",
+      "date": "1991-06-05",
+      "home": "Denmark",
+      "away": "United States",
+      "home_score": 1,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Denmark",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "Denmark",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "6348d3f7fdffaffc1822580dc6c2e4a31c9e1b7a84c2fdb8eda43f51669c1e84",
+      "date": "1991-08-04",
+      "home": "China",
+      "away": "United States",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "China",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "China",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "be8506d769425bad602da89f93d1a631a64b888391deeca85e72cb873007b359",
+      "date": "1991-08-08",
+      "home": "China",
+      "away": "United States",
+      "home_score": 2,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "China",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "China",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "3bc545204e84172f88206514751cdfb6a3f607f0bd1735862301777bc8271097",
+      "date": "1991-08-10",
+      "home": "China",
+      "away": "United States",
+      "home_score": 0,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "China",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "China",
+        "away": "United States"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "5ccaa216e36ac7c223ac3f831ec194343b3570d29d579be409fd4796912e5c81",
+      "date": "1991-08-30",
+      "home": "United States",
+      "away": "Norway",
+      "home_score": 0,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Norway"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "e74805c118ae77e3fbca1dbe1f520050aa35b2763c46263bd86006f4b18acf64",
+      "date": "1991-09-01",
+      "home": "United States",
+      "away": "Norway",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Norway"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "4c1772f91748c36e8d93cf97ab2085d40816e9574ad90c70c0b572cc4d2e6adc",
+      "date": "1991-10-04",
+      "home": "United States",
+      "away": "China",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "China"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "4cdf4851922fd0d7f9687d983e2916a1672ab2d645a9486dbed1c41479857e57",
+      "date": "1991-10-12",
+      "home": "United States",
+      "away": "China",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa"
+      ],
+      "source_location": "1991 Results, dated entry; no non-full-international (+) marker",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "China"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "6c24cccd8abe0c225a897239217e4601c34120e9c29311fa74cfb649c9f7836a",
+      "date": "1993-05-30",
+      "home": "South Africa",
+      "away": "Eswatini",
+      "home_score": 14,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "South Africa",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "southafrica"
+      ],
+      "source_location": "Numbered internationals 1-3; Swaziland maps to pinned-source Eswatini",
+      "identity_mapping": {
+        "home": "South Africa",
+        "away": "Eswatini"
+      },
+      "orientation_review": "Historical Swaziland -> Eswatini, same national federation; host oriented home.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "304043ca08a41d7025b1aaea00e1e5c721aac0bdb8c07d84d7b5c6323d118519",
+      "date": "1993-10-23",
+      "home": "Zimbabwe",
+      "away": "South Africa",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Zimbabwe",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "southafrica"
+      ],
+      "source_location": "Numbered internationals 1-3; Swaziland maps to pinned-source Eswatini",
+      "identity_mapping": {
+        "home": "Zimbabwe",
+        "away": "South Africa"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "6062d961858aec9cd84ddb9ac567edec99002f7d4dbe1247a68a23c887931598",
+      "date": "1993-10-24",
+      "home": "Zimbabwe",
+      "away": "South Africa",
+      "home_score": 0,
+      "away_score": 8,
+      "neutral": false,
+      "venue_country": "Zimbabwe",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "southafrica"
+      ],
+      "source_location": "Numbered internationals 1-3; Swaziland maps to pinned-source Eswatini",
+      "identity_mapping": {
+        "home": "Zimbabwe",
+        "away": "South Africa"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "1a2f691a66a9d72189568d9407dd81bd7132f0bf793102f30619e240c6e4e8cf",
+      "date": "1994-04-20",
+      "home": "Australia",
+      "away": "Russia",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Brisbane",
+      "classification": "women_senior_national",
+      "competition": "Gold Coast Invitational",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "Russia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "1b33cc84d03353bde1689a5a68642b7fbcb582670e3119b5191b5927280eb6b4",
+      "date": "1994-04-23",
+      "home": "Australia",
+      "away": "Russia",
+      "home_score": 1,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Southport",
+      "classification": "women_senior_national",
+      "competition": "Gold Coast Invitational",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "Russia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "aca7ec1de3252c5675eeef586c5acb90d420a35e24a092520ead0681fcb13a0e",
+      "date": "1994-08-12",
+      "home": "Russia",
+      "away": "Australia",
+      "home_score": 0,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "Russia",
+      "venue_city": "Samara",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Russia",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "f81d90852e05283041b63f52a67286ebd8236d57661dbcfd64e751574b66e5e6",
+      "date": "1994-08-27",
+      "home": "Russia",
+      "away": "Ghana",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": true,
+      "venue_country": "India",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "International tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Russia",
+        "away": "Ghana"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "e48ea7190bcbdb19c7d9187ade0bada8f3a236b3295305c3cb098d87c5488177",
+      "date": "1994-08-31",
+      "home": "Ghana",
+      "away": "New Zealand",
+      "home_score": 3,
+      "away_score": 0,
+      "neutral": true,
+      "venue_country": "India",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "International tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Ghana",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "1a45e34a68e5c974f36288d66884bf437ccd6029229f91e5465c0f289302119b",
+      "date": "1994-09-04",
+      "home": "Ghana",
+      "away": "Bulgaria",
+      "home_score": 5,
+      "away_score": 1,
+      "neutral": true,
+      "venue_country": "India",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "International tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Ghana",
+        "away": "Bulgaria"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "1434d73076910d8ce5ed355281f216748546a69be8d54d053b95b9bda4fff1bf",
+      "date": "1994-09-06",
+      "home": "Ghana",
+      "away": "Hungary",
+      "home_score": 4,
+      "away_score": 1,
+      "neutral": true,
+      "venue_country": "India",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "International tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Ghana",
+        "away": "Hungary"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "696dd5848386a5a4abc33b32b37a2d8cd3a95d65d164374a2e50913a83772ce2",
+      "date": "1994-09-09",
+      "home": "Ghana",
+      "away": "Russia",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": true,
+      "venue_country": "India",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "International tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Archive explicitly records 2-1 after extra time, 1-1 regulation; shootout excluded.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Ghana",
+        "away": "Russia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "b90107f006839fedbb5552489aa71cab82a23e7c6620137c8c863ae361d29af5",
+      "date": "1994-09-27",
+      "home": "Japan",
+      "away": "Australia",
+      "home_score": 2,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Japan",
+      "venue_city": "Tokyo",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Japan",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "412c5d2be6e32b6a0025bf2fed3e8b8d471eddd51d2a6c97b2f7f6be78c93f24",
+      "date": "1995-03-17",
+      "home": "Australia",
+      "away": "New Zealand",
+      "home_score": 4,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Canberra",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "7d5d3c6748ca7728c8a7cedf313ea33c86b14081f97408c4560663a9000f1d2f",
+      "date": "1995-03-19",
+      "home": "Australia",
+      "away": "New Zealand",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Canberra",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "9d1b2d3385e09f8cea2fdac3710ef3d0651b358003ff9733de32552130905b20",
+      "date": "1995-04-10",
+      "home": "Australia",
+      "away": "Argentina",
+      "home_score": 7,
+      "away_score": 0,
+      "neutral": true,
+      "venue_country": "Brazil",
+      "venue_city": "Uberlandia",
+      "classification": "women_senior_national",
+      "competition": "Uberlandia tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "Argentina"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "0c1cfe1bd5485c29c572d4998ec1ad3733a2c394365fcdb28f4fffdaacf75376",
+      "date": "1995-04-11",
+      "home": "Brazil",
+      "away": "Argentina",
+      "home_score": 4,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Brazil",
+      "venue_city": "Uberlandia",
+      "classification": "women_senior_national",
+      "competition": "Uberlandia tournament",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "brazil"
+      ],
+      "source_location": "Senior A-match list entry 17 (26)",
+      "identity_mapping": {
+        "home": "Brazil",
+        "away": "Argentina"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "f500062a967e1a858f3750a249bcac582c95ce43cacbd4504fc38482c91b1242",
+      "date": "1995-05-11",
+      "home": "Canada",
+      "away": "Australia",
+      "home_score": 3,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Canada",
+      "venue_city": "Vancouver",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Canada",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "2e36139c03048bc9d896e77de2fe1edeeefb46c6b7ea170d33c01f1edd3400dc",
+      "date": "1995-05-12",
+      "home": "United States",
+      "away": "Brazil",
+      "home_score": 3,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": "Tacoma",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa",
+        "brazil"
+      ],
+      "source_location": "1995 dated result in both archives",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Brazil"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "8c5c62cd69b42042b532b97c3deec31b21dd10871fcbb1e3e8a985f4165a0dc2",
+      "date": "1995-05-13",
+      "home": "Canada",
+      "away": "Australia",
+      "home_score": 0,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "Canada",
+      "venue_city": "Vancouver",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Canada",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "6368cc0407a93511b70a643b550170ff95a55d35940f6b189258b7ce73ea0367",
+      "date": "1995-05-14",
+      "home": "United States",
+      "away": "Brazil",
+      "home_score": 4,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": "Portland",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "usa",
+        "brazil"
+      ],
+      "source_location": "1995 dated result in both archives",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Brazil"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "5a55f33543cebe0710551d885370b061a09e472b78ea298c5fb29ced00310b33",
+      "date": "1995-05-18",
+      "home": "Scotland",
+      "away": "Australia",
+      "home_score": 0,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Scotland",
+      "venue_city": "Kilmarnock",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Scotland",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "1e5eb28c9f93e8670c91f18e2b9df6893747638bf9c640d820a9551e48c54bc1",
+      "date": "1995-05-19",
+      "home": "United States",
+      "away": "Canada",
+      "home_score": 9,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "United States",
+      "venue_city": "Dallas",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "canada",
+        "usa"
+      ],
+      "source_location": "Match 432; USA archive May 19 1995",
+      "identity_mapping": {
+        "home": "United States",
+        "away": "Canada"
+      },
+      "orientation_review": "Canada page lists Canada first (1-9); reversed to USA home in Dallas, including scores.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "7a9c3bb46c9eed85af66e3bfd2007772cb6e64f591ac456fd3082bcbec1c446d",
+      "date": "1995-05-27",
+      "home": "Sweden",
+      "away": "Australia",
+      "home_score": 5,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Sweden",
+      "venue_city": "Helsingborg",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 40 / printed 78-79, 1995 World Cup campaign",
+      "identity_mapping": {
+        "home": "Sweden",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "c87cffae093b028354a88520273394cb777091430aa97774db7c1cff21098d95",
+      "date": "1998-10-10",
+      "home": "Ghana",
+      "away": "Egypt",
+      "home_score": 4,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Ghana",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Ghana",
+        "away": "Egypt"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "b1ac3165f5f9fe255f3ed65a0fec499f34fabee22740362d9f12ea5600b46a0b",
+      "date": "1999-02-14",
+      "home": "Turkey",
+      "away": "Germany",
+      "home_score": 1,
+      "away_score": 12,
+      "neutral": false,
+      "venue_country": "Turkey",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Turkey",
+        "away": "Germany"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "f5805b62cb72299cf7e4b26ffb3a516479c2be4f8c97e66f7b3166cb659313ec",
+      "date": "1999-03-06",
+      "home": "China",
+      "away": "Ghana",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "China",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "China",
+        "away": "Ghana"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "956894f3e4ccd35f79cf485b4ffed6aa9f6f86a4d6b1f001469369112822a288",
+      "date": "1999-03-09",
+      "home": "China",
+      "away": "Ghana",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "China",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "China",
+        "away": "Ghana"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "40c0658a144dac0350ddf3fbf09ee6d77ee534e052ed8a797bbafa608b856f5e",
+      "date": "1999-03-25",
+      "home": "Germany",
+      "away": "China",
+      "home_score": 0,
+      "away_score": 3,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "China"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "f72c49edb73071f41a5216688710295a87c3bc0ff4d8dbe93258535e1f83df4e",
+      "date": "1999-03-28",
+      "home": "Germany",
+      "away": "China",
+      "home_score": 4,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "China"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "4782f599260cd4e1b9d79c1cd66da6305161c14e9d27d1160ee18773b10e82a4",
+      "date": "1999-04-22",
+      "home": "Germany",
+      "away": "Denmark",
+      "home_score": 3,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Denmark"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "0147e1576f8b8d435f9d3cd1a098c152af34e36fbfd56c89749855a17a65eb65",
+      "date": "1999-05-15",
+      "home": "Nigeria",
+      "away": "Ghana",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Nigeria",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ghana"
+      ],
+      "source_location": "Numbered senior international results; # denotes first meeting",
+      "identity_mapping": {
+        "home": "Nigeria",
+        "away": "Ghana"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "41bc95b8ac327c1132b620bf92ccbaa1b04306578c6b0db61bafe0e6e830640b",
+      "date": "1999-05-26",
+      "home": "Germany",
+      "away": "Switzerland",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Switzerland"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "f01f9bc22e3ca4a2a3ef2c8541a6ad0e1569afc794fb422e1d028525a6d60b02",
+      "date": "1999-05-30",
+      "home": "Germany",
+      "away": "France",
+      "home_score": 4,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "France"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "51cc48cbcb43d19599899452e75d9a150cd3c1af05618c2d5126fd159ec2e227",
+      "date": "1999-06-03",
+      "home": "Germany",
+      "away": "Netherlands",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb1999"
+      ],
+      "source_location": "Women international friendlies 1998/99, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Netherlands"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "5e541f4247f5c4c0dedb59d7572606fac899113525e47756430d738c58b734d1",
+      "date": "2007-07-19",
+      "home": "Australia",
+      "away": "New Zealand",
+      "home_score": 3,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Coffs Harbour",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 37 / printed 72-73, senior A internationals; page 41 campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "991d8aee33396f2f3924e238b4f8055f30abb2f2fce41db276147f10786d2e2e",
+      "date": "2007-07-22",
+      "home": "Australia",
+      "away": "New Zealand",
+      "home_score": 1,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Australia",
+      "venue_city": "Coffs Harbour",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "australia.pdf"
+      ],
+      "source_location": "PDF page 37 / printed 72-73, senior A internationals; page 41 campaign",
+      "identity_mapping": {
+        "home": "Australia",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "083abcaf7b73d311c88ec1438283cc5fb3a0b56624b383f031d4e8988afea276",
+      "date": "2010-09-15",
+      "home": "Germany",
+      "away": "Canada",
+      "home_score": 5,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Canada"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "d647792b7f3d4d7556576cf5719d1e1d0a45edf29d741f743a6f94f73f0df736",
+      "date": "2010-10-28",
+      "home": "Germany",
+      "away": "Australia",
+      "home_score": 2,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Australia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "81fdaba88662abf47a67712cc58138c29770252408452b9a9f6dac278b1cf552",
+      "date": "2010-11-25",
+      "home": "Germany",
+      "away": "Nigeria",
+      "home_score": 8,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Nigeria"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "e938f4bf0a4feef9be8a87f91a9f35d6fd40fb7be2df4dd04f0ec0d2c2488f02",
+      "date": "2011-05-21",
+      "home": "Germany",
+      "away": "North Korea",
+      "home_score": 2,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "North Korea"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "34789e3d5747a190700d2ad632852c8055f549d48f8c9b325a8192fc5b3932c3",
+      "date": "2011-06-03",
+      "home": "Germany",
+      "away": "Italy",
+      "home_score": 5,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Italy"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "38cb7a414bea285e6017fc3a0c1ba4791b5b6bdafdb7d660395803277355b452",
+      "date": "2011-06-07",
+      "home": "Germany",
+      "away": "Netherlands",
+      "home_score": 5,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Netherlands"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "934e16bf61a3c7ea06ccd59376ff823c0730e6f8e92a0eccf156f0fe82429ede",
+      "date": "2011-06-16",
+      "home": "Germany",
+      "away": "Norway",
+      "home_score": 3,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Germany",
+      "venue_city": null,
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "dfb2011"
+      ],
+      "source_location": "Women international friendlies 2010/11, dated result",
+      "identity_mapping": {
+        "home": "Germany",
+        "away": "Norway"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    },
+    {
+      "fixture_id": "c5d273fe6cbed07c53b9846cf37b3f8627b7209ea0327b235fa158a178ffc032",
+      "date": "2014-09-11",
+      "home": "Ecuador",
+      "away": "Peru",
+      "home_score": 1,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Riobamba",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Peru"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "920bbf27f9135cfcba264fe7a8bdcfdaa0a0e4a2113a9191739b8c6772db26ea",
+      "date": "2014-09-13",
+      "home": "Ecuador",
+      "away": "Venezuela",
+      "home_score": 1,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Ambato",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Venezuela"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "089a8dd4fb19a3f37ef0e43d97ea7e01acdb01fe87add60bcd79d0626076407c",
+      "date": "2014-09-17",
+      "home": "Ecuador",
+      "away": "Colombia",
+      "home_score": 0,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Ambato",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Colombia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "3913b6e9b961335ca3c70f1341e434fb4fb5e6521b3511d155948cda8597c5bf",
+      "date": "2014-09-19",
+      "home": "Ecuador",
+      "away": "Uruguay",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Latacunga",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Uruguay"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "40576cbc6e21a48978f7d806c7beb470ea9f3e3b6de8084ac4e239fe3b248707",
+      "date": "2014-09-24",
+      "home": "Ecuador",
+      "away": "Brazil",
+      "home_score": 0,
+      "away_score": 4,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Quito",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Brazil"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "e4c8c63cd1fac529fc9e5f7dce3334ae5a6d87182c62791f6078ecafeb02d9f1",
+      "date": "2014-09-26",
+      "home": "Ecuador",
+      "away": "Colombia",
+      "home_score": 1,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Sangolqui",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Colombia"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "9e1bd7929e799f0c23ca5c87cef597b1701f2da3c5b30f15815ca8619e8d3706",
+      "date": "2014-09-28",
+      "home": "Ecuador",
+      "away": "Argentina",
+      "home_score": 3,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Quito",
+      "classification": "women_senior_national",
+      "competition": "South American championship",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Argentina"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "b8335e4944638b5ca74e1c55192455f7a521315a1a61da820f8f680662f92079",
+      "date": "2014-11-08",
+      "home": "Ecuador",
+      "away": "Trinidad and Tobago",
+      "home_score": 0,
+      "away_score": 0,
+      "neutral": false,
+      "venue_country": "Ecuador",
+      "venue_city": "Quito",
+      "classification": "women_senior_national",
+      "competition": "World Cup qualifying playoff",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "2014 championship dated match / playoff",
+      "identity_mapping": {
+        "home": "Ecuador",
+        "away": "Trinidad and Tobago"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "25fd962aa3e2cbc4638bc3820362311c64225e832c73a7f235bbb144e629cb25",
+      "date": "2014-12-02",
+      "home": "Trinidad and Tobago",
+      "away": "Ecuador",
+      "home_score": 0,
+      "away_score": 1,
+      "neutral": false,
+      "venue_country": "Trinidad and Tobago",
+      "venue_city": "Port of Spain",
+      "classification": "women_senior_national",
+      "competition": "World Cup qualifying playoff",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "ecuador"
+      ],
+      "source_location": "CONCACAF-CONMEBOL playoff second leg",
+      "identity_mapping": {
+        "home": "Trinidad and Tobago",
+        "away": "Ecuador"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "attributed_historical_archive"
+    },
+    {
+      "fixture_id": "0d9eb86699c36ea295b9495d71911535de6e3a88c5de1c5358e27d2fa7d18330",
+      "date": "2015-03-03",
+      "home": "Spain",
+      "away": "New Zealand",
+      "home_score": 2,
+      "away_score": 2,
+      "neutral": false,
+      "venue_country": "Spain",
+      "venue_city": "Guadalajara",
+      "classification": "women_senior_national",
+      "competition": "Friendly",
+      "score_basis": "including_extra_time_no_shootout",
+      "score_semantics_review": "Completed senior result; no extra-time or shootout annotation for this fixture. Score used as recorded final, never as a new regulation label.",
+      "status": "approved_addition",
+      "availability": "unverified",
+      "source_ids": [
+        "rfef2015"
+      ],
+      "source_location": "Dated senior team match report",
+      "identity_mapping": {
+        "home": "Spain",
+        "away": "New Zealand"
+      },
+      "orientation_review": "Host-country team placed home for the unchanged home-advantage model; neutral fixtures retain listed order.",
+      "evidence_confidence": "official_federation"
+    }
+  ],
+  "decisions": [
+    {
+      "identity": "Brazil-Australia April 1995",
+      "decision": "excluded_or_unresolved",
+      "reason": "Unresolved dates: official Australia guide April 15/17 vs RSSSF Brasil April 13/16; exclude both matches."
+    },
+    {
+      "identity": "USA-Australia January 1995",
+      "decision": "excluded_or_unresolved",
+      "reason": "Official guide lists January 20/23; USA archive has no January 1995 matches. Classification/date corroboration unresolved; exclude."
+    },
+    {
+      "identity": "Egypt-Ghana September 1998",
+      "decision": "excluded_or_unresolved",
+      "reason": "Approximate date (~26 September), not an exact cutoff-safe observation."
+    },
+    {
+      "identity": "USA-Yugoslavia 1991-04-01",
+      "decision": "excluded_or_unresolved",
+      "reason": "Historical federation identity not approved against modern successor labels; excluded pending identity review."
+    },
+    {
+      "identity": "Nigeria-China 1999-06-12",
+      "decision": "excluded_or_unresolved",
+      "reason": "Search lead reports 4-3; venue/classification and authoritative evidence not verified, excluded."
+    },
+    {
+      "identity": "Brazil 1991",
+      "decision": "excluded_or_unresolved",
+      "reason": "All eight pre-World-Cup senior A results already in original; club/state/unofficial selections not accepted."
+    },
+    {
+      "identity": "Nigeria 1991",
+      "decision": "excluded_or_unresolved",
+      "reason": "No verified pre-November-1990 senior results recovered; frozen baseline remains a cold start."
+    },
+    {
+      "identity": "Canada PDF",
+      "decision": "excluded_or_unresolved",
+      "reason": "Requested PDF returned 404; replaced with official match 432 and corroborating USA archive."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "model": "international-recorded-score-poisson-v1",
+  "source_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+  "source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+  "cutoff": "2023-07-19",
+  "source_rows_before_cutoff": 9416,
+  "latest_source_day": "2023-07-18",
+  "ratings": {
+    "New Zealand": {
+      "offense": 26.41,
+      "defense": 63.73,
+      "form": 8.8,
+      "evidence": {
+        "matches": 33,
+        "form_matches": 14,
+        "last_match": "2023-07-14",
+        "reference_teams": 142,
+        "reason": null,
+        "status": "experimental",
+        "score_basis": "recorded_final_including_extra_time_no_shootout"
+      }
+    },
+    "Norway": {
+      "offense": 91.2,
+      "defense": 84.15,
+      "form": 70.83,
+      "evidence": {
+        "matches": 41,
+        "form_matches": 11,
+        "last_match": "2023-04-11",
+        "reference_teams": 142,
+        "reason": null,
+        "status": "experimental",
+        "score_basis": "recorded_final_including_extra_time_no_shootout"
+      }
+    },
+    "Australia": {
+      "offense": 94.72,
+      "defense": 86.97,
+      "form": 92.13,
+      "evidence": {
+        "matches": 43,
+        "form_matches": 12,
+        "last_match": "2023-07-14",
+        "reference_teams": 142,
+        "reason": null,
+        "status": "experimental",
+        "score_basis": "recorded_final_including_extra_time_no_shootout"
+      }
+    },
+    "Republic of Ireland": {
+      "offense": 67.96,
+      "defense": 89.79,
+      "form": 79.17,
+      "evidence": {
+        "matches": 31,
+        "form_matches": 9,
+        "last_match": "2023-07-06",
+        "reference_teams": 142,
+        "reason": null,
+        "status": "experimental",
+        "score_basis": "recorded_final_including_extra_time_no_shootout"
+      }
+    }
+  },
+  "usage": "Verification artifact only. Runtime reconstructs from pinned results; no Star Power/Clutch assumptions included.",
+  "reconstruction_hash": "acf6f6256525b99a9569b78c169244b55649da41462a021c5b5af3a2c31590ad"
+}

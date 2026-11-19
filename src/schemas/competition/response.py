@@ -35,7 +35,11 @@ class SimulationFinal(Contract):
     probability: float = Field(ge=0, le=100)
 
 
+SIMULATION_MODEL_VERSION = "five-input-poisson-knockout-v1"
+
+
 class TournamentResponse(Contract):
+    model_version: Literal["five-input-poisson-knockout-v1"]
     seed: int = Field(strict=True, ge=0, le=4294967295)
     predicted_champion_id: int = Field(gt=0)
     kind: Literal["hypothetical_knockout"] = "hypothetical_knockout"

@@ -6,6 +6,7 @@
     "match",
     "scenarios",
     "saved_predictions",
+    "evaluation",
     "docs"
   ],
   "routes": [
@@ -95,6 +96,16 @@
     [
       "/api/v1/competitions/simulate",
       "competition.simulate",
+      [
+        "OPTIONS",
+        "POST"
+      ],
+      true,
+      {}
+    ],
+    [
+      "/api/v1/evaluations/backtests",
+      "evaluation.backtest",
       [
         "OPTIONS",
         "POST"

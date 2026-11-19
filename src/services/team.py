@@ -24,21 +24,19 @@ class TeamService:
 
     def list(self) -> list[dict[str, Any]]:
         with self.repo.transaction() as session:
-            return [
-                CatalogTeamResponse.model_validate(row, from_attributes=True).model_dump(
-                    mode="json"
-                )
-                for row in self.repo.list(session)
-            ]
+            return [self._profile(row, values) for row, values in self.repo.list_profiles(session)]
+
+    @staticmethod
+    def _profile(row: Any, enrichment: dict[str, object]) -> dict[str, Any]:
+        values = CatalogTeamResponse.model_validate(row, from_attributes=True).model_dump()
+        return CatalogTeamResponse.model_validate({**values, **enrichment}).model_dump(mode="json")
 
     def get(self, team_id: int) -> dict[str, Any]:
         with self.repo.transaction() as session:
-            row = self.repo.get_by_id(session, team_id)
-            if row is None:
+            rows = self.repo.list_profiles(session, team_id)
+            if not rows:
                 raise NotFound()
-            return CatalogTeamResponse.model_validate(row, from_attributes=True).model_dump(
-                mode="json"
-            )
+            return self._profile(*rows[0])
 
     def summary(self, team_id: int, query: TeamSummaryQuery) -> dict[str, Any]:
         """Read available records using provisional recorded-final-score semantics."""

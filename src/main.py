@@ -39,6 +39,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from exceptions.handlers import problem, register_error_handlers, request_validation
 from football.cli import register_commands
 from infra.repositories.competition import CompetitionRepository
+from infra.repositories.evaluation import EvaluationRepository
 from infra.repositories.match import MatchRepository
 from infra.repositories.prediction import PredictionRepository
 from infra.repositories.scenario import ScenarioRepository
@@ -46,6 +47,7 @@ from infra.repositories.team import TeamRepository
 from infra.resources.db import Database, is_ready
 from infra.resources.redis import RedisCache
 from routers.competition import create_competition_blueprint
+from routers.evaluation import create_evaluation_blueprint
 from routers.infra import create_health_blueprint
 from routers.match import create_match_blueprint
 from routers.openapi import create_docs_blueprint
@@ -54,6 +56,7 @@ from routers.scenario import create_scenarios_blueprint
 from routers.team import create_team_blueprint
 from schemas.problem import ProblemDetailSchema
 from services.competition import CompetitionService
+from services.evaluation import EvaluationService
 from services.match import MatchService
 from services.prediction import PredictionService
 from services.scenario import ScenarioService
@@ -122,6 +125,7 @@ def create_app(config: Settings | Mapping[str, str] | None = None) -> Flask:
     app.register_api(create_match_blueprint(match_service))
     app.register_api(create_scenarios_blueprint(scenario_service))
     app.register_api(create_predictions_blueprint(prediction_service))
+    app.register_api(create_evaluation_blueprint(EvaluationService(EvaluationRepository(database))))
     register_commands(app, database)
     register_error_handlers(app)
     if settings.core.openapi_enabled:

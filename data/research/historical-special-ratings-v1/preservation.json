@@ -1,0 +1,143 @@
+{
+  "canonical_database_preserved": true,
+  "database_fingerprinting": "SHA256 of JSON serialization of sorted row_to_json text tuples; read-only transaction",
+  "database_before": {
+    "matches": {
+      "count": 348,
+      "sha256": "5bbe9c69d840f15e425080ea8c9168eb09070a450c145a49864821824065bba5"
+    },
+    "competitions": {
+      "count": 9,
+      "sha256": "e5644f1fa058ac1d2a05dca4fd5a3ffeeb86cb8ae9936536883d7d3f7908ac73"
+    },
+    "teams": {
+      "count": 44,
+      "sha256": "8dec28a6f861bca1afdd2309b2168801eae87822f5dd99c83f4ca46eaf541530"
+    },
+    "ranking_releases": {
+      "count": 96,
+      "sha256": "537be0c5774d58e6ecb98f496bb9523ac3833e18c7a32d7a5b3c0638c1770c1e"
+    },
+    "ranking_observations": {
+      "count": 16525,
+      "sha256": "9bd708d2dbd142c7f1f5c5d1a230d0ec7a5e8de48c659a4022b4bb919edaf7e9"
+    },
+    "fifa_team_mappings": {
+      "count": 44,
+      "sha256": "f2fe7036c527193cfce0f149d7c880054f9541b741a15d98d1ef4c0fc17de07e"
+    },
+    "rating_runs": {
+      "count": 1,
+      "sha256": "50504dcc4f4e5649182b538f38b44b0a8344e794f69523db8699dcf36af0ec6d"
+    },
+    "team_ratings": {
+      "count": 44,
+      "sha256": "f687088ef79e9265f90f11bb242f1949311ba623403dc69b72f18a41aba84cbd"
+    },
+    "scenarios": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "predictions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "database_after": {
+    "matches": {
+      "count": 348,
+      "sha256": "5bbe9c69d840f15e425080ea8c9168eb09070a450c145a49864821824065bba5"
+    },
+    "competitions": {
+      "count": 9,
+      "sha256": "e5644f1fa058ac1d2a05dca4fd5a3ffeeb86cb8ae9936536883d7d3f7908ac73"
+    },
+    "teams": {
+      "count": 44,
+      "sha256": "8dec28a6f861bca1afdd2309b2168801eae87822f5dd99c83f4ca46eaf541530"
+    },
+    "ranking_releases": {
+      "count": 96,
+      "sha256": "537be0c5774d58e6ecb98f496bb9523ac3833e18c7a32d7a5b3c0638c1770c1e"
+    },
+    "ranking_observations": {
+      "count": 16525,
+      "sha256": "9bd708d2dbd142c7f1f5c5d1a230d0ec7a5e8de48c659a4022b4bb919edaf7e9"
+    },
+    "fifa_team_mappings": {
+      "count": 44,
+      "sha256": "f2fe7036c527193cfce0f149d7c880054f9541b741a15d98d1ef4c0fc17de07e"
+    },
+    "rating_runs": {
+      "count": 1,
+      "sha256": "50504dcc4f4e5649182b538f38b44b0a8344e794f69523db8699dcf36af0ec6d"
+    },
+    "team_ratings": {
+      "count": 44,
+      "sha256": "f687088ef79e9265f90f11bb242f1949311ba623403dc69b72f18a41aba84cbd"
+    },
+    "scenarios": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "predictions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "repositories": [
+    {
+      "repository": "goal-stats-service",
+      "branch": "member/wes-v2",
+      "head": "396eedbb0107d87c81d466cb860d07c13b1f3334",
+      "preserved_preexisting_files": 319,
+      "changed_preexisting_files": [],
+      "baseline_inventory_sha256": "2e5074ece212f262497a79a2096407d93610ada56b2bead58bce2f8c026ca49a",
+      "working_tree": "Intentionally uncommitted; prior Prompt 1 changes preserved",
+      "committed": false,
+      "pushed": false
+    },
+    {
+      "repository": "goal-stats-app",
+      "branch": "member/wes-v2",
+      "head": "799740f8ec7807d3b6798845879d5506e44d93ae",
+      "preserved_preexisting_files": 162,
+      "changed_preexisting_files": [],
+      "baseline_inventory_sha256": "32478d1af854c7be932dc46f76d16d2695c9f1f001d4bf2eb40926f55cd472cc",
+      "working_tree": "Intentionally uncommitted; prior Prompt 1 changes preserved",
+      "committed": false,
+      "pushed": false
+    }
+  ],
+  "validation": {
+    "full_certification": {
+      "passed": 1867,
+      "failed": 0,
+      "duration_seconds": 1656.26,
+      "reported_combined_coverage": 95.05268797999643,
+      "coverage_gate": "PASS",
+      "cleanup": "PASS"
+    },
+    "final_focused_research": {
+      "passed": 34,
+      "failed": 0,
+      "combined_coverage": 99.38650306748467
+    },
+    "final_per_file_coverage": {
+      "covered_lines": 4298,
+      "num_statements": 4451,
+      "covered_branches": 1053,
+      "num_branches": 1148,
+      "percent": 95.57063761385962,
+      "method": "Use full certification for unchanged modules; replace every research module with its final focused coverage. Counts are overlapping, not additive."
+    },
+    "final_research_python_sha256": {
+      "src/research/feasibility.py": "d3923b3be7423dbbf3fc4f458ceb5b6a86196fc716deb3b6dd1d32e8de7f101d",
+      "src/research/__init__.py": "cbd9aa99e6f8a9cb23bf8b18de46a48a4edfb1e566c50e64a08ace76ed6c7af8",
+      "src/research/special_ratings.py": "873ccd13c231b9001f7e3e9365f2dc61b1b97c9156f5e9258ea4068be82dfffb",
+      "tests/unit/research/test_feasibility.py": "fb5ac6a93f713cd324c8114cf1bfb31000f9fd91c580b7431d035b4ea3d1d325",
+      "tests/unit/research/test_special_ratings.py": "4a38218407dd4ecc056e01e93d9900d2cc7dcc790a07eca94646738916a0c5b5",
+      "scripts/evaluation/build_special_research.py": "1d71792d9e9f9cbe4b1f8a34d1e492d76a96f08bd2e91e44ef9ba30b5d91e0e2"
+    }
+  }
+}

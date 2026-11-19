@@ -639,11 +639,29 @@ def test_pinned_source_import_repeat_and_application_restart(
     }
     assert len(expected) == len(stored) == 348
     assert sum(row["home_score"] + row["away_score"] for row in stored) == 1081
+    preserved_tables = {
+        "users",
+        "ranking_releases",
+        "ranking_observations",
+        "fifa_team_mappings",
+        "rating_runs",
+        "team_ratings",
+    }
     assert (
         set(before)
         == set(after)
-        == {"teams", "competitions", "matches", "scenarios", "predictions", "alembic_version"}
+        == {
+            "teams",
+            "competitions",
+            "matches",
+            "scenarios",
+            "predictions",
+            "alembic_version",
+            *preserved_tables,
+        }
     )
+    for table in preserved_tables:
+        assert after[table] == before[table]
     for row in stored:
         key = (row["match_date"], row["source_home_team"], row["source_away_team"])
         ordinal, raw = expected[key]

@@ -65,5 +65,6 @@ def test_simulation_preserves_order_and_calculates_after_transaction(service_con
 
     monkeypatch.setattr(competition, "simulate_tournament", simulate)
     result = service.simulate(TournamentRequest(teams=[team(i) for i in [4, 3, 2, 1]]))
+    assert result["model_version"] == "five-input-poisson-knockout-v1"
     assert result["kind"] == "hypothetical_knockout"
     assert service_context.events == ["begin", "commit"]

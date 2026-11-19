@@ -1,0 +1,71 @@
+{
+  "sources": [
+    {
+      "id": "fifa-technical-1",
+      "publisher": "FIFA",
+      "url": "https://www.ussoccerhistory.org/wp-content/uploads/2025/01/igmaj4jv8erfljjbs47z-compressed.pdf",
+      "sha256": "d8073c27eaddb9bb93336fc7cfe4e5f2aa4adb17cb6ee2f8faa7c72a2b25ade3",
+      "source_type": "Primary technical report, retrospective; SASH mirror",
+      "rights": "Inspected only; document not redistributed",
+      "historical_publication_verified": false
+    },
+    {
+      "id": "fifa-technical-2",
+      "publisher": "FIFA",
+      "url": "https://www.ussoccerhistory.org/wp-content/uploads/2025/01/pcq1fcktjwzzyi2gsm7c-compressed.pdf",
+      "sha256": "e88fb0fa8e77f148af4cc02923511afdcf4ef6cdb70427bd0fdd02e5ec1159a8",
+      "source_type": "Primary technical report, retrospective; SASH mirror",
+      "rights": "Inspected only; document not redistributed",
+      "historical_publication_verified": false
+    },
+    {
+      "id": "ifab-1991-92",
+      "publisher": "IFAB/FIFA",
+      "url": "https://downloads.theifab.com/downloads/laws-of-the-game-1991-92?l=en",
+      "source_type": "Contemporaneous general laws; July 1991; not the tournament regulations",
+      "locator": "PDF pages 5,18,60\u201363 (1-based)",
+      "rights": "Structured factual summaries only; no document redistribution",
+      "sha256": "08a41b1a5f5d9ebc9809a5fd9442b6ffeaeaf106edce32ae084f89915199dc6a"
+    }
+  ],
+  "verified_primary": [
+    {
+      "fact": "80 minutes, two 40-minute halves",
+      "source": "fifa-technical-2",
+      "locator": "PDF page 3, Germany special rules comments"
+    },
+    {
+      "fact": "Two matches went to extra time; none to shootouts",
+      "source": "fifa-technical-1",
+      "locator": "PDF page 10"
+    },
+    {
+      "fact": "Contemporary general law permits added time for lost time at referee discretion and extends a period for a penalty kick",
+      "source": "ifab-1991-92",
+      "locator": "Law VII, PDF page 18"
+    },
+    {
+      "fact": "General penalty-mark procedure: alternating five kicks subject to early decision, then equal-kick sudden death; shootouts do not form part of the match",
+      "source": "ifab-1991-92",
+      "locator": "PDF pages 60\u201362"
+    }
+  ],
+  "supported_archive_evidence": [
+    {
+      "fact": "All 26 fixtures recorded completed; regulation scores separately reviewed, not final-score substitutions",
+      "source": "Previously approved RSSSF registry; each case retains URL, hash and line"
+    },
+    {
+      "fact": "Denmark\u2013Germany regulation 1\u20131, final 1\u20132; Norway\u2013Italy regulation 2\u20132, final 3\u20132",
+      "source": "Approved RSSSF 1991 archive and FIFA technical match reports"
+    }
+  ],
+  "unresolved": [
+    "Original 1991 tournament regulations not acquired; an unlinked bibliographic citation is not the document.",
+    "Exact tournament extra-time period lengths and any golden-goal exception are not certified by the acquired primary material. Do not promote inherited registry flags to verified original rules.",
+    "Tournament-specific adoption/exceptions for penalty-mark procedure, advancement ties and abandoned matches remain unverified. Observed winners are not proof of every possible procedure.",
+    "Exact added-time exposure per half is unavailable; nominal 80 minutes is not measured ball-in-play time."
+  ],
+  "regulation_label_definition": "Score after two 40-minute halves plus associated referee-added time, before any extra time or shootout. Extra-time matches 19 and 21 remain draws for regulation classification.",
+  "model_restriction": "No knockout advancement or extra-time prediction; unresolved procedures retained as exclusions in this conservative research release."
+}

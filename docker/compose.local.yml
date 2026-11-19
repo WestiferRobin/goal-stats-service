@@ -44,6 +44,12 @@ services:
     command: ["flask", "--app", "main:create_app()", "run", "--host=0.0.0.0", "--port=8000", "--reload", "--no-debugger"]
     volumes:
       - ../src:/app/src:ro
+      - type: bind
+        source: ../data/raw/martj42-womens-results/1855e313ae8bcd0330426e62c8e4cf15ce45077c/results.csv
+        target: /app/data/bootstrap/results.csv
+        read_only: true
+        bind:
+          create_host_path: false
     depends_on:
       postgres: {condition: service_healthy}
       redis: {condition: service_healthy}

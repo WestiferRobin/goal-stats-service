@@ -1,12 +1,22 @@
 """Team response contracts; existing validation and serialization preserved."""
 
 from datetime import date
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 from pydantic import Field, RootModel, model_validator
 
 from schemas.common import CatalogID, Contract
 from schemas.team.request import TeamSummaryQuery
+
+
+class RatingsMetadata(Contract):
+    run_id: str = Field(pattern=r"^[a-f0-9]{64}$")
+    model: str
+    cutoff: date
+    source: str
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    status: Literal["experimental"]
+    evidence: dict[str, Any]
 
 
 class CatalogTeamResponse(Contract):
@@ -20,6 +30,12 @@ class CatalogTeamResponse(Contract):
     clutch: float | None = Field(examples=[None])
     fifa_rank: int | None = Field(examples=[None])
     ranking_date: date | None = Field(examples=[None])
+    fifa_points: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    fifa_team_id: str | None = None
+    ranking_release_id: str | None = None
+    ranking_source: str | None = None
+    ranking_status: Literal["ranked", "unranked", "unavailable"] = "unavailable"
+    ratings_metadata: RatingsMetadata | None = None
     prediction_ready: Literal[False] = Field(
         default=False,
         description=(

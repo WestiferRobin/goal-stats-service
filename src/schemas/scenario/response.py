@@ -3,13 +3,19 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import Field, RootModel
+from pydantic import Field, RootModel, ValidationInfo, field_validator
 
 from schemas.scenario.base import SCENARIO_EXAMPLE, ScenarioConfig
 from schemas.scenario.request import ScenarioCreate
 
 
 class ScenarioResponse(ScenarioCreate):
+    @field_validator("team1_shots_on_target", "team2_shots_on_target")
+    @classmethod
+    def consistent_shots(cls, value: int, info: ValidationInfo) -> int:
+        """Read legacy persisted inputs without imposing new write-time relationships."""
+        return value
+
     model_config = ScenarioConfig(
         openapi_extra={
             "example": {

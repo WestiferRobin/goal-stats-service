@@ -1,0 +1,11 @@
+{
+  "package_id": "three-input-validation-v1",
+  "protocol_hash": "43f1bd4637788464199d2ad9becb57c951fa99487000a61184dac7bc48e2110e",
+  "files": {
+    "protocol.json": "7b89982c92f29d3d38c12ebbb99c214540485d5fd2f46e49244eb4ed5a044282",
+    "rankings.json": "2ec1a17e75b3096f58274811c96e51b9bfd12f9fe0d7fa08636cd98fce1c162b",
+    "predictions.json": "cbea93e50c4573fa2081857d478e5f24454a50529e77eee160924fe67029a424",
+    "results.json": "efabc51d042ba77b87ffce47a60843c024edf1c411c7e0a8e3758970a5ed8606"
+  },
+  "status": "retrospective_research_not_production_approved"
+}

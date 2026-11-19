@@ -106,11 +106,22 @@ def test_all_relocated_json_schemas_match_original_contracts():
                 ):
                     assert name not in actual, "Duplicate contract definition"
                     actual[name] = {
-                        mode: digest(model.model_json_schema(mode=mode))
+                        mode: digest(compatible_schema(name, model.model_json_schema(mode=mode)))
                         for mode in ("validation", "serialization")
                     }
     assert len(actual) == len(baseline["schemas"])
     assert actual == baseline["schemas"]
+
+
+def compatible_schema(name, schema):
+    if name == "TournamentResponse":
+        assert schema["properties"].pop("model_version") == {
+            "const": "five-input-poisson-knockout-v1",
+            "title": "Model Version",
+            "type": "string",
+        }
+        schema["required"].remove("model_version")
+    return schema
 
 
 def digest(value):

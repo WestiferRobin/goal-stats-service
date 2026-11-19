@@ -2,7 +2,8 @@
 
 from typing import Annotated, Self
 
-from pydantic import ConfigDict, Field, JsonValue, model_validator
+from pydantic import ConfigDict, Field, JsonValue, ValidationInfo, field_validator, model_validator
+from pydantic_core import PydanticCustomError
 
 from schemas.common import CatalogID, Contract, Count, validate_possession
 
@@ -52,6 +53,16 @@ class ScenarioState(Contract):
     team2_red_cards: Annotated[int, Field(strict=True, ge=0, le=11)]
     team2_possession: Percentage
     team2_modifier_total: ModifierTotal = 0
+
+    @field_validator("team1_shots_on_target", "team2_shots_on_target")
+    @classmethod
+    def consistent_shots(cls, value: int, info: ValidationInfo) -> int:
+        total = info.data.get(str(info.field_name).replace("_on_target", ""))
+        if total is not None and value > total:
+            raise PydanticCustomError(
+                "shots_on_target_exceeds_total", "Shots on target cannot exceed total shots."
+            )
+        return value
 
     @model_validator(mode="after")
     def consistent_possession(self) -> Self:

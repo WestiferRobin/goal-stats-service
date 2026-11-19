@@ -2,7 +2,7 @@
 
 from typing import Annotated, Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, ValidationInfo, field_validator, model_validator
 
 from schemas.common import CatalogID, Contract, HistoryQuery
 from schemas.scenario.base import (
@@ -83,6 +83,13 @@ class ScenarioPatch(Contract):
     team2_red_cards: Annotated[int, Field(strict=True, ge=0, le=11)] | None = None
     team2_possession: Percentage | None = None
     team2_modifier_total: ModifierTotal | None = None
+
+    @field_validator("team1_shots_on_target", "team2_shots_on_target")
+    @classmethod
+    def consistent_shots(cls, value: int | None, info: ValidationInfo) -> int | None:
+        if value is not None:
+            ScenarioState.consistent_shots(value, info)
+        return value
 
     @model_validator(mode="after")
     def nonempty_nonnull(self) -> Self:

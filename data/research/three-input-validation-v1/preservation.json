@@ -1,0 +1,236 @@
+{
+  "repositories": [
+    {
+      "repository": "goal-stats-service",
+      "branch": "member/wes-v2",
+      "head": "396eedbb0107d87c81d466cb860d07c13b1f3334",
+      "preserved_preexisting_files": 332,
+      "changed_preexisting_files": [],
+      "baseline_inventory_sha256": "9c3867f048ecf40ead4a9313a29a96797fd29aab986e24a91349238f9387e62d",
+      "committed": false,
+      "pushed": false,
+      "git_status_porcelain": [
+        " M .gitattributes",
+        " M src/schemas/evaluation/request.py",
+        " M src/schemas/evaluation/response.py",
+        " M src/services/evaluation.py",
+        " M tests/integration/routers/test_evaluation_full.py",
+        " M tests/unit/schemas/contract_fingerprints.json",
+        "?? data/evaluation/international-results-recovery-v1/README.md",
+        "?? data/evaluation/international-results-recovery-v1/coverage.json",
+        "?? data/evaluation/international-results-recovery-v1/manifest.json",
+        "?? data/evaluation/international-results-recovery-v1/overlay.json",
+        "?? data/evaluation/international-results-recovery-v1/ratings.json",
+        "?? data/evaluation/international-results-recovery-v1/sources/brazil.html",
+        "?? data/evaluation/international-results-recovery-v1/sources/ecuador.html",
+        "?? data/evaluation/international-results-recovery-v1/sources/ghana.html",
+        "?? data/evaluation/international-results-recovery-v1/sources/southafrica.html",
+        "?? data/research/historical-special-ratings-v1/.gitattributes",
+        "?? data/research/historical-special-ratings-v1/README.md",
+        "?? data/research/historical-special-ratings-v1/coverage.json",
+        "?? data/research/historical-special-ratings-v1/manifest.json",
+        "?? data/research/historical-special-ratings-v1/preservation.json",
+        "?? data/research/historical-special-ratings-v1/sources.json",
+        "?? data/research/historical-special-ratings-v1/specification.json",
+        "?? data/research/three-input-validation-v1/.gitattributes",
+        "?? data/research/three-input-validation-v1/README.md",
+        "?? data/research/three-input-validation-v1/manifest.json",
+        "?? data/research/three-input-validation-v1/predictions.json",
+        "?? data/research/three-input-validation-v1/preservation.json",
+        "?? data/research/three-input-validation-v1/protocol.json",
+        "?? data/research/three-input-validation-v1/rankings.json",
+        "?? data/research/three-input-validation-v1/results.json",
+        "?? scripts/evaluation/build_recovery.py",
+        "?? scripts/evaluation/build_special_research.py",
+        "?? scripts/evaluation/build_three_input.py",
+        "?? src/football/results_recovery.py",
+        "?? src/research/__init__.py",
+        "?? src/research/feasibility.py",
+        "?? src/research/model_validation.py",
+        "?? src/research/special_ratings.py",
+        "?? src/research/three_input.py",
+        "?? src/services/evaluation_recovery.py",
+        "?? tests/unit/research/test_feasibility.py",
+        "?? tests/unit/research/test_model_validation.py",
+        "?? tests/unit/research/test_special_ratings.py",
+        "?? tests/unit/research/test_three_input.py",
+        "?? tests/unit/services/test_evaluation_recovery.py"
+      ]
+    },
+    {
+      "repository": "goal-stats-app",
+      "branch": "member/wes-v2",
+      "head": "799740f8ec7807d3b6798845879d5506e44d93ae",
+      "preserved_preexisting_files": 162,
+      "changed_preexisting_files": [],
+      "baseline_inventory_sha256": "32478d1af854c7be932dc46f76d16d2695c9f1f001d4bf2eb40926f55cd472cc",
+      "committed": false,
+      "pushed": false,
+      "git_status_porcelain": [
+        " M src/features/analytics/components/backtesting-panel.test.tsx",
+        " M src/features/analytics/components/backtesting-panel.tsx",
+        " M src/features/analytics/domain/backtesting.test.ts",
+        " M src/features/analytics/domain/backtesting.ts",
+        " M tests/e2e/backtesting.normalized.spec.ts"
+      ]
+    }
+  ],
+  "canonical_database_preserved": true,
+  "database_before": {
+    "matches": {
+      "count": 348,
+      "sha256": "5bbe9c69d840f15e425080ea8c9168eb09070a450c145a49864821824065bba5"
+    },
+    "competitions": {
+      "count": 9,
+      "sha256": "e5644f1fa058ac1d2a05dca4fd5a3ffeeb86cb8ae9936536883d7d3f7908ac73"
+    },
+    "teams": {
+      "count": 44,
+      "sha256": "8dec28a6f861bca1afdd2309b2168801eae87822f5dd99c83f4ca46eaf541530"
+    },
+    "ranking_releases": {
+      "count": 96,
+      "sha256": "537be0c5774d58e6ecb98f496bb9523ac3833e18c7a32d7a5b3c0638c1770c1e"
+    },
+    "ranking_observations": {
+      "count": 16525,
+      "sha256": "9bd708d2dbd142c7f1f5c5d1a230d0ec7a5e8de48c659a4022b4bb919edaf7e9"
+    },
+    "fifa_team_mappings": {
+      "count": 44,
+      "sha256": "f2fe7036c527193cfce0f149d7c880054f9541b741a15d98d1ef4c0fc17de07e"
+    },
+    "rating_runs": {
+      "count": 1,
+      "sha256": "50504dcc4f4e5649182b538f38b44b0a8344e794f69523db8699dcf36af0ec6d"
+    },
+    "team_ratings": {
+      "count": 44,
+      "sha256": "f687088ef79e9265f90f11bb242f1949311ba623403dc69b72f18a41aba84cbd"
+    },
+    "scenarios": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "predictions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "database_after": {
+    "matches": {
+      "count": 348,
+      "sha256": "5bbe9c69d840f15e425080ea8c9168eb09070a450c145a49864821824065bba5"
+    },
+    "competitions": {
+      "count": 9,
+      "sha256": "e5644f1fa058ac1d2a05dca4fd5a3ffeeb86cb8ae9936536883d7d3f7908ac73"
+    },
+    "teams": {
+      "count": 44,
+      "sha256": "8dec28a6f861bca1afdd2309b2168801eae87822f5dd99c83f4ca46eaf541530"
+    },
+    "ranking_releases": {
+      "count": 96,
+      "sha256": "537be0c5774d58e6ecb98f496bb9523ac3833e18c7a32d7a5b3c0638c1770c1e"
+    },
+    "ranking_observations": {
+      "count": 16525,
+      "sha256": "9bd708d2dbd142c7f1f5c5d1a230d0ec7a5e8de48c659a4022b4bb919edaf7e9"
+    },
+    "fifa_team_mappings": {
+      "count": 44,
+      "sha256": "f2fe7036c527193cfce0f149d7c880054f9541b741a15d98d1ef4c0fc17de07e"
+    },
+    "rating_runs": {
+      "count": 1,
+      "sha256": "50504dcc4f4e5649182b538f38b44b0a8344e794f69523db8699dcf36af0ec6d"
+    },
+    "team_ratings": {
+      "count": 44,
+      "sha256": "f687088ef79e9265f90f11bb242f1949311ba623403dc69b72f18a41aba84cbd"
+    },
+    "scenarios": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "predictions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "database_fingerprint_method": "SHA256 of JSON-serialized sorted row_to_json text tuples in read-only transaction",
+  "frozen_code_and_evaluation_artifacts_unchanged_during_certification": true,
+  "frozen_sha256": {
+    "src/research/three_input.py": "01b8da77babc98a38e2ff8d24b04945664f2be9444b61389614806c638a96da2",
+    "src/research/model_validation.py": "ebda33345a36a82d1112616b1ddf4553d1bac4776db3099ccd97e1be0278675e",
+    "tests/unit/research/test_three_input.py": "143a5a3594a38ebd740f6ae9bfa6a8b5dbd96a90c4bf8525bf9094f0468ca040",
+    "tests/unit/research/test_model_validation.py": "b769176bc00c922a2330f88de9151832c8480eccb8cb688216cdfea67b9ffd65",
+    "scripts/evaluation/build_three_input.py": "0cba795f708f70363fbba01aa53249f2dca11f147f137eab1424980f8fb6281e",
+    "data/research/three-input-validation-v1/results.json": "efabc51d042ba77b87ffce47a60843c024edf1c411c7e0a8e3758970a5ed8606",
+    "data/research/three-input-validation-v1/rankings.json": "2ec1a17e75b3096f58274811c96e51b9bfd12f9fe0d7fa08636cd98fce1c162b",
+    "data/research/three-input-validation-v1/manifest.json": "560e625cb74c453c76952f57937e33307fe946ceada04c687baf3f4028a70bed",
+    "data/research/three-input-validation-v1/protocol.json": "7b89982c92f29d3d38c12ebbb99c214540485d5fd2f46e49244eb4ed5a044282",
+    "data/research/three-input-validation-v1/predictions.json": "cbea93e50c4573fa2081857d478e5f24454a50529e77eee160924fe67029a424"
+  },
+  "docker_preservation": {
+    "result": "PASS",
+    "baseline_counts": {
+      "containers": 16,
+      "running": 16,
+      "networks": 7,
+      "volumes": 7
+    },
+    "after_counts": {
+      "containers": 16,
+      "running": 16,
+      "networks": 7,
+      "volumes": 7
+    },
+    "baseline_sha256": "8483f780012043ad6b0b2dff0650528ec8d53cd6f64a7cb3d86cde48209949da",
+    "owned_test_resources_absent": true
+  },
+  "initial_certification_attempt": {
+    "tests_passed": 1903,
+    "tests_failed": 0,
+    "coverage_gate": "PASS",
+    "wrapper": "FAIL: Docker resource preservation during cleanup; exact cause not retained; owned test resources removed"
+  },
+  "validation": {
+    "full_certification": {
+      "passed": 1903,
+      "failed": 0,
+      "duration_seconds": 1261.42,
+      "coverage": {
+        "covered_lines": 4513,
+        "num_statements": 4666,
+        "percent_covered": 95.80514208389715,
+        "percent_covered_display": "95.805142",
+        "missing_lines": 153,
+        "excluded_lines": 2,
+        "percent_statements_covered": 96.72096013716245,
+        "percent_statements_covered_display": "96.720960",
+        "num_branches": 1246,
+        "num_partial_branches": 63,
+        "covered_branches": 1151,
+        "missing_branches": 95,
+        "percent_branches_covered": 92.37560192616372,
+        "percent_branches_covered_display": "92.375602"
+      },
+      "cleanup": "PASS",
+      "coverage_gate": "PASS"
+    },
+    "focused_research": {
+      "passed": 69,
+      "failed": 0,
+      "new_prompt3_tests": 35,
+      "preserved_prompt2_tests": 34,
+      "new_module_statement_and_branch_coverage": 100
+    },
+    "ruff": "PASS",
+    "formatting": "PASS",
+    "mypy": "PASS; 102 source files",
+    "frontend": "Not applicable; no changes"
+  }
+}

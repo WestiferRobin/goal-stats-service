@@ -256,3 +256,37 @@ def test_conflict_rolls_back(scenario_client, scenario_body, monkeypatch):
     finally:
         event.remove(Session, "before_commit", fail)
     assert scenario_client.get(URL).json == []
+
+
+@pytest.mark.postgres
+def test_shot_contract_preview_create_and_merged_patch(
+    scenario_client, scenario_body, import_database
+):
+    from tests.fixtures.historical_database import snapshot
+
+    client = scenario_client
+    before = snapshot(import_database)
+    bad = {**scenario_body, "team1_shots": 0, "team1_shots_on_target": 4}
+    for endpoint, body in [
+        (URL, bad),
+        (
+            "/api/v1/predictions/preview",
+            {k: v for k, v in bad.items() if k not in {"title", "match_id"}},
+        ),
+    ]:
+        response = client.post(endpoint, json=body)
+        assert response.status_code == 400
+        assert response.json["reason"] == "shots_on_target_exceeds_total"
+        assert response.json["field_errors"] == {
+            "team1_shots_on_target": "Shots on target cannot exceed total shots."
+        }
+    assert snapshot(import_database) == before
+    created = client.post(URL, json={**bad, "team1_shots": 4})
+    assert created.status_code == 201
+    location = created.headers["Location"]
+    before = snapshot(import_database)
+    invalid = client.patch(location, json={"team1_shots": 0})
+    assert invalid.status_code == 400 and invalid.json["reason"] == "shots_on_target_exceeds_total"
+    assert snapshot(import_database) == before
+    assert client.patch(location, json={"team1_shots_on_target": 0}).status_code == 200
+    assert client.patch(location, json={"team1_shots": 0}).status_code == 200

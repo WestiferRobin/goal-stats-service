@@ -9,7 +9,33 @@ import pytest
 from schemas.scenario import ScenarioState
 
 
-def test_full_openapi_matches_original_contract(app):
+def original_contract(spec):
+    """Assert the additive contracts before checking every pre-existing spec byte."""
+    schemas = spec["components"]["schemas"]
+    tournament = schemas["TournamentResponse"]
+    assert tournament["properties"].pop("model_version") == {
+        "const": "five-input-poisson-knockout-v1",
+        "title": "Model Version",
+        "type": "string",
+    }
+    tournament["required"].remove("model_version")
+    problem = schemas["ProblemDetailSchema"]
+    assert problem["properties"].pop("reason") == {
+        "anyOf": [{"type": "string"}, {"type": "null"}],
+        "default": None,
+        "title": "Reason",
+    }
+    assert problem["properties"].pop("field_errors") == {
+        "anyOf": [{"additionalProperties": {"type": "string"}, "type": "object"}, {"type": "null"}],
+        "default": None,
+        "title": "Field Errors",
+    }
+    responses = spec["paths"]["/api/v1/evaluations/backtests"]["post"]["responses"]
+    assert responses.pop("503") == responses["default"]
+    return spec
+
+
+def test_full_openapi_matches_current_contract(app):
     baseline = json.loads(
         (
             Path(__file__).resolve().parents[2] / "unit/schemas/contract_fingerprints.json"
@@ -19,9 +45,23 @@ def test_full_openapi_matches_original_contract(app):
     assert response.status_code == 200
     assert (
         hashlib.sha256(
-            json.dumps(response.json, sort_keys=True, separators=(",", ":")).encode()
+            json.dumps(
+                original_contract(response.json), sort_keys=True, separators=(",", ":")
+            ).encode()
         ).hexdigest()
         == baseline["openapi"]
+    )
+
+
+def test_evaluation_addition_preserves_original_openapi_contract(app):
+    spec = original_contract(app.test_client().get("/swagger/v1/swagger.json").json)
+    del spec["paths"]["/api/v1/evaluations/backtests"]
+    for name in ("Assumption", "BacktestRequest", "BacktestResponse", "CaseResult"):
+        del spec["components"]["schemas"][name]
+    spec["tags"] = [tag for tag in spec["tags"] if tag["name"] != "evaluation"]
+    assert (
+        hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        == "4d708c52faa32562e97536985588f1080f1fe02aac6715408b026c1eb24c45fc"
     )
 
 
@@ -106,6 +146,7 @@ def test_exact_route_and_openapi_resource_contract(app):
         "/api/v1/predictions/preview": {"post"},
         "/api/v1/catalog/matches/insights": {"get"},
         "/api/v1/competitions/simulate": {"post"},
+        "/api/v1/evaluations/backtests": {"post"},
     }
     assert set(spec["paths"]) == set(football) | {"/health", "/ready"}
     for path, methods in football.items():

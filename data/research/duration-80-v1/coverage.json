@@ -1,0 +1,2607 @@
+{
+  "calibration_candidate_hash": "d10a0529119413445e2ae463609eaa854a39a87113873ec78ed0201d25c4bf5d",
+  "calibration_candidates": 138,
+  "cases": [
+    {
+      "rating_evidence": {
+        "participants": {
+          "China": {
+            "defense": 98.21,
+            "evidence": {
+              "form_matches": 10,
+              "last_match": "1991-10-12",
+              "matches": 26,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 39.47,
+            "offense": 94.64
+          },
+          "Norway": {
+            "defense": 87.5,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-09-29",
+              "matches": 27,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 81.58,
+            "offense": 69.64
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "31352eb174e01f70847fd8866c54455f61e122533111262ed335be101e5cffe3",
+        "source_rows": 605
+      },
+      "record": {
+        "archive_fixture": "16 Nov Guangzhou    China        4-0 Norway",
+        "archive_line": 34,
+        "archive_orientation_reversed": false,
+        "away": "Norway",
+        "away_team_id": 2,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-16",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          4,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "China",
+        "home_team_id": 1,
+        "match_id": 1,
+        "match_key": "a6efc08ffb6be2c5b64cc47c056e0790c0fbc37fa6728aa30d568cccc8648670",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          4,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-15",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Brazil": {
+            "defense": 16.07,
+            "evidence": {
+              "form_matches": 0,
+              "last_match": "1991-05-05",
+              "matches": 8,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": 83.93
+          },
+          "Japan": {
+            "defense": 58.93,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-06-08",
+              "matches": 23,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 28.95,
+            "offense": 91.07
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "2f0c0b9a2f0f630a2362e5125f2d809cb5e75f35d5d2971334e3f3bfdd2f6b9c",
+        "source_rows": 607
+      },
+      "record": {
+        "archive_fixture": "17 Nov Foshan       Japan        0-1 Brazil",
+        "archive_line": 55,
+        "archive_orientation_reversed": false,
+        "away": "Brazil",
+        "away_team_id": 6,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-17",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          1
+        ],
+        "golden_goal_rule": false,
+        "home": "Japan",
+        "home_team_id": 5,
+        "match_id": 3,
+        "match_key": "58d5c7a62464e4e79f893c01a03fdd22d9a11b013e923328f6f0bbc94b319e26",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          1
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-16",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Germany": {
+            "defense": 69.64,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-07-14",
+              "matches": 21,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 65.79,
+            "offense": 80.36
+          },
+          "Nigeria": {
+            "defense": null,
+            "evidence": {
+              "form_matches": 0,
+              "last_match": "1991-06-30",
+              "matches": 6,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": null
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "2f0c0b9a2f0f630a2362e5125f2d809cb5e75f35d5d2971334e3f3bfdd2f6b9c",
+        "source_rows": 607
+      },
+      "record": {
+        "archive_fixture": "17 Nov Jiangmen     Germany      4-0 Nigeria",
+        "archive_line": 82,
+        "archive_orientation_reversed": false,
+        "away": "Nigeria",
+        "away_team_id": 10,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-17",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          4,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Germany",
+        "home_team_id": 9,
+        "match_id": 5,
+        "match_key": "6c0c8552e8e46fc540e7235408eeba680dbab04ef9234751cbc9cd42d096d6e9",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          4,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-16",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Italy": {
+            "defense": 62.5,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-10-19",
+              "matches": 24,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 23.68,
+            "offense": 48.21
+          },
+          "Taiwan": {
+            "defense": 94.64,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-06-08",
+              "matches": 24,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 39.47,
+            "offense": 55.36
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "2f0c0b9a2f0f630a2362e5125f2d809cb5e75f35d5d2971334e3f3bfdd2f6b9c",
+        "source_rows": 607
+      },
+      "record": {
+        "archive_fixture": "17 Nov Jiangmen     Taiwan       0-5 Italy",
+        "archive_line": 78,
+        "archive_orientation_reversed": false,
+        "away": "Italy",
+        "away_team_id": 12,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-17",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          5
+        ],
+        "golden_goal_rule": false,
+        "home": "Taiwan",
+        "home_team_id": 11,
+        "match_id": 6,
+        "match_key": "b7e8786e951686201264bb1c6f5439f6d3479c52c5c87b68f5836ec26a042360",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          5
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-16",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Denmark": {
+            "defense": 80.36,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-10-16",
+              "matches": 19,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 55.26,
+            "offense": 58.93
+          },
+          "New Zealand": {
+            "defense": 73.21,
+            "evidence": {
+              "form_matches": 4,
+              "last_match": "1991-05-24",
+              "matches": 13,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.37,
+            "offense": 73.21
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "2f0c0b9a2f0f630a2362e5125f2d809cb5e75f35d5d2971334e3f3bfdd2f6b9c",
+        "source_rows": 607
+      },
+      "record": {
+        "archive_fixture": "17 Nov Guangzhou    Denmark      3-0 New Zealand",
+        "archive_line": 37,
+        "archive_orientation_reversed": false,
+        "away": "New Zealand",
+        "away_team_id": 4,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-17",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          3,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Denmark",
+        "home_team_id": 3,
+        "match_id": 2,
+        "match_key": "bb9ac035e3ee59b8f45f7f68206033a2fcacb062c8f57782407793ab9f230b48",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          3,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-16",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Sweden": {
+            "defense": 76.79,
+            "evidence": {
+              "form_matches": 3,
+              "last_match": "1991-10-23",
+              "matches": 20,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 71.05,
+            "offense": 66.07
+          },
+          "United States": {
+            "defense": 91.07,
+            "evidence": {
+              "form_matches": 16,
+              "last_match": "1991-10-12",
+              "matches": 34,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 92.11,
+            "offense": 98.21
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "2f0c0b9a2f0f630a2362e5125f2d809cb5e75f35d5d2971334e3f3bfdd2f6b9c",
+        "source_rows": 607
+      },
+      "record": {
+        "archive_fixture": "17 Nov Panyu        Sweden       2-3 USA",
+        "archive_line": 57,
+        "archive_orientation_reversed": false,
+        "away": "United States",
+        "away_team_id": 8,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-17",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          2,
+          3
+        ],
+        "golden_goal_rule": false,
+        "home": "Sweden",
+        "home_team_id": 7,
+        "match_id": 4,
+        "match_key": "e1180a6b111519450fbc9fa493b3c4cbb4d91848fea7be1d2ae574afb1f69768",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          3
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-16",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "New Zealand": {
+            "defense": 62.5,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-11-17",
+              "matches": 14,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 86.84,
+            "offense": 66.07
+          },
+          "Norway": {
+            "defense": 87.5,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-16",
+              "matches": 28,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 65.79,
+            "offense": 73.21
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Guangzhou    Norway       4-0 New Zealand",
+        "archive_line": 41,
+        "archive_orientation_reversed": false,
+        "away": "New Zealand",
+        "away_team_id": 4,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          4,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Norway",
+        "home_team_id": 2,
+        "match_id": 7,
+        "match_key": "542a80ba7bb339756cd26ce36a1e01602ca15563b524588eff6a0a9f86ba213f",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          4,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "China": {
+            "defense": 98.21,
+            "evidence": {
+              "form_matches": 11,
+              "last_match": "1991-11-16",
+              "matches": 27,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 50.0,
+            "offense": 94.64
+          },
+          "Denmark": {
+            "defense": 91.07,
+            "evidence": {
+              "form_matches": 8,
+              "last_match": "1991-11-17",
+              "matches": 20,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 71.05,
+            "offense": 62.5
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Guangzhou    China        2-2 Denmark",
+        "archive_line": 39,
+        "archive_orientation_reversed": false,
+        "away": "Denmark",
+        "away_team_id": 3,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          2,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "China",
+        "home_team_id": 1,
+        "match_id": 8,
+        "match_key": "631777db9b56acf10db92e0c039305410462d41323977e16b6a46d1530cd3796",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          2
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "draw",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Italy": {
+            "defense": 69.64,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-11-17",
+              "matches": 25,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 76.32,
+            "offense": 55.36
+          },
+          "Nigeria": {
+            "defense": null,
+            "evidence": {
+              "form_matches": 0,
+              "last_match": "1991-11-17",
+              "matches": 7,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": null
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Zhongshan    Italy        1-0 Nigeria",
+        "archive_line": 86,
+        "archive_orientation_reversed": false,
+        "away": "Nigeria",
+        "away_team_id": 10,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          1,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Italy",
+        "home_team_id": 12,
+        "match_id": 11,
+        "match_key": "7baeb4f3bdba4f23ba8411af574e2a695f6fed67c0dece043c83a9bfc28b7539",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          1,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Japan": {
+            "defense": 58.93,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-17",
+              "matches": 24,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 23.68,
+            "offense": 91.07
+          },
+          "Sweden": {
+            "defense": 73.21,
+            "evidence": {
+              "form_matches": 3,
+              "last_match": "1991-11-17",
+              "matches": 21,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 44.74,
+            "offense": 69.64
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Foshan       Japan        0-8 Sweden",
+        "archive_line": 60,
+        "archive_orientation_reversed": false,
+        "away": "Sweden",
+        "away_team_id": 7,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          8
+        ],
+        "golden_goal_rule": false,
+        "home": "Japan",
+        "home_team_id": 5,
+        "match_id": 9,
+        "match_key": "c3b316bc0fea0a70ca7d919db78b0b41315cbb48f3e0f48cf210fb72d4c15c11",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          8
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Brazil": {
+            "defense": 23.21,
+            "evidence": {
+              "form_matches": 1,
+              "last_match": "1991-11-17",
+              "matches": 9,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": 80.36
+          },
+          "United States": {
+            "defense": 94.64,
+            "evidence": {
+              "form_matches": 17,
+              "last_match": "1991-11-17",
+              "matches": 35,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.37,
+            "offense": 98.21
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Panyu        Brazil       0-5 USA",
+        "archive_line": 63,
+        "archive_orientation_reversed": false,
+        "away": "United States",
+        "away_team_id": 8,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          5
+        ],
+        "golden_goal_rule": false,
+        "home": "Brazil",
+        "home_team_id": 6,
+        "match_id": 10,
+        "match_key": "d1d764efde7e5cf256d1880a143876c173b458d18af0a03a5c6b3ec65754fe1a",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          5
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Germany": {
+            "defense": 80.36,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-11-17",
+              "matches": 22,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 60.53,
+            "offense": 83.93
+          },
+          "Taiwan": {
+            "defense": 83.93,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-17",
+              "matches": 25,
+              "reason": null,
+              "reference_teams": 28,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 2.63,
+            "offense": 51.79
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "d14ef03a510e77c0ce34eaaf9f969df5917121c98421a5085d0dfc598ac5d3b0",
+        "source_rows": 612
+      },
+      "record": {
+        "archive_fixture": "19 Nov Zhongshan    Taiwan       0-3 Germany",
+        "archive_line": 84,
+        "archive_orientation_reversed": false,
+        "away": "Germany",
+        "away_team_id": 9,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-19",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          3
+        ],
+        "golden_goal_rule": false,
+        "home": "Taiwan",
+        "home_team_id": 11,
+        "match_id": 12,
+        "match_key": "f1bca136c0080ebb2303cdbaa900bb7dd382298a063371f6bfc9adf99074c8a5",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          3
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-18",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Denmark": {
+            "defense": 87.93,
+            "evidence": {
+              "form_matches": 9,
+              "last_match": "1991-11-19",
+              "matches": 21,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 71.05,
+            "offense": 67.24
+          },
+          "Norway": {
+            "defense": 91.38,
+            "evidence": {
+              "form_matches": 8,
+              "last_match": "1991-11-19",
+              "matches": 29,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 81.58,
+            "offense": 77.59
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Panyu        Norway       2-1 Denmark",
+        "archive_line": 45,
+        "archive_orientation_reversed": false,
+        "away": "Denmark",
+        "away_team_id": 3,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          2,
+          1
+        ],
+        "golden_goal_rule": false,
+        "home": "Norway",
+        "home_team_id": 2,
+        "match_id": 14,
+        "match_key": "1c03bb64b0ecb72a01cc2eb1afbcd1215e31f2bf04d667b0176d81710d1df91a",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          1
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Nigeria": {
+            "defense": 53.45,
+            "evidence": {
+              "form_matches": 0,
+              "last_match": "1991-11-19",
+              "matches": 8,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": 53.45
+          },
+          "Taiwan": {
+            "defense": 74.14,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-19",
+              "matches": 26,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 7.89,
+            "offense": 50.0
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Jiangmen     Taiwan       2-0 Nigeria",
+        "archive_line": 88,
+        "archive_orientation_reversed": false,
+        "away": "Nigeria",
+        "away_team_id": 10,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          2,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Taiwan",
+        "home_team_id": 11,
+        "match_id": 17,
+        "match_key": "2642d6fb67b085175082b9a5f47d5973e78753a32f4b2c9151d999f94745b3c8",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Germany": {
+            "defense": 84.48,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-19",
+              "matches": 23,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 76.32,
+            "offense": 91.38
+          },
+          "Italy": {
+            "defense": 77.59,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-11-19",
+              "matches": 26,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 60.53,
+            "offense": 56.9
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Zhongshan    Italy        0-2 Germany",
+        "archive_line": 90,
+        "archive_orientation_reversed": false,
+        "away": "Germany",
+        "away_team_id": 9,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "Italy",
+        "home_team_id": 12,
+        "match_id": 18,
+        "match_key": "7313afbd9e5477a1d556a6e0d3c9345dde11cf4a6bd7cc76c0000c550f6b8289",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          2
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Japan": {
+            "defense": 36.21,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-19",
+              "matches": 25,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 2.63,
+            "offense": 87.93
+          },
+          "United States": {
+            "defense": 94.83,
+            "evidence": {
+              "form_matches": 18,
+              "last_match": "1991-11-19",
+              "matches": 36,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.37,
+            "offense": 98.28
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Foshan       Japan        0-3 USA",
+        "archive_line": 66,
+        "archive_orientation_reversed": false,
+        "away": "United States",
+        "away_team_id": 8,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          3
+        ],
+        "golden_goal_rule": false,
+        "home": "Japan",
+        "home_team_id": 5,
+        "match_id": 15,
+        "match_key": "8845878301c009aa97fec3304022b7fa9c082b6b03b28b4e3f7044b83180fe48",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          3
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Brazil": {
+            "defense": 22.41,
+            "evidence": {
+              "form_matches": 2,
+              "last_match": "1991-11-19",
+              "matches": 10,
+              "reason": "insufficient_recent_results",
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": null,
+            "offense": 74.14
+          },
+          "Sweden": {
+            "defense": 81.03,
+            "evidence": {
+              "form_matches": 4,
+              "last_match": "1991-11-19",
+              "matches": 22,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 92.11,
+            "offense": 84.48
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Panyu        Brazil       0-2 Sweden",
+        "archive_line": 68,
+        "archive_orientation_reversed": false,
+        "away": "Sweden",
+        "away_team_id": 7,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "Brazil",
+        "home_team_id": 6,
+        "match_id": 16,
+        "match_key": "9e2f3fca49dc779bc23395945d2aed5180584969f8d0f4c4c374d5cdce835a40",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          2
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_ratings_insufficient",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": false,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "China": {
+            "defense": 98.28,
+            "evidence": {
+              "form_matches": 12,
+              "last_match": "1991-11-19",
+              "matches": 28,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 44.74,
+            "offense": 94.83
+          },
+          "New Zealand": {
+            "defense": 50.0,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-19",
+              "matches": 15,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 55.26,
+            "offense": 60.34
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "44b470883b58efa5b57b6e0adf07523fc20b358b182570641479cfb363024239",
+        "source_rows": 618
+      },
+      "record": {
+        "archive_fixture": "21 Nov Foshan       China        4-1 New Zealand",
+        "archive_line": 43,
+        "archive_orientation_reversed": false,
+        "away": "New Zealand",
+        "away_team_id": 4,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-21",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          4,
+          1
+        ],
+        "golden_goal_rule": false,
+        "home": "China",
+        "home_team_id": 1,
+        "match_id": 13,
+        "match_key": "a48561f281fe549f1185819f46d943586801576968add619b0cccd182d2c5b46",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          4,
+          1
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "group",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-20",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Taiwan": {
+            "defense": 77.59,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-21",
+              "matches": 27,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 7.5,
+            "offense": 50.0
+          },
+          "United States": {
+            "defense": 94.83,
+            "evidence": {
+              "form_matches": 19,
+              "last_match": "1991-11-21",
+              "matches": 37,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.5,
+            "offense": 98.28
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "a52f6a05184be5aaa839148d61756df700b88e977cd35d3acf8abd9d12793d63",
+        "source_rows": 624
+      },
+      "record": {
+        "archive_fixture": "24 Nov Foshan       USA          7-0 Taiwan",
+        "archive_line": 107,
+        "archive_orientation_reversed": false,
+        "away": "Taiwan",
+        "away_team_id": 11,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-24",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          7,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "United States",
+        "home_team_id": 8,
+        "match_id": 22,
+        "match_key": "1e04c537812802b182e0e397fd4112686adfa5f0bb375b05cb6ace88e5d9116e",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          7,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "quarterfinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-23",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Denmark": {
+            "defense": 81.03,
+            "evidence": {
+              "form_matches": 10,
+              "last_match": "1991-11-21",
+              "matches": 22,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 67.5,
+            "offense": 67.24
+          },
+          "Germany": {
+            "defense": 87.93,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-21",
+              "matches": 24,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 82.5,
+            "offense": 91.38
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "a52f6a05184be5aaa839148d61756df700b88e977cd35d3acf8abd9d12793d63",
+        "source_rows": 624
+      },
+      "record": {
+        "archive_fixture": "24 Nov Zhongshan    Germany      2-1 Denmark        [aet]",
+        "archive_line": 105,
+        "archive_orientation_reversed": true,
+        "away": "Germany",
+        "away_team_id": 9,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-24",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": true,
+        "extra_time_score": [
+          1,
+          2
+        ],
+        "final_score": [
+          1,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "Denmark",
+        "home_team_id": 3,
+        "match_id": 19,
+        "match_key": "21105b12edf52a31a557358bbe4c2eb350fe727a3f78396760bd7c09cc8fc0b6",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          1,
+          1
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "quarterfinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-23",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "draw",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "China": {
+            "defense": 98.28,
+            "evidence": {
+              "form_matches": 13,
+              "last_match": "1991-11-21",
+              "matches": 29,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 47.5,
+            "offense": 94.83
+          },
+          "Sweden": {
+            "defense": 84.48,
+            "evidence": {
+              "form_matches": 5,
+              "last_match": "1991-11-21",
+              "matches": 23,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 92.5,
+            "offense": 81.03
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "a52f6a05184be5aaa839148d61756df700b88e977cd35d3acf8abd9d12793d63",
+        "source_rows": 624
+      },
+      "record": {
+        "archive_fixture": "24 Nov Guangzhou    China        0-1 Sweden",
+        "archive_line": 100,
+        "archive_orientation_reversed": false,
+        "away": "Sweden",
+        "away_team_id": 7,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-24",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          0,
+          1
+        ],
+        "golden_goal_rule": false,
+        "home": "China",
+        "home_team_id": 1,
+        "match_id": 20,
+        "match_key": "2db17a272873d31e4c2f18d9e4a0926fbc47734d856d73e6b5e4a0772c41df7d",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          0,
+          1
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "quarterfinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-23",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Italy": {
+            "defense": 74.14,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-21",
+              "matches": 27,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 57.5,
+            "offense": 56.9
+          },
+          "Norway": {
+            "defense": 91.38,
+            "evidence": {
+              "form_matches": 9,
+              "last_match": "1991-11-21",
+              "matches": 30,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 77.5,
+            "offense": 77.59
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "a52f6a05184be5aaa839148d61756df700b88e977cd35d3acf8abd9d12793d63",
+        "source_rows": 624
+      },
+      "record": {
+        "archive_fixture": "24 Nov Jiangmen     Norway       3-2 Italy          [aet]",
+        "archive_line": 102,
+        "archive_orientation_reversed": false,
+        "away": "Italy",
+        "away_team_id": 12,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-24",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": true,
+        "extra_time_score": [
+          3,
+          2
+        ],
+        "final_score": [
+          3,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "Norway",
+        "home_team_id": 2,
+        "match_id": 21,
+        "match_key": "42597669535c6ce8faaa220b465c6314f114a520db9da48833d950522d48fe1c",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          2
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "quarterfinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-23",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "draw",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Germany": {
+            "defense": 87.93,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-24",
+              "matches": 25,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 73.53,
+            "offense": 91.38
+          },
+          "United States": {
+            "defense": 94.83,
+            "evidence": {
+              "form_matches": 20,
+              "last_match": "1991-11-24",
+              "matches": 38,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.06,
+            "offense": 98.28
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "cac7d6c1698dae2cf48deae5c39fc07d26cf615e9abaf5147903a2283877df52",
+        "source_rows": 628
+      },
+      "record": {
+        "archive_fixture": "27 Nov Guangzhou    USA          5-2 Germany",
+        "archive_line": 125,
+        "archive_orientation_reversed": true,
+        "away": "United States",
+        "away_team_id": 8,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-27",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          2,
+          5
+        ],
+        "golden_goal_rule": false,
+        "home": "Germany",
+        "home_team_id": 9,
+        "match_id": 24,
+        "match_key": "3e6a58f4f2ed66ca56b9012754796f7f609b5478cd063298562cfe64fbc8fd94",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          2,
+          5
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "semifinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-26",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Norway": {
+            "defense": 84.48,
+            "evidence": {
+              "form_matches": 9,
+              "last_match": "1991-11-24",
+              "matches": 31,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 79.41,
+            "offense": 81.03
+          },
+          "Sweden": {
+            "defense": 91.38,
+            "evidence": {
+              "form_matches": 6,
+              "last_match": "1991-11-24",
+              "matches": 24,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 91.18,
+            "offense": 84.48
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "cac7d6c1698dae2cf48deae5c39fc07d26cf615e9abaf5147903a2283877df52",
+        "source_rows": 628
+      },
+      "record": {
+        "archive_fixture": "27 Nov Panyu        Norway       4-1 Sweden",
+        "archive_line": 113,
+        "archive_orientation_reversed": true,
+        "away": "Norway",
+        "away_team_id": 2,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-27",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          1,
+          4
+        ],
+        "golden_goal_rule": false,
+        "home": "Sweden",
+        "home_team_id": 7,
+        "match_id": 23,
+        "match_key": "df5e1f219a7dab7a167783006df0b01c6fdc13a3c53c29ab19b6c015947bb82c",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          1,
+          4
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "semifinal",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-26",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Germany": {
+            "defense": 81.03,
+            "evidence": {
+              "form_matches": 8,
+              "last_match": "1991-11-27",
+              "matches": 26,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 61.76,
+            "offense": 91.38
+          },
+          "Sweden": {
+            "defense": 87.93,
+            "evidence": {
+              "form_matches": 7,
+              "last_match": "1991-11-27",
+              "matches": 25,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 79.41,
+            "offense": 81.03
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "6b7b0acef67795595d6a1888949a6e8119b9f649d6c8dbd231a5886d2d63195e",
+        "source_rows": 630
+      },
+      "record": {
+        "archive_fixture": "29 Nov Guangzhou    Sweden       4-0 Germany",
+        "archive_line": 139,
+        "archive_orientation_reversed": false,
+        "away": "Germany",
+        "away_team_id": 9,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-29",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          4,
+          0
+        ],
+        "golden_goal_rule": false,
+        "home": "Sweden",
+        "home_team_id": 7,
+        "match_id": 25,
+        "match_key": "4d0d1a3ff63d99281cd4d53c0d45e0a9c3904269a68086319b860fa53ac29e52",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          4,
+          0
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "third_place",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-28",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "home_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    },
+    {
+      "rating_evidence": {
+        "participants": {
+          "Norway": {
+            "defense": 87.93,
+            "evidence": {
+              "form_matches": 10,
+              "last_match": "1991-11-27",
+              "matches": 32,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 79.41,
+            "offense": 81.03
+          },
+          "United States": {
+            "defense": 94.83,
+            "evidence": {
+              "form_matches": 21,
+              "last_match": "1991-11-27",
+              "matches": 39,
+              "reason": null,
+              "reference_teams": 29,
+              "score_basis": "recorded_final_including_extra_time_no_shootout",
+              "status": "experimental"
+            },
+            "form": 97.06,
+            "offense": 98.28
+          }
+        },
+        "source_hash": "22259e986df3cbf5970eea96a4ea4a884dad06ca5846d904da73f1d65237df85",
+        "source_population_hash": "a624e58a25c8bb6178bc3f0cdc9c3cb141bedaed3c613776b4717c2d5f402ed2",
+        "source_rows": 631
+      },
+      "record": {
+        "archive_fixture": "30 Nov Guangzhou    USA          2-1 Norway",
+        "archive_line": 153,
+        "archive_orientation_reversed": true,
+        "away": "United States",
+        "away_team_id": 8,
+        "catalog_revision": "1855e313ae8bcd0330426e62c8e4cf15ce45077c",
+        "catalog_source_sha256": "de1dc4322c2d686981da32f577bfb5ddce4d3f71dea8023e05acfba7250743b0",
+        "completion_status": "completed",
+        "date": "1991-11-30",
+        "definition": "observed_score_at_end_of_regulation",
+        "discrepancies": [],
+        "edition": 1991,
+        "extra_time_played": false,
+        "extra_time_score": null,
+        "final_score": [
+          1,
+          2
+        ],
+        "golden_goal_rule": false,
+        "home": "Norway",
+        "home_team_id": 2,
+        "match_id": 26,
+        "match_key": "52597d3108a086c5175b7b82a9680fa94c32f8947f0556a3cd974af362bfefa0",
+        "regulation_minutes": 80,
+        "regulation_score": [
+          1,
+          2
+        ],
+        "shootout_score": null,
+        "source_id": "rsssf-1991",
+        "source_revision": "content-addressed snapshot fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "source_url": "https://www.rsssf.org/tablesw/wwc91f.html",
+        "stage": "final",
+        "verification_status": "verified_attributed_archive"
+      },
+      "research": {
+        "calibration_through": null,
+        "classification": "research_only",
+        "cutoff": "1991-11-29",
+        "eligible": false,
+        "exclusion_reasons": [
+          "duration_annotated_training_evidence_missing",
+          "duration_compatible_rating_validation_missing",
+          "historical_source_availability_unverified",
+          "independent_80_minute_validation_missing",
+          "original_1991_tournament_procedures_unverified"
+        ],
+        "model_version": "odf-exposure-80-evidence-blocked-v1",
+        "observed_regulation_outcome": "away_win",
+        "parameter_version": null,
+        "probabilities": null,
+        "rating_complete": true,
+        "rating_duration_compatible": false,
+        "regulation_minutes": 80,
+        "source_sha256": "fdea5e3210ae2c96a2cd2446d73c4bcc0451ecb60997f42b5dce822837b0d672",
+        "training_through": null,
+        "validation_status": "evidence_blocked"
+      }
+    }
+  ],
+  "eligible": 0,
+  "excluded": 26,
+  "full_inventory": {
+    "1991": 26,
+    "1995": 26,
+    "1999": 32,
+    "2003": 32,
+    "2007": 32,
+    "2011": 32,
+    "2015": 52,
+    "2019": 52,
+    "2023": 64
+  },
+  "pre_tournament_recorded_score_candidates": 605,
+  "protocol": {
+    "accuracy": null,
+    "blockers": [
+      "duration_annotated_training_evidence_missing",
+      "duration_compatible_rating_validation_missing",
+      "independent_80_minute_validation_missing",
+      "historical_source_availability_unverified",
+      "original_1991_tournament_procedures_unverified"
+    ],
+    "brier_score": null,
+    "calibration": "Disjoint verified observations from 1990-01-01 through 1991-11-15",
+    "classification": "research_only",
+    "distribution_candidate": "Independent Poisson regulation goals; not yet fitted or validated",
+    "evaluation": "1991-11-16 through 1991-11-30; all 26 matches retained",
+    "exposure": "Nominal regulation minutes including associated added time; exclude extra time",
+    "fit_requirements": "Source-pinned regulation goals and nominal duration per observation; historical publication and input cutoffs; pre-match O/D/F reference populations; independently reviewed identifiability, sample sufficiency and out-of-time calibration",
+    "forbidden_substitutes": [
+      "2.6 * 80/90 treated as validated",
+      "2007 temperature parameters"
+    ],
+    "formula_candidate": "lambda_i = 80 * r_per_team_minute * exp(beta_OD*(O_i-D_j)/100 + beta_F*(F_i-F_j)/100)",
+    "freeze_policy": "Freeze parameters before 1991-11-16; no within-tournament updates",
+    "historical_publication_verified": false,
+    "log_loss": null,
+    "model_version": "odf-exposure-80-evidence-blocked-v1",
+    "outcomes": [
+      "home_win",
+      "draw",
+      "away_win"
+    ],
+    "parameters": null,
+    "probabilities": null,
+    "production_eligible": false,
+    "qualified_calibration_observations": 0,
+    "qualified_training_observations": 0,
+    "rating_compatibility": "Unverified: existing ratings mix unknown durations and final scores",
+    "regulation_minutes": 80,
+    "selection": "Protocol specified without fitting or scoring the 26 evaluation labels",
+    "training": "Verified regulation-only observations dated before 1990-01-01",
+    "uncertainty": "Not estimable from qualified evidence; no intervals or accuracy published",
+    "validation_status": "evidence_blocked"
+  },
+  "protocol_hash": "81f1e7e22980e476c9ce38df34d12fcdb98a57e2d1708c47abf1c043f634c274",
+  "qualified_calibration": 0,
+  "qualified_training": 0,
+  "rating_complete": 20,
+  "shortfall": "Every candidate lacks jointly verified nominal duration, regulation-only score and historical publication timing in the approved training schema. No candidate is promoted to a training observation. No parameters estimated or accuracy scored.",
+  "source_manifest_hashes": {
+    "original": "2d5ee8384de03b74ded3c32ca6460c8024ebe40ddbeda9b715a4fe580f914c55",
+    "recovery": "688a6b4eb66505c69be226c67a2a65730ece0e107aac072e2cb25ec5433dc0a5"
+  },
+  "training_candidate_hash": "f30be29eec3e06958ddc1983ec1018c34125e21eed1f813ed778ff6f3d54d21a",
+  "training_candidates": 467
+}

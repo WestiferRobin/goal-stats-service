@@ -1,0 +1,13 @@
+{
+  "classification": "retrospective_research_integration_verification",
+  "files": {
+    ".gitattributes": "9e8f041ed812cb5288282cc6b187de804e96b688d56647fdae181c49fec71863",
+    "README.md": "5f74e37481f70ab1f019c97a1443861f4614b05241584be9258d752a62165546",
+    "coverage.json": "dcd85f8a8d3cfe53526e156218ffe4ba17cd24f9bd62465f78efcbccd5eb6dff",
+    "preservation.json": "a288e310afa3fc1aa10553f24aa2490d7de11a0f18ccbf4caa1606f9da7b79f8"
+  },
+  "production_model_approval": false,
+  "strict_historical_eligible": 0,
+  "total_cases": 348,
+  "version": "full-integration-verification-v1"
+}

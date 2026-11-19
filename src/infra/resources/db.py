@@ -13,6 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from models.competition import Competition
+from models.enrichment import RankingRelease, RatingRun
 from models.match import Match
 from models.prediction import Prediction
 from models.scenario import Scenario
@@ -72,6 +73,8 @@ def is_ready(database: Database) -> bool:
                 Scenario,
                 Prediction,
                 User,
+                RankingRelease,
+                RatingRun,
             ):
                 connection.execute(select(model).limit(1)).all()
             return True

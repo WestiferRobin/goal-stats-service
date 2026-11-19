@@ -305,8 +305,9 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
     config = Config(str(Path(__file__).resolve().parents[4] / "alembic.ini"))
     scripts = ScriptDirectory.from_config(config)
     assert scripts.get_bases() == ["a7c93e25d104"]
-    assert scripts.get_heads() == ["e42b7c19a603"]
+    assert scripts.get_heads() == ["f31a6e208b47"]
     assert [r.revision for r in scripts.walk_revisions()] == [
+        "f31a6e208b47",
         "e42b7c19a603",
         "d91e6a4b208f",
         "c8d42f19e630",
@@ -320,7 +321,7 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
         assert MigrationContext.configure(connection).get_current_revision() == starting_revision
         command.upgrade(config, "head")
         command.upgrade(config, "head")
-        assert MigrationContext.configure(connection).get_current_revision() == "e42b7c19a603"
+        assert MigrationContext.configure(connection).get_current_revision() == "f31a6e208b47"
         assert set(inspect(connection).get_table_names()) == {
             "alembic_version",
             "teams",
@@ -329,6 +330,11 @@ def test_supported_upgrade_preserves_catalog_scenario_and_saved_output(
             "scenarios",
             "predictions",
             "users",
+            "ranking_releases",
+            "ranking_observations",
+            "fifa_team_mappings",
+            "rating_runs",
+            "team_ratings",
         }
         assert (
             compare_metadata(

@@ -202,7 +202,7 @@ def history_url(saved):
 
 @pytest.fixture
 def saved_scenario(scenario_client, scenario_body):
-    scenario_body.update(team1_shots_on_target=4, team1_modifier_total=-7)
+    scenario_body.update(team1_shots=4, team1_shots_on_target=4, team1_modifier_total=-7)
     response = scenario_client.post("/api/v1/scenarios", json=scenario_body)
     assert response.status_code == 201
     return response.json
