@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 
 import pytest
 
@@ -10,9 +11,42 @@ from research.special_ratings import digest
 from research.three_input import SPEC, A, B, C
 
 
+def assert_numeric_reconstruction(actual, expected):
+    """Allow only platform libm roundoff, never structure or discrete-value drift."""
+    assert type(actual) is type(expected)
+    if isinstance(expected, dict):
+        assert actual.keys() == expected.keys()
+        for key in expected:
+            if key in {"accuracy", "precision", "recall", "bin"}:
+                assert actual[key] == expected[key]
+            else:
+                assert_numeric_reconstruction(actual[key], expected[key])
+    elif isinstance(expected, list):
+        assert len(actual) == len(expected)
+        for value, reference in zip(actual, expected, strict=True):
+            assert_numeric_reconstruction(value, reference)
+    elif isinstance(expected, float):
+        assert math.isfinite(actual) and math.isfinite(expected)
+        assert actual == pytest.approx(expected, rel=0, abs=1e-15)
+    else:
+        assert actual == expected
+
+
 def test_complete_inventory_pinned_sources_and_reconstruction():
     data = audit.reconstruct()
-    assert data == json.loads((audit.PACKAGE / "predictions.json").read_text())
+    frozen = json.loads((audit.PACKAGE / "predictions.json").read_text())
+    assert {k: v for k, v in data.items() if k != "cases"} == {
+        k: v for k, v in frozen.items() if k != "cases"
+    }
+    for actual, expected in zip(data["cases"], frozen["cases"], strict=True):
+        assert {k: v for k, v in actual.items() if k != "predictions"} == {
+            k: v for k, v in expected.items() if k != "predictions"
+        }
+        assert_numeric_reconstruction(actual["predictions"], expected["predictions"])
+        for model, probabilities in actual["predictions"].items():
+            assert max(range(3), key=probabilities.__getitem__) == max(
+                range(3), key=expected["predictions"][model].__getitem__
+            )
     assert len(data["cases"]) == 348
     assert sum(c["rating_complete"] for c in data["cases"]) == 340
     assert sum(B in c["predictions"] for c in data["cases"]) == 320
@@ -36,7 +70,14 @@ def test_complete_inventory_pinned_sources_and_reconstruction():
         assert row["rating_population_size"] >= len(row["inputs"])
     assert data["protocol_hash"] == digest(SPEC)
     report = audit.evaluate(data)
-    assert report == json.loads((audit.PACKAGE / "results.json").read_text())
+    frozen_report = json.loads((audit.PACKAGE / "results.json").read_text())
+    # Each report must bind exactly to its own inputs: libm roundoff changes their hash.
+    assert report["data_hash"] == digest(data)
+    assert frozen_report["data_hash"] == digest(frozen)
+    assert {k: v for k, v in report.items() if k not in {"results", "data_hash"}} == {
+        k: v for k, v in frozen_report.items() if k not in {"results", "data_hash"}
+    }
+    assert_numeric_reconstruction(report["results"], frozen_report["results"])
     assert sum(r["total"] for r in report["editions"]) == 348
     assert sum(r["excluded"] for r in report["editions"]) == 28
     assert report["results"]["validation"]["calibrated_common"]["sample_size"] == 84
@@ -50,6 +91,32 @@ def test_complete_inventory_pinned_sources_and_reconstruction():
         report["five_input_status"]
         == "Five-input historical comparison not yet supported by available evidence."
     )
+
+
+def test_numeric_reconstruction_accepts_only_machine_scale_roundoff():
+    assert_numeric_reconstruction([0.22410477438952608], [0.22410477438952617])
+
+
+@pytest.mark.parametrize(
+    ("actual", "expected"),
+    [
+        ([0.25 + 2e-15], [0.25]),
+        ([float("nan")], [0.25]),
+        ([float("inf")], [0.25]),
+        ([float("inf")], [float("inf")]),
+        ([0.25, 0.75], [0.25]),
+        ({"other_model": [0.25]}, {"model": [0.25]}),
+        ({"sample_size": 319}, {"sample_size": 320}),
+        ({"eligible": 1}, {"eligible": True}),
+        ({"accuracy": 0.5 + 1e-16}, {"accuracy": 0.5}),
+        ({"precision": 0.5 + 1e-16}, {"precision": 0.5}),
+        ({"recall": 0.5 + 1e-16}, {"recall": 0.5}),
+        ({"bin": [0.2 + 1e-16]}, {"bin": [0.2]}),
+    ],
+)
+def test_numeric_reconstruction_rejects_drift(actual, expected):
+    with pytest.raises(AssertionError):
+        assert_numeric_reconstruction(actual, expected)
 
 
 def test_frozen_files_and_hypothesis_preservation():
