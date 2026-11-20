@@ -1,12 +1,43 @@
 """Source/temporal invariants. Synthetic matches test mathematics, not history."""
 
 import json
+import math
+from copy import deepcopy
 from datetime import date, timedelta
 
 import pytest
 
 from football.enrichment import observations, release_index
 from football.team_ratings import Result, calculate, fit, percentile, read_results, validate_model
+
+
+def test_validation_report_platform_roundoff_only():
+    from football.enrichment import same_validation_report
+
+    expected = {
+        "folds": [
+            {
+                "matches": 120,
+                "baseline_nll": 3.5,
+                "opponent_adjusted_nll": 3.2,
+                "with_form_nll": 3.3,
+            }
+        ]
+    }
+    actual = deepcopy(expected)
+    actual["folds"][0]["baseline_nll"] = math.nextafter(3.5, math.inf, steps=2)
+    original = deepcopy(actual)
+    assert same_validation_report(actual, expected)
+    assert actual == original
+    for value in (3.500001, math.nextafter(3.5, math.inf, steps=5), float("nan"), float("inf"), 3):
+        actual = deepcopy(expected)
+        actual["folds"][0]["baseline_nll"] = value
+        assert not same_validation_report(actual, expected)
+    for actual in ({}, {"folds": []}, {"folds": [None]}, {"folds": [{}]}):
+        assert not same_validation_report(actual, expected)
+    actual = deepcopy(expected)
+    actual["folds"][0]["matches"] = 121
+    assert not same_validation_report(actual, expected)
 
 
 def observation(**changes):

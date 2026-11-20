@@ -25,6 +25,12 @@
 # Original historical sources stay local and outside application packaging.
 data/raw/
 
+# Ship only the reviewed FIFA snapshot, never private acquisition/session directories.
+# Its manifest and each payload are verified during the production build and startup.
+data/bootstrap/*
+!data/bootstrap/fifa-enrichment-v1/
+!data/bootstrap/fifa-enrichment-v1/**
+
 !.coveragerc
 
 # Retired prototype assets must never re-enter runtime packaging.

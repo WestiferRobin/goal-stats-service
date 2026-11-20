@@ -7,6 +7,13 @@ per-team snapshots. Catalog reads project enrichment without copying it into
 prediction inputs. Star Power and Clutch remain unchanged everywhere in the
 backend.
 
+Production `--bootstrap --confirm-production` now runs this same importer after
+historical catalog verification, inside the shared bootstrap transaction. It uses
+the immutable `data/bootstrap/fifa-enrichment-v1` copy of the approved snapshot
+and the packaged bootstrap CSV, with cutoff 2026-06-10. It requires no separate
+production import command or raw-CSV mount. Default server startup and `make seed`
+retain their existing behavior. See [Render bootstrap](render.md#automatic-production-bootstrap-free-or-paid).
+
 ## Reproduce locally
 
 To restore the reviewed reference population, reuse the retained, validated
@@ -48,6 +55,12 @@ same command after reviewing its report. All releases, mappings and the cohort
 commit atomically. An advisory transaction lock serializes CLI writers. Identical
 imports insert nothing; changed publication dates, response bytes, mappings or
 stored observations fail rather than overwrite. No migrations run inside import.
+Replay also finds an existing cohort by its unique model/cutoff/source identity.
+Team ratings and evidence must match exactly. Only the six held-out NLL metrics
+may differ by at most four floating-point steps from platform math-library rounding;
+all other report fields remain exact. The stored report must still reproduce the
+original run hash with the full calculated reference population. Its ID and report
+are preserved byte-for-byte rather than creating a second cohort or rewriting results.
 Cloud imports additionally require the existing verified TLS/production target
 authorization. Import error exceptions cause transaction rollback.
 
@@ -69,7 +82,8 @@ profile ratings remain explicitly experimental.
 Source permissions: the FIFA website/API is not an unrestricted redistribution
 license. Retain attribution and establish permission for the intended deployment
 under https://inside.fifa.com/terms-of-service before public/commercial release.
-Downloaded packages are ignored local artifacts, not committed public datasets.
+Only the reviewed bootstrap snapshot is packaged; other downloaded packages remain
+ignored local artifacts. Packaging does not grant redistribution rights.
 
 ## Rating specification: international-recorded-score-poisson-v1
 

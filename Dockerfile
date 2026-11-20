@@ -33,3 +33,4 @@ RUN python -c "import hashlib,json; from pathlib import Path; from urllib.reques
 
 FROM runtime AS production
 COPY --from=historical_source /tmp/results.csv /app/data/bootstrap/results.csv
+RUN python -c "from football.bootstrap_enrichment import verify_evidence; verify_evidence()"

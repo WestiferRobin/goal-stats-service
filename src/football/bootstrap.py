@@ -15,6 +15,7 @@ from sqlalchemy import inspect, select, text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session, sessionmaker
 
+from football import bootstrap_enrichment, enrichment
 from football.datasets import HistoricalBatch, read_historical_dataset
 from football.historical_dataset import APPROVED_DATASETS, load_manifest
 from football.historical_import import import_historical_dataset
@@ -51,6 +52,8 @@ class FailureCategory(Enum):
     MIGRATION = "Alembic migration failure"
     IMPORT = "historical import failure"
     CATALOG = "catalog verification failure"
+    ENRICHMENT_SOURCE = "approved enrichment source validation failure"
+    ENRICHMENT = "FIFA enrichment import or verification failure"
     COMMIT = "database transaction completion failure"
 
 
@@ -170,6 +173,8 @@ def bootstrap(
     target.validate(database.engine.url)
     diagnostic.stage = FailureCategory.SOURCE
     batches = [read_historical_dataset(directory, load_manifest(d)) for d in APPROVED_DATASETS]
+    diagnostic.stage = FailureCategory.ENRICHMENT_SOURCE
+    inputs = bootstrap_enrichment.prepare(directory / "results.csv")
     diagnostic.stage = FailureCategory.CONNECTION
     with database.engine.begin() as connection:
         bound = copy(database)
@@ -186,6 +191,8 @@ def bootstrap(
             # Same lock as the importer; serialize cooperating import/bootstrap processes.
             if not session.scalar(text("SELECT pg_try_advisory_xact_lock(718235940215)")):
                 raise ConfigurationError("Another historical import/bootstrap is running.")
+            if not session.scalar(text("SELECT pg_try_advisory_xact_lock(71839461)")):
+                raise ConfigurationError("Another FIFA enrichment import is running.")
         allowed = set(Base.metadata.tables) | {
             "alembic_version",
             "items",
@@ -221,6 +228,23 @@ def bootstrap(
         diagnostic.stage = FailureCategory.CATALOG
         with bound.transaction() as session:
             verify_catalog(session, batches)
+        diagnostic.stage = FailureCategory.ENRICHMENT
+        connection.execute(
+            text(
+                "LOCK TABLE ranking_releases, ranking_observations, fifa_team_mappings, "
+                "rating_runs, team_ratings IN SHARE ROW EXCLUSIVE MODE"
+            )
+        )
+        with bound.transaction() as session:
+            enrichment.import_package(
+                session,
+                inputs.manifest,
+                inputs.package,
+                inputs.ratings,
+                inputs.report,
+                bootstrap_enrichment.CUTOFF,
+                apply=True,
+            )
         diagnostic.stage = FailureCategory.COMMIT
     return "imported" if empty else "verified existing"
 
@@ -254,6 +278,7 @@ def main() -> None:
         if database is not None:
             database.dispose()
     print(f"Historical bootstrap {result}: 44 teams, 9 competitions, 348 matches verified.")
+    print("Approved FIFA enrichment verified: 96 releases, 16525 observations, 44 team ratings.")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ import json
 import math
 import re
 from concurrent.futures import ThreadPoolExecutor
+from copy import deepcopy
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -204,6 +205,29 @@ def mapped_teams(
     return mapped
 
 
+def same_validation_report(actual: dict[str, Any], expected: dict[str, Any]) -> bool:
+    """Only libm rounding in held-out NLL metrics may differ across platforms."""
+    if actual == expected:
+        return True
+    normalized = deepcopy(actual)
+    try:
+        for stored, computed in zip(normalized["folds"], expected["folds"], strict=True):
+            for field in ("baseline_nll", "opponent_adjusted_nll", "with_form_nll"):
+                a, b = stored[field], computed[field]
+                if (
+                    type(a) is not float
+                    or type(b) is not float
+                    or not math.isfinite(a)
+                    or not math.isfinite(b)
+                    or abs(a - b) > 4 * math.ulp(b)
+                ):
+                    return False
+                stored[field] = b
+    except (KeyError, TypeError, ValueError):
+        return False
+    return normalized == expected
+
+
 def import_package(
     session: Session,
     manifest: dict[str, Any],
@@ -236,6 +260,8 @@ def import_package(
             if (
                 release.sha256 != metadata["sha256"]
                 or release.published_on.isoformat() != metadata["date"]
+                or release.source_url != metadata["url"]
+                or release.index_sha256 != manifest["index_sha256"]
             ):
                 raise ValueError("Stored ranking release conflicts; no observations overwritten")
             stored = list(
@@ -247,6 +273,17 @@ def import_package(
             )
             if {r.fifa_team_id: r.raw for r in stored} != {r["IdTeam"]: r for r in values}:
                 raise ValueError("Stored ranking observations are incomplete or changed")
+            for observation in stored:
+                raw = observation.raw
+                ranked = raw["RankingStatus"] == 0 and bool(raw.get("Rank"))
+                expected_rank = raw["Rank"] if ranked else None
+                expected_points = Decimal(str(raw["TotalPoints"])) if ranked else None
+                if (observation.rank, observation.points, observation.status) != (
+                    expected_rank,
+                    expected_points,
+                    raw["RankingStatus"],
+                ):
+                    raise ValueError("Stored ranking projection conflicts with source evidence")
             unchanged += len(values)
             continue
         inserted += len(values)
@@ -290,6 +327,14 @@ def import_package(
     }
     run_id = digest(encoded(payload))
     run = session.get(RatingRun, run_id)
+    if run is None:
+        run = session.scalar(
+            select(RatingRun).where(
+                RatingRun.cutoff == cutoff,
+                RatingRun.model_version == team_ratings.MODEL,
+                RatingRun.source_sha256 == team_ratings.SOURCE_SHA,
+            )
+        )
     snapshots = {}
     for team in teams:
         snapshots[team.team_id] = ratings.get(
@@ -302,6 +347,13 @@ def import_package(
             },
         )
     if run:
+        if (run.cutoff, run.model_version, run.source_sha256, run.source_url) != (
+            cutoff,
+            team_ratings.MODEL,
+            team_ratings.SOURCE_SHA,
+            team_ratings.SOURCE_URL,
+        ):
+            raise ValueError("Stored rating run provenance conflicts")
         stored_ratings = {
             r.team_id: {
                 "offense": r.offense,
@@ -309,10 +361,16 @@ def import_package(
                 "form": r.form,
                 "evidence": r.evidence,
             }
-            for r in session.scalars(select(TeamRating).where(TeamRating.run_id == run_id))
+            for r in session.scalars(select(TeamRating).where(TeamRating.run_id == run.run_id))
         }
-        if stored_ratings != snapshots or run.report != report:
+        if (
+            stored_ratings != snapshots
+            or not same_validation_report(run.report, report)
+            or run.run_id != digest(encoded({**payload, "report": run.report}))
+        ):
             raise ValueError("Stored rating cohort conflicts with reproducible calculation")
+        # Keep the original immutable ID/report, including its original platform rounding.
+        run_id = run.run_id
     elif apply:
         session.add(
             RatingRun(

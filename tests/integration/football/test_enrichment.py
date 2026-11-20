@@ -1,3 +1,5 @@
+import math
+from copy import deepcopy
 from datetime import date
 from decimal import Decimal
 
@@ -9,6 +11,36 @@ from infra.repositories.team import TeamRepository
 from models.enrichment import RankingObservation, RankingRelease, TeamRating
 from models.team import Team
 from services.team import TeamService
+
+
+@pytest.mark.postgres
+def test_cross_platform_replay_preserves_original_cohort(import_database, package):
+    report = {
+        "folds": [
+            {
+                "matches": 120,
+                "baseline_nll": 3.5,
+                "opponent_adjusted_nll": 3.2,
+                "with_form_nll": 3.3,
+            }
+        ]
+    }
+    inputs = (*package[:3], report, package[4])
+    with import_database.transaction() as session:
+        original = import_package(session, *inputs, apply=True)
+    from tests.fixtures.historical_database import snapshot
+
+    before = snapshot(import_database)
+    other_platform = deepcopy(report)
+    other_platform["folds"][0]["baseline_nll"] = math.nextafter(3.5, math.inf, steps=2)
+    with import_database.transaction() as session:
+        replay = import_package(session, *package[:3], other_platform, package[4], apply=True)
+    assert replay["run_id"] == original["run_id"] and replay["ratings_inserted"] == 0
+    assert snapshot(import_database) == before
+    other_platform["folds"][0]["baseline_nll"] += 1e-6
+    with pytest.raises(ValueError, match="conflicts"), import_database.transaction() as session:
+        import_package(session, *package[:3], other_platform, package[4], apply=True)
+    assert snapshot(import_database) == before
 
 
 @pytest.fixture

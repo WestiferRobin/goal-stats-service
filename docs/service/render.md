@@ -6,7 +6,13 @@ The default Docker image serves the API. Named `runtime` and `tooling` targets r
 The production build downloads only the approved immutable `results.csv`, verifies its
 SHA-256 against the manifest, and packages it at `/app/data/bootstrap/results.csv`.
 Unrelated raw data and local credentials remain excluded. A download/checksum failure
-fails the build. Runtime and tooling targets retain their existing source packaging.
+fails the build. Runtime and tooling targets still exclude the historical raw CSV.
+The reviewed FIFA snapshot is copied byte-for-byte into
+`data/bootstrap/fifa-enrichment-v1`. Its pinned manifest hash and all referenced
+index/response hashes are verified during the production build and every bootstrap.
+No FIFA acquisition runs during build or startup; private `.host-sessions` files
+remain outside the build context. Bootstrap calculates the existing O/D/F model
+from the packaged historical CSV at the frozen 2026-06-10 cutoff.
 
 ## Render settings
 
@@ -123,7 +129,12 @@ The single startup process (never Gunicorn workers):
 4. Requires exactly 44 historical teams, nine competitions, and 348 matches. Verifies
    every match's facts, participant links, edition and provenance against the pinned source.
    Edition match counts are 26, 26, 32, 32, 32, 32, 52, 52, and 64.
-5. Commits and then replaces the startup process with Gunicorn.
+5. Uses the existing FIFA importer to insert or verify the approved 96 releases,
+   16,525 observations, 44 identity mappings, and 44 team ratings in one rating run.
+   Existing matching rows are preserved; conflicting observations, projections,
+   mappings, rating provenance or ratings abort the transaction. Other valid cohorts
+   are retained. The existing experimental model and prediction mathematics are unchanged.
+6. Commits and then replaces the startup process with Gunicorn.
 
 Migrations and all imports share one outer PostgreSQL transaction; importer transactions
 use savepoints. Import/verification failures roll back the whole bootstrap, including
@@ -131,14 +142,19 @@ earlier editions and newly applied migrations. No success is logged before commi
 Raw exceptions/credentials are suppressed. A lost commit acknowledgment stops startup;
 the next attempt verifies whatever actually committed.
 
-On repeat deployments, a complete catalog is verified and no importer is invoked.
+On repeat deployments, a complete catalog is verified without historical reimport.
+Enrichment inputs are verified and recalculated before connecting, then the approved
+cohort is checked by the existing importer without updates to matching records.
 Existing scenarios, predictions and separately attributed team ratings are retained.
 Partial, conflicting, extra, or altered historical records are refused without repairs
 or deletion. An unrelated table in the target schema also blocks bootstrap. Resolve
 such failures explicitly; never reset a populated database to force startup.
 
-Keep one service instance and serialize deployments. A competing historical import
+Keep one service instance and serialize deployments. A competing historical or FIFA import
 causes safe refusal; retry after it finishes. Catalog writes are locked while bootstrapping.
+Enrichment writes are also locked. Missing/corrupt FIFA evidence fails before migrations;
+an enrichment conflict rolls back any migrations or historical inserts from that startup.
+Allow time for rating computation before the listener starts; the run is synchronous.
 Old instances may serve reads during deployment, so schema changes must remain compatible.
 Gunicorn never starts on failure. `/ready` retains its database/schema and Redis policy;
 the detailed historical verification runs at each bootstrap, not on every health probe.
